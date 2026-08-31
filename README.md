@@ -282,6 +282,7 @@ closeness to the sensors, engaging past 0.55 and releasing under 0.25.
 
 ```sh
 npm install                  # postinstall fetches the Electron runtime
+npm run hooks                # activate .githooks (once per clone)
 npm start                    # bundle the renderer, launch Electron
 npm test                     # BLAKE2b and minisign, under Node
 npm run test:electron        # the same tests under Electron's BoringSSL
@@ -291,6 +292,12 @@ npm run dist:win             # Windows installer
 npm run dist:mac             # macOS DMG
 npm run dist:linux           # Linux AppImage
 ```
+
+Git hooks are not cloned, so `npm run hooks` points `core.hooksPath` at
+`.githooks/`. The `commit-msg` hook rejects AI attribution trailers; real
+co-authors are unaffected. Because a hook can be skipped with `--no-verify`, the
+Checks workflow enforces the same rule on what a push actually adds, and keeps
+the documentation free of dashes, arrows, ellipses and curly quotes.
 
 Both test commands matter. Electron links BoringSSL and Node links OpenSSL, and
 they disagree about which hashes exist, so a crypto test that passes under one
