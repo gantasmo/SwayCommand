@@ -1,4 +1,4 @@
-// Assignment rail — the editor for whatever is selected: a deck control
+// Assignment rail, the editor for whatever is selected: a deck control
 // (pad / knob / button / gesture dimension), a timeline track, a section
 // (region) on a track, or a .gan plugin control. Pads pick an action (sample
 // / visual / punch / scene event / stem / track punch), knobs pick a
@@ -11,7 +11,7 @@
 //
 // BIND is the short path from "this effect" to "that control": press BIND on
 // any track-effect parameter and the next control you click on the deck (or
-// touch on the Sway) takes it — a pad becomes a punch to the value shown, a
+// touch on the Sway) takes it, a pad becomes a punch to the value shown, a
 // knob a continuous control over the parameter's range, a gesture a route.
 
 import { parseTarget, QUANTS } from '../../shared/swayproject.js';
@@ -21,7 +21,7 @@ const $ = (sel) => document.querySelector(sel);
 
 // Control ids (pad:5, knob:3, button:2, xy:x, gesture:press, track:<id>,
 // region:<track>:<id>, gan:<plugin>:<ctl>) are a different grammar from
-// assignment targets — parseTarget rejects them by design.
+// assignment targets, parseTarget rejects them by design.
 function ctlParts(id) {
   const at = id.indexOf(':');
   return { ns: id.slice(0, at), key: id.slice(at + 1) };
@@ -65,7 +65,7 @@ export function createAssign(deps) {
   let vstList = null; // scanned plugins, fetched on first track panel
   let vstStatus = null;
   let vstBusy = '';
-  let vstParamsOpen = null; // { track, index, rows } — the inline parameter editor
+  let vstParamsOpen = null; // { track, index, rows }, the inline parameter editor
 
   const header = $('#assign-target');
   const body = $('#assign-body');
@@ -82,7 +82,7 @@ export function createAssign(deps) {
   }
   function fmt(v) {
     const n = Number(v);
-    if (!Number.isFinite(n)) return '—';
+    if (!Number.isFinite(n)) return '--';
     if (Math.abs(n) >= 1000) return String(Math.round(n));
     if (Math.abs(n) >= 100) return n.toFixed(1);
     return n.toFixed(2);
@@ -217,12 +217,12 @@ export function createAssign(deps) {
 
   function sampleOptions(current) {
     const rows = sampler.listSamples().map((s) => `<option value="${esc(s.id)}"${s.id === current ? ' selected' : ''}>${esc(s.name)}</option>`);
-    return `<option value=""${current ? '' : ' selected'}>—</option>${rows.join('')}`;
+    return `<option value=""${current ? '' : ' selected'}>-</option>${rows.join('')}`;
   }
   function mediaOptions(current) {
     const p = project();
     const rows = (p ? p.media : []).map((m) => `<option value="${esc(m.id)}"${m.id === current ? ' selected' : ''}>${esc(m.name)}</option>`);
-    return `<option value=""${current ? '' : ' selected'}>—</option>${rows.join('')}`;
+    return `<option value=""${current ? '' : ' selected'}>-</option>${rows.join('')}`;
   }
   function trackOptions(current, allowNone) {
     const rows = transport.tracks().map((t) => `<option value="${esc(t.id)}"${t.id === current ? ' selected' : ''}>${esc(t.name)}</option>`);
@@ -273,7 +273,7 @@ export function createAssign(deps) {
 
   function bindNote() {
     if (!pendingBind) return '';
-    return `<div class="assign-note"><b>BIND ARMED</b> — click a pad, a knob or a gesture chip on the deck (or touch it on the Sway) to put <b>${esc(pendingBind.label)}</b> on it. Esc cancels.</div>`;
+    return `<div class="assign-note"><b>BIND ARMED</b>, click a pad, a knob or a gesture chip on the deck (or touch it on the Sway) to put <b>${esc(pendingBind.label)}</b> on it. Esc cancels.</div>`;
   }
 
   // --- pads ------------------------------------------------------------------------
@@ -284,7 +284,7 @@ export function createAssign(deps) {
     const rows = [
       bindNote(),
       `<div class="assign-row"><span>ACTION</span><select data-pad-kind>
-        <option value="off"${kind === 'off' ? ' selected' : ''}>—</option>
+        <option value="off"${kind === 'off' ? ' selected' : ''}>-</option>
         <option value="sample"${kind === 'sample' ? ' selected' : ''}>sample</option>
         <option value="stem"${kind === 'stem' ? ' selected' : ''}>stem (in sync)</option>
         <option value="scene"${kind === 'scene' ? ' selected' : ''}>visual</option>
@@ -304,7 +304,7 @@ export function createAssign(deps) {
           <option value="gate"${pad.mode === 'gate' ? ' selected' : ''}>gate</option>
         </select></div>`);
         rows.push(`<div class="assign-row"><span>GAIN</span><input type="range" data-pad-opt="gain" min="0" max="1.5" step="0.01" value="${pad.gain}"><b>${pad.gain.toFixed(2)}</b></div>`);
-        rows.push(`<div class="assign-row"><span>CHOKE</span><input type="number" data-pad-opt="chokeGroup" min="0" max="8" step="1" value="${pad.chokeGroup ?? ''}" placeholder="—"></div>`);
+        rows.push(`<div class="assign-row"><span>CHOKE</span><input type="number" data-pad-opt="chokeGroup" min="0" max="8" step="1" value="${pad.chokeGroup ?? ''}" placeholder="-"></div>`);
         rows.push('<div class="assign-row"><span></span><button class="btn btn-ghost btn-small" data-pad-trig>TRIG</button></div>');
       }
     } else if (kind === 'stem') {
@@ -360,11 +360,11 @@ export function createAssign(deps) {
     const rows = [
       bindNote(),
       `<div class="assign-row"><span>TARGET</span><select data-knob-target>
-        <option value=""${a ? '' : ' selected'}>—</option>${continuousTargetOptions(a && a.target)}
+        <option value=""${a ? '' : ' selected'}>-</option>${continuousTargetOptions(a && a.target)}
       </select></div>`,
     ];
     if (a) {
-      rows.push(`<div class="assign-row"><span>RANGE</span><input type="number" data-knob-min step="any" value="${a.min}"> – <input type="number" data-knob-max step="any" value="${a.max}"></div>`);
+      rows.push(`<div class="assign-row"><span>RANGE</span><input type="number" data-knob-min step="any" value="${a.min}">, <input type="number" data-knob-max step="any" value="${a.max}"></div>`);
       rows.push(`<div class="assign-row"><span>CURVE</span><select data-knob-curve>
         <option value="linear"${a.curve === 'linear' ? ' selected' : ''}>linear</option>
         <option value="detent"${a.curve === 'detent' ? ' selected' : ''}>center detent</option>
@@ -376,9 +376,9 @@ export function createAssign(deps) {
   function renderButton(i) {
     const b = asg().buttons[i];
     const rows = [
-      `<div class="assign-row"><span>CC</span><b>${b.cc === null ? '—' : b.cc}</b><span style="min-width:0">${b.cc === null ? 'LEARN captures the hardware button' : ''}</span></div>`,
+      `<div class="assign-row"><span>CC</span><b>${b.cc === null ? '-' : b.cc}</b><span style="min-width:0">${b.cc === null ? 'LEARN captures the hardware button' : ''}</span></div>`,
       `<div class="assign-row"><span>TARGET</span><select data-btn-target>
-        <option value=""${b.action ? '' : ' selected'}>—</option>
+        <option value=""${b.action ? '' : ' selected'}>-</option>
         <optgroup label="SWITCHES">${TOGGLE_TARGETS.map(([v, l]) => `<option value="${v}"${b.action && b.action.target === v ? ' selected' : ''}>${l}</option>`).join('')}</optgroup>
         <optgroup label="RACK">${booleanFxOptions(b.action && b.action.target)}</optgroup>
         ${trackToggleOptions(b.action && b.action.target)}
@@ -401,7 +401,7 @@ export function createAssign(deps) {
           `<div class="assign-list" data-route="${gi}">
             <div class="assign-row"><span>ROUTE</span><select data-route-target="${gi}">${continuousTargetOptions(g.target)}</select>
               <button class="btn btn-ghost btn-small" data-route-del="${gi}">✕</button></div>
-            <div class="assign-row"><span>DEPTH</span><input type="number" data-route-min="${gi}" step="any" value="${g.min}"> – <input type="number" data-route-max="${gi}" step="any" value="${g.max}">
+            <div class="assign-row"><span>DEPTH</span><input type="number" data-route-min="${gi}" step="any" value="${g.min}">, <input type="number" data-route-max="${gi}" step="any" value="${g.max}">
               <input type="checkbox" data-route-on="${gi}"${g.enabled ? ' checked' : ''} title="active"></div>
           </div>`
         );
@@ -481,7 +481,7 @@ export function createAssign(deps) {
     rows.push(`<div class="assign-row"><span></span><button class="chip${t.muted ? ' on' : ''}" data-tr-mute>MUTE</button><button class="chip${t.solo ? ' on' : ''}" data-tr-solo>SOLO</button><span style="flex:1"></span><button class="chip" data-tr-delete title="Remove this track">DELETE</button></div>`);
 
     // Live effect chain.
-    rows.push(`<div class="assign-sub">EFFECTS <select data-fx-add class="chip" style="margin-left:auto"><option value="">+ add…</option>${FX_ORDER.map((k) => `<option value="${k}">${esc(FX_KINDS[k].label)}</option>`).join('')}</select></div>`);
+    rows.push(`<div class="assign-sub">EFFECTS <select data-fx-add class="chip" style="margin-left:auto"><option value="">+ add...</option>${FX_ORDER.map((k) => `<option value="${k}">${esc(FX_KINDS[k].label)}</option>`).join('')}</select></div>`);
     if (!t.fx.length) rows.push('<div class="assign-note">No effects yet. Add one, set it, then BIND a parameter to a pad (a held punch), a knob (continuous) or a gesture. Shift+drag on the track marks a section where it engages by itself.</div>');
     t.fx.forEach((e, ei) => {
       const spec = FX_KINDS[e.kind];
@@ -508,12 +508,12 @@ export function createAssign(deps) {
     // VST chain (offline render through the sidecar).
     rows.push('<div class="assign-sub">VST3</div>');
     if (!vstStatus) {
-      rows.push('<div class="assign-note">Checking for a pedalboard host…</div>');
+      rows.push('<div class="assign-note">Checking for a pedalboard host...</div>');
       refreshVst();
     } else if (!vstStatus.ok) {
       rows.push(`<div class="assign-note">${esc(vstStatus.error || 'no host')} <button class="chip" data-vst-python>PICK PYTHON</button></div>`);
     } else {
-      rows.push(`<div class="assign-row"><span>ADD</span><select data-vst-add><option value="">${vstList ? (vstList.length ? '+ plugin…' : 'no VST3 found') : 'scanning…'}</option>${(vstList || []).map((p) => `<option value="${esc(p.path)}">${esc(p.name)}${p.vendor ? ' · ' + esc(p.vendor) : ''}</option>`).join('')}</select><button class="chip" data-vst-rescan title="Scan the VST3 folders again">SCAN</button></div>`);
+      rows.push(`<div class="assign-row"><span>ADD</span><select data-vst-add><option value="">${vstList ? (vstList.length ? '+ plugin...' : 'no VST3 found') : 'scanning...'}</option>${(vstList || []).map((p) => `<option value="${esc(p.path)}">${esc(p.name)}${p.vendor ? ' · ' + esc(p.vendor) : ''}</option>`).join('')}</select><button class="chip" data-vst-rescan title="Scan the VST3 folders again">SCAN</button></div>`);
       t.vst.plugins.forEach((p, pi) => {
         const builtin = p.path.startsWith('builtin:');
         const open = vstParamsOpen && vstParamsOpen.track === t.id && vstParamsOpen.index === pi;
@@ -524,7 +524,7 @@ export function createAssign(deps) {
             `<button class="chip" data-vst-del="${pi}">✕</button></div>`
         );
         if (open) {
-          if (!vstParamsOpen.rows) rows.push('<div class="assign-note">reading parameters…</div>');
+          if (!vstParamsOpen.rows) rows.push('<div class="assign-note">reading parameters...</div>');
           else if (!vstParamsOpen.rows.length) rows.push('<div class="assign-note">this plugin exposes no parameters</div>');
           for (const row of vstParamsOpen.rows || []) {
             const cur = p.params[row.name] !== undefined ? p.params[row.name] : row.raw;
@@ -548,7 +548,7 @@ export function createAssign(deps) {
     rows.push('<div class="assign-sub">SECTIONS</div>');
     if (!t.regions.length) rows.push('<div class="assign-note">Shift+drag across the track on the timeline to mark a section; the effect parameter you pick takes its value while the playhead is inside.</div>');
     for (const r of t.regions) {
-      rows.push(`<div class="region-row" data-region="${r.id}"><span class="nm">${fmt(r.start)}s – ${fmt(r.end)}s · ${esc(regionLabel(t, r))} = ${fmt(r.value)}</span><button class="chip" data-region-del="${r.id}">✕</button></div>`);
+      rows.push(`<div class="region-row" data-region="${r.id}"><span class="nm">${fmt(r.start)}s, ${fmt(r.end)}s · ${esc(regionLabel(t, r))} = ${fmt(r.value)}</span><button class="chip" data-region-del="${r.id}">✕</button></div>`);
     }
     body.innerHTML = rows.join('');
   }
@@ -576,7 +576,7 @@ export function createAssign(deps) {
     const cur = `${r.fx}:${r.param}`;
     const curSpec = targets.find((x) => x.v === cur) || { lo: 0, hi: 1 };
     const rows = [
-      `<div class="assign-note">TRACK · ${esc(t.name)} · ${fmt(r.start)}s – ${fmt(r.end)}s</div>`,
+      `<div class="assign-note">TRACK · ${esc(t.name)} · ${fmt(r.start)}s, ${fmt(r.end)}s</div>`,
       `<div class="assign-row"><span>EFFECT</span><select data-rg-target>${targets.map((x) => `<option value="${esc(x.v)}"${x.v === cur ? ' selected' : ''}>${esc(x.label)}</option>`).join('')}</select></div>`,
       `<div class="assign-row"><span>VALUE</span>${slider('data-rg-value', [curSpec.lo, curSpec.hi, r.value, curSpec.unit], Math.max(curSpec.lo, Math.min(curSpec.hi, r.value)))}<b>${unitText(curSpec.unit, r.value)}</b></div>`,
       `<div class="assign-row"><span>START</span><input type="number" data-rg-start step="0.01" min="0" value="${r.start}"> s</div>`,
@@ -678,7 +678,7 @@ export function createAssign(deps) {
           const result = await router.learnBinding(`button:${slot}`);
           const b = asg().buttons[Number(slot)];
           b.cc = result.cc;
-          // The captured CC is a button, not a continuous control — drop the
+          // The captured CC is a button, not a continuous control, drop the
           // override the learn call recorded so it never drives a knob path.
           const overrides = deps.midi.getOverrides();
           delete overrides[result.target];
@@ -1028,7 +1028,7 @@ export function createAssign(deps) {
       if (vedit) {
         const p = tr.vst.plugins[Number(vedit.dataset.vstEdit)];
         if (!p) return;
-        vstBusy = 'EDITING…';
+        vstBusy = 'EDITING...';
         renderBody();
         try {
           const r = await window.swaycommand.vst.editor(p.path, { params: p.params, rawState: p.rawState });
@@ -1046,7 +1046,7 @@ export function createAssign(deps) {
       }
       if (e.target.closest('[data-vst-render]')) {
         if (vstBusy) return;
-        vstBusy = 'RENDERING…';
+        vstBusy = 'RENDERING...';
         renderBody();
         try {
           await deps.onRenderVst(tr, (msg) => {

@@ -153,7 +153,7 @@ async function main() {
     path.join(outDir, 'dsp.worklet.js'),
   );
 
-  // Bundled display font — the CSP has no font-src, so remote fonts cannot load.
+  // Bundled display font, the CSP has no font-src, so remote fonts cannot load.
   copyDir(path.join(rendererDir, 'fonts'), path.join(outDir, 'fonts'));
 
   // Images the documentation viewer draws. It renders README.md, whose scene

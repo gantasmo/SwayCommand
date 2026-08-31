@@ -1,4 +1,4 @@
-// The Sway deck — a stroke line-art schematic of the hardware, drawn once as
+// The Sway deck, a stroke line-art schematic of the hardware, drawn once as
 // SVG and mutated per frame. It is the assignment surface: every interactive
 // node carries data-ctl in the shared control-id grammar (pad:N, knob:N,
 // button:N, xy:x, xy:y, gesture:*), so clicking on screen and touching the
@@ -12,10 +12,10 @@
 
 const NS = 'http://www.w3.org/2000/svg';
 
-// Screen cell → pad index, as the user numbered the deck (2026-08-20
-// screenshot): top rows first, left to right — left cluster 0-3, right
-// cluster 4-7 — then the bottom rows, left cluster 8-11, right cluster 12-15.
-// Pads are displayed 0-based everywhere (PAD 0 … PAD 15). Nothing else
+// Screen cell -> pad index, as the user numbered the deck (2026-08-20
+// screenshot): top rows first, left to right, left cluster 0-3, right
+// cluster 4-7, then the bottom rows, left cluster 8-11, right cluster 12-15.
+// Pads are displayed 0-based everywhere (PAD 0 ... PAD 15). Nothing else
 // references the geometry; a hardware monitor session (scripts/
 // midi-session.ps1) confirms or corrects this table alone.
 export const PAD_CELLS = [
@@ -126,7 +126,7 @@ export function createSurface(container, { onSelect }) {
     );
   }
 
-  // Center: preset row, display, wheel — device-local, display-only.
+  // Center: preset row, display, wheel, device-local, display-only.
   for (let i = 0; i < 6; i++) {
     parts.push(`<rect class="etch" x="${571 + i * 22}" y="90" width="14" height="8" />`);
   }
@@ -137,7 +137,7 @@ export function createSurface(container, { onSelect }) {
   parts.push('<circle class="etch" cx="763" cy="128" r="9" />');
   parts.push('<line class="etch" x1="763" y1="106" x2="763" y2="112" />');
 
-  // Selection reticle — corner brackets + pulsing diamond arms.
+  // Selection reticle, corner brackets + pulsing diamond arms.
   parts.push(
     '<g id="reticle" visibility="hidden">' +
       '<path id="ret-tl" class="arm" d="" /><path id="ret-tr" class="arm" d="" />' +
@@ -240,7 +240,7 @@ export function createSurface(container, { onSelect }) {
     refresh(labels, buttonLit) {
       for (let i = 0; i < 16; i++) {
         const text = labels[i] || '';
-        padLabels[i].textContent = text.length > 9 ? `${text.slice(0, 8)}…` : text;
+        padLabels[i].textContent = text.length > 9 ? `${text.slice(0, 8)}...` : text;
         padTicks[i].setAttribute('opacity', text ? '0.9' : '0');
       }
       for (let i = 0; i < 8; i++) {

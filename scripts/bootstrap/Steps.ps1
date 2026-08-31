@@ -1,4 +1,4 @@
-﻿# Steps.ps1 — the SwayCommand dependency graph.
+﻿# Steps.ps1, the SwayCommand dependency graph.
 #
 #   system ─┬─ repo ─┬─ node ── npm-deps ─┬─ electron-runtime ── launch
 #           │        │                    └─ renderer ──────────┘
@@ -97,7 +97,7 @@ function Get-ExpectedPackageCount {
       How many directories `npm install` should leave directly under
       node_modules. The lockfile over-counts: it lists nested trees and
       platform-specific optional packages that will never be installed here. So
-      the lockfile figure is only the first-run guess — after one successful
+      the lockfile figure is only the first-run guess, after one successful
       install we use the count this machine actually produced, and the progress
       bar becomes exact from the second run onwards.
     #>
@@ -163,7 +163,7 @@ function New-SwayBootstrapGraph {
             if ($null -ne $free) {
                 $detail = '{0} · {1} GB free' -f $detail, $free
                 if ($free -lt 2) {
-                    return @{ Satisfied = $false; Detail = "Only $free GB free — SwayCommand needs about 1.5 GB" }
+                    return @{ Satisfied = $false; Detail = "Only $free GB free, SwayCommand needs about 1.5 GB" }
                 }
             }
             return @{ Satisfied = $true; Detail = $detail }
@@ -221,7 +221,7 @@ function New-SwayBootstrapGraph {
             }
             return @{
                 Satisfied = $false
-                Detail    = 'Not found — a private copy will be installed just for SwayCommand'
+                Detail    = 'Not found, a private copy will be installed just for SwayCommand'
                 Variant   = $variant
             }
         } `
@@ -295,7 +295,7 @@ function New-SwayBootstrapGraph {
             # Content-addressed, so a fresh clone's mtimes are irrelevant and a
             # lockfile-only dependency bump is still noticed.
             # npm writes node_modules/.package-lock.json only after a reify
-            # finishes, so its presence — not a directory count — is the
+            # finishes, so its presence (not a directory count) is the
             # trustworthy "the install completed" marker.
             if (-not (Test-Path -LiteralPath (Join-Path $nm '.package-lock.json'))) {
                 return @{ Satisfied = $false; Detail = 'A previous install did not finish' }
@@ -362,7 +362,7 @@ function New-SwayBootstrapGraph {
                     }
                 } catch { }
                 $detail = 'Package present but the runtime binary was never downloaded'
-                if ($variant -eq 'cached') { $detail = 'Will be restored from the local cache — no download needed' }
+                if ($variant -eq 'cached') { $detail = 'Will be restored from the local cache, no download needed' }
                 # The defect this whole node exists for: npm reports success, the
                 # package folder is present, and the runtime is simply not there.
                 return @{ Satisfied = $false; Detail = $detail; Variant = $variant }
@@ -492,7 +492,7 @@ function New-SwayBootstrapGraph {
 
     # --- optional: DFU driver -------------------------------------------------
     [void]$steps.Add((New-BootstrapStep -Id 'dfu-driver' -Name 'Sway firmware-update driver' `
-        -Description 'Official STM32 WinUSB driver. Only needed to update Sway firmware — playing needs no driver. Asks for administrator approval.' `
+        -Description 'Official STM32 WinUSB driver. Only needed to update Sway firmware, playing needs no driver. Asks for administrator approval.' `
         -Requires @('system') -Optional -DefaultSelected $false -EstimateSeconds 25 `
         -Test {
             param($ctx)
@@ -532,7 +532,7 @@ function New-SwayBootstrapGraph {
             $res = Invoke-TrackedProcess -Context $ctx -FilePath 'powershell.exe' `
                 -Arguments @('-NoProfile', '-NonInteractive', '-Command', $cmd) -TimeoutSeconds 300
             if ($res.ExitCode -ne 0) {
-                throw 'The driver was not installed — administrator approval was declined or pnputil reported an error. SwayCommand still plays normally without it.'
+                throw 'The driver was not installed, administrator approval was declined or pnputil reported an error. SwayCommand still plays normally without it.'
             }
             $report.Invoke(@{ Progress = 1.0; Detail = 'Driver staged' })
         }))

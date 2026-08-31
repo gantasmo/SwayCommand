@@ -1,4 +1,4 @@
-﻿# Ui.ps1 — the installer window.
+﻿# Ui.ps1, the installer window.
 #
 # WPF via Windows PowerShell 5.1, which is the only GUI toolkit guaranteed to be
 # present before anything has been installed. Deliberately quiet: one neutral

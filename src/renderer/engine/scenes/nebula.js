@@ -1,9 +1,9 @@
-// Nebula — a fullscreen fbm gas cloud turned psychedelic.
+// Nebula, a fullscreen fbm gas cloud turned psychedelic.
 // The original three-layer domain-warp foundation is intact (value-noise fbm
 // layers warping each other into gas folds on one quad), but the field is now
 // mirror-folded into a fixed-axis kaleidoscope (the fold breathes open and
 // shut; the mirrors never spin), contoured into hard neon filaments, and
-// coloured by a full five-stop palette ramp whose hue travels with density —
+// coloured by a full five-stop palette ramp whose hue travels with density,
 // so the gas reads iridescent and layered instead of a dim teal smudge. Bass
 // stacks concentric shells, mid drives the warp, treble strobes a
 // scintillation layer, beats punch the domain, and each of the sixteen pads
@@ -11,7 +11,7 @@
 // Sway is the turbulence morph: one smoothed value re-weights the fbm octave
 // gain, rotates the flow field from gradient push to curl, and folds ridged
 // cell walls into the density, so the gas glides from laminar drift to
-// churning storm cells — the field re-forms, nothing shears or leans. A
+// churning storm cells, the field re-forms, nothing shears or leans. A
 // strike (pad rising edge) is ignition: a burst core blooms at the centre
 // and shoves a density wave outward through the field itself.
 // One quad, one draw call. Follows docs/SCENE_CONTRACT.md; style: beams.js,
@@ -42,7 +42,7 @@ export function createScene(ctx) {
   // can unroll (dynamic bounds are legal in ES 3.00, constants still compile
   // to the tightest code).
   // OCT_MAIN is paid twice per pixel (layers 2 and 3), so it is the single
-  // most expensive knob here — med stays at 3 to hold 60 fps at 1080p on an
+  // most expensive knob here, med stays at 3 to hold 60 fps at 1080p on an
   // integrated GPU, and the amplitude normalisation below keeps the 0..1
   // range (and every threshold keyed off it) identical across tiers.
   const defines = {
@@ -60,7 +60,7 @@ export function createScene(ctx) {
 
   // --- pad shockwave ring: PULSE_N slots of (x, y, radius, energy) in the
   //     same centered aspect-corrected space the shader works in. This exact
-  //     Float32Array is the uniform value — three.js uploads flat arrays for
+  //     Float32Array is the uniform value, three.js uploads flat arrays for
   //     vec4[] directly, so the per-frame path is mutate-in-place, no copies.
   const pulses = new Float32Array(PULSE_N * 4);
 
@@ -127,11 +127,11 @@ export function createScene(ctx) {
         float d = hash(i + vec2(1.0, 1.0));
         return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
       }
-      // both fbms divide by the accumulated amplitude, so the 0..1 range —
-      // and therefore every threshold below — is identical on every tier.
+      // both fbms divide by the accumulated amplitude, so the 0..1 range,
+      // and therefore every threshold below, is identical on every tier.
       // The octave gain is sway's morph target: low gain sinks the energy
       // into the first octave (smooth laminar billows), high gain hands it
-      // to the fine octaves (broken, churning detail) — the spectrum of the
+      // to the fine octaves (broken, churning detail), the spectrum of the
       // gas itself glides, and the normalisation keeps exposure constant.
       float fbmW(vec2 p) {          // cheap fbm feeding the warp vector
         float v = 0.0;
@@ -169,7 +169,7 @@ export function createScene(ctx) {
         return mix(c, uColors[0], clamp(t - 4.0, 0.0, 1.0));
       }
 
-      // mirror-fold the domain into SEGMENTS wedges about a fixed axis — the
+      // mirror-fold the domain into SEGMENTS wedges about a fixed axis, the
       // mirrors never turn. amt blends the folded coordinate against the free
       // one, so the field breathes between loose gas and a hard mandala
       // without the angle ever jumping.
@@ -207,7 +207,7 @@ export function createScene(ctx) {
         pshock = min(pshock, 2.5);
 
         // --- strike ignition: a burst core at the centre and a density
-        //     front travelling outward. The front is added to dens below —
+        //     front travelling outward. The front is added to dens below,
         //     real gas being shoved through the field, not an overlay ring.
         float rc = length(uvc);
         float igCore = uIgnite * exp(-rc * rc * 9.0);
@@ -220,7 +220,7 @@ export function createScene(ctx) {
         p = kaleido(p, uFold);
 
         // perspective-ish lens: detail crowds toward the center, which also
-        // brightens it later — the cheap read on infinite depth
+        // brightens it later, the cheap read on infinite depth
         float depth = clamp(1.0 / (0.30 + rc * 1.5), 0.65, 2.40);
 
         // layer 1 (far): slowest parallax; bass widens its scale, and it is
@@ -309,7 +309,7 @@ export function createScene(ctx) {
         sp *= sp;
         float gid = dot(floor(ps), vec2(7.3, 13.1));
         // both uTime * 33 and gid grow without bound over a long set, and
-        // float32 sin() range reduction falls apart past ~1e5 — wrap the
+        // float32 sin() range reduction falls apart past ~1e5, wrap the
         // phase into one turn so the strobe stays a strobe all night
         sp *= 0.18 + 0.82 * step(0.25, sin(mod(uTime * 33.0 + gid, 6.2831853)));
         col += mix(edgeCol, vec3(1.0), 0.40) * sp
@@ -325,7 +325,7 @@ export function createScene(ctx) {
         col += gasCol * igWave * (0.55 + 0.90 * g);
 
         // center-forward gradient sells the depth. No tone rolloff and no
-        // vignette here — the compositor owns limiting and vignetting.
+        // vignette here, the compositor owns limiting and vignetting.
         col *= 0.76 + depth * 0.30;
 
         fragColor = vec4(col * uIntensity, 1.0);
@@ -356,7 +356,7 @@ export function createScene(ctx) {
     update(dt, t, io) {
       const bass = io.bands.bass;
 
-      // band envelopes — short time constants so the gas tracks the track
+      // band envelopes, short time constants so the gas tracks the track
       bassSm += (bass - bassSm) * (1 - Math.exp(-dt * 9));
       midSm += (io.bands.mid - midSm) * (1 - Math.exp(-dt * 12));
 
@@ -376,7 +376,7 @@ export function createScene(ctx) {
 
       // sway is the turbulence morph: one smoothed value re-weights the fbm
       // octaves, rotates the flow field toward its curl and folds ridged
-      // cell walls into the density — laminar drift at rest, churning storm
+      // cell walls into the density, laminar drift at rest, churning storm
       // cells at full sway. The field re-forms; nothing shears or leans.
       turb += (io.gestures.sway - turb) * (1 - Math.exp(-dt * 2.2));
 
@@ -441,7 +441,7 @@ export function createScene(ctx) {
       u.uBloom.value = io.gestures.pulse;
       u.uIntensity.value = io.intensity;
 
-      // Palette animates upstream — copy all five every frame, never mutate
+      // Palette animates upstream, copy all five every frame, never mutate
       // io.palette itself. The copies then get a lightness lift (a shift the
       // contract permits): palettes like ambient-teal carry stops as dark as
       // #0f4c5c, which land near 0.1 in the linear working space and would

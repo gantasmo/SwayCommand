@@ -1,4 +1,4 @@
-// Chrome Valley — the real cymatics "landscape" modes from GANTASMO's theDAW:
+// Chrome Valley, the real cymatics "landscape" modes from GANTASMO's theDAW:
 // an infinite-scroll synthwave valley under a turbulent plasma sun, morphing
 // into a ferrofluid spike field.
 //
@@ -11,7 +11,7 @@
 // statement of changes.
 //
 // CHANGES FROM THE ORIGINAL:
-//   * baseTerrain(), spikeField() and calcLandscape() are reproduced verbatim —
+//   * baseTerrain(), spikeField() and calcLandscape() are reproduced verbatim,
 //     the sideMask that carves the flat valley floor between mountain walls,
 //     the three sine/cosine octaves, the valleyWave, the 7-direction
 //     golden-angle quasicrystal, the phi/romanesco modulation, the same
@@ -42,7 +42,7 @@
 //   * Audio: theDAW's analyser bands become io.bands, smoothed with upstream's
 //     own slow envelope (k = 0.035 per 60 Hz frame) so the spikes rise and
 //     fall without jitter.
-//   * Gestures replace theDAW's mode switcher — terrain physics, not motion:
+//   * Gestures replace theDAW's mode switcher, terrain physics, not motion:
 //     SWAY glides isFerrofluid 0..1, crossfading landscape-chrome into
 //     landscape-ferrofluid live, and biases the scroll speed 0.6..1.8 (applied
 //     through the time accumulator: the scrollSpeed uniform scales accumulated
@@ -50,13 +50,13 @@
 //     a pad STRIKE is a seismic hit (mountainHeight +1.2 decaying ~1.5 s, the
 //     plasma and bloom flare with it); PRESS dives the camera down between the
 //     ridges while the fog pulls in (near 5 -> 3); PULSE surges the sun and the
-//     stars; XY steers — x drifts the camera across the valley, y moves the
+//     stars; XY steers, x drifts the camera across the valley, y moves the
 //     eye line.
 //   * No autonomous rotation (project rule): upstream rolls the star field
 //     0.0006/frame around the view axis; here the sky holds still behind the
 //     scrolling terrain. The terrain scroll, the valleyWave, the spike ebb
 //     and the plasma's noise-domain flow are translations and pulses, not
-//     rotations, and stay as they are. The camera has no orbit of its own —
+//     rotations, and stay as they are. The camera has no orbit of its own,
 //     io.xy and press place it.
 //   * Plane segments are 180/300/340 by quality tier (upstream fixed 300).
 
@@ -401,7 +401,7 @@ export function createScene(ctx) {
 
       // Sky: stars twinkle with the highs; PULSE surges them. Upstream's
       // 0.0006/frame roll of the star field around the view axis is dropped
-      // (project rule: nothing rotates by itself) — the sky holds still
+      // (project rule: nothing rotates by itself), the sky holds still
       // behind the scrolling terrain.
       starMat.color.copy(io.palette[2]);
       starMat.opacity = 0.3 + 0.45 * envH + io.gestures.pulse * 0.45;
@@ -435,7 +435,7 @@ export function createScene(ctx) {
     },
     dispose() {
       landGeo.dispose();
-      landMat.dispose(); // envMap is ctx.environment — engine-owned, kept
+      landMat.dispose(); // envMap is ctx.environment, engine-owned, kept
       sunCoreGeo.dispose();
       plasmaMat.dispose();
       sunHaloGeo.dispose();

@@ -1,4 +1,4 @@
-// Miracle Mile — the launch map: a holographic globe of every ICBM and SLBM
+// Miracle Mile, the launch map: a holographic globe of every ICBM and SLBM
 // route "if the unspeakable happened and all were launched", drawn as a
 // tactical overlay above the city. A scene-private helper of miraclemile.js
 // (docs/SCENE_CONTRACT.md, the sub-directory exception): it exports a factory,
@@ -19,37 +19,37 @@
 //   map.totals                 { routes, warheads, nodes } from the table, for a readout
 //
 //   THE GLOBE   A real unit sphere held at a fixed distance in front of the
-//               eye — D = 1 / sin(fovFraction · fov / 2) — so it reads as the
+//               eye (D = 1 / sin(fovFraction · fov / 2)) so it reads as the
 //               pen's orthographic disc (55 % of the frame height by default)
 //               wherever the Mile's camera is and however it moves. Dark and
 //               translucent (premultiplied over the city: the city behind dims
 //               to forty percent), a cool fresnel rim, scanlines flowing up it
 //               and a slow sweep (a flow, not a rotation), a graticule every
 //               15°, the COASTLINES as polylines and the land as a faint
-//               hatched fill — GEOGRAPHY FROM REAL DATA: coast.js is generated
+//               hatched fill, GEOGRAPHY FROM REAL DATA: coast.js is generated
 //               by scripts/gen-coast.js from Natural Earth's 1:110m land
 //               (public domain) via world-atlas / topojson-client, ~2,570
 //               points in 100 rings plus a 1024×512 land mask, imported as a
 //               constant (no fetch, no asset; the mask becomes a DataTexture at
 //               creation). Nothing rotates by itself: the globe turns only
-//               with the hand — X is the yaw (a full turn across the hand), Y
-//               the pitch — and holds otherwise.
+//               with the hand, X is the yaw (a full turn across the hand), Y
+//               the pitch, and holds otherwise.
 //   THE DATA    Launch nodes, command nodes and cities from published
-//               estimates (the table below — FAS Nuclear Notebook 2025 for the
+//               estimates (the table below, FAS Nuclear Notebook 2025 for the
 //               arsenals; the field and base positions are the public ones),
 //               labelled "EST" on the overlay. The ROUTES are the obvious
 //               reading of those numbers: each arsenal spread over its
-//               plausible targets — Russia ↔ the US and NATO, China ↔ the US
-//               and India, the US ↔ Russia, China and the DPRK, the UK and
-//               France ↔ Russia, Israel ↔ Iran, India ↔ Pakistan and China,
-//               Pakistan ↔ India, the DPRK ↔ the US, Japan and Korea — as
+//               plausible targets, Russia <-> the US and NATO, China <-> the US
+//               and India, the US <-> Russia, China and the DPRK, the UK and
+//               France <-> Russia, Israel <-> Iran, India <-> Pakistan and China,
+//               Pakistan <-> India, the DPRK <-> the US, Japan and Korea, as
 //               ~120 routes { from, to, warheads }. "Data based" means the
 //               arsenal sizes and the field locations are real; the targeting
 //               is an inference, and nothing here is a plan.
 //   THE ROUTES  Great-circle arcs (the real ones go over the Arctic), lifted
-//               off the globe on a ballistic profile — 4s(1−s) of an apogee
+//               off the globe on a ballistic profile, 4s(1−s) of an apogee
 //               that scales with the arc (0.19 R at 10,000 km, about 1,200
-//               km) — drawn as Sankey RIBBONS: instanced screen-space
+//               km), drawn as Sankey RIBBONS: instanced screen-space
 //               capsules, one mesh for every route, width ∝ warheads, the
 //               routes from one field fanning out of the node side by side
 //               (stacked by bearing at both ends, the pen's nodePadding feel),
@@ -59,23 +59,23 @@
 //               shader). NODES: launch fields as discs sized by warheads,
 //               targets as rings, command nodes as ringed dots.
 //   ALL LAUNCHED  launchAll() plays the scenario: the map is idle (routes
-//               faint, the plan) → every launch node flashes and BULLETS
+//               faint, the plan) -> every launch node flashes and BULLETS
 //               (bright heads with a short tail) grow from a point at every
-//               field at once and travel their arcs — a real ICBM flight is
-//               ~30 min, an SLBM 10–15, a regional missile under ten; all
+//               field at once and travel their arcs, a real ICBM flight is
+//               ~30 min, an SLBM 10 to 15, a regional missile under ten; all
 //               compressed ×0.8 s per minute so the whole thing is ~25 s and
 //               the SLBMs arrive first. MIRV: past 82 % of the arc the bus
 //               splits into up to six smaller heads (grown out of the bus)
 //               that fan to the target's neighbourhood. ARRIVAL: the target
 //               ring flashes white and stays as a glowing SCAR that deepens
 //               with every warhead that lands; the ribbon burns warm behind
-//               the heads and cools out. A running count — warheads IN FLIGHT
-//               (left) and DETONATED (right) — in seven-segment glyphs made
+//               the heads and cools out. A running count, warheads IN FLIGHT
+//               (left) and DETONATED (right), in seven-segment glyphs made
 //               of capsules (no DOM, no fonts) under the disc, with a bar
 //               each. At the end the globe holds the scars and the routes
 //               fade; reset() returns to the plan. No sound.
 //   LOOK        Cockpit hologram: thin lines, additive, the palette's cool
-//               entry (2) for the globe and its lines, the warm end (1 → 0)
+//               entry (2) for the globe and its lines, the warm end (1 -> 0)
 //               for bursts and scars; io.intensity scales everything; the
 //               beat pulses the node discs. show(false) fades it out over
 //               0.6 s; show(true) grows it from a point. Nothing appears at
@@ -91,7 +91,7 @@
 //               each program lands off screen, and only then does show(false)
 //               hide the group.
 //
-// PORT — after "Map Sankey Chart: Global Coffee Supply Chain", amCharts
+// PORT, after "Map Sankey Chart: Global Coffee Supply Chain", amCharts
 // (https://codepen.io/amcharts/pen/OPRwxBd), which ships as:
 //
 //     The MIT License (MIT)
@@ -210,17 +210,17 @@ export const NODES = [
   ['tehran', 'Tehran', 35.7, 51.4, 'IR', 'city', 0],
 ];
 
-// [from, to, warheads] — each arsenal allocated across its plausible targets;
+// [from, to, warheads], each arsenal allocated across its plausible targets;
 // the sums per launch node equal the node's estimate above.
 export const ROUTES = [
-  // US ICBM fields → Russian fields, command, bases; F.E. Warren → China
+  // US ICBM fields -> Russian fields, command, bases; F.E. Warren -> China
   ['malmstrom', 'kozelsk', 25], ['malmstrom', 'tatishchevo', 25], ['malmstrom', 'teykovo', 20], ['malmstrom', 'yoshkarola', 20], ['malmstrom', 'vypolzovo', 20], ['malmstrom', 'moscow', 20], ['malmstrom', 'gadzhiyevo', 20],
   ['minot', 'uzhur', 30], ['minot', 'dombarovsky', 30], ['minot', 'ntagil', 25], ['minot', 'novosibirsk', 25], ['minot', 'barnaul', 20], ['minot', 'irkutsk', 20],
   ['warren', 'yumen', 30], ['warren', 'hami', 30], ['warren', 'ordos', 25], ['warren', 'jilantai', 25], ['warren', 'beijing', 20], ['warren', 'df41', 20],
   // US SSBN: the Atlantic boats at Russia's west, the Pacific boats at its east, China and the DPRK
   ['kingsbay', 'moscow', 80], ['kingsbay', 'stpetersburg', 60], ['kingsbay', 'kozelsk', 50], ['kingsbay', 'tatishchevo', 50], ['kingsbay', 'teykovo', 40], ['kingsbay', 'yoshkarola', 40], ['kingsbay', 'gadzhiyevo', 60], ['kingsbay', 'murmansk', 40], ['kingsbay', 'vypolzovo', 30], ['kingsbay', 'yekaterinburg', 30],
   ['bangor', 'vilyuchinsk', 70], ['bangor', 'vladivostok', 60], ['bangor', 'irkutsk', 50], ['bangor', 'beijing', 50], ['bangor', 'shanghai', 40], ['bangor', 'yulin', 40], ['bangor', 'yumen', 40], ['bangor', 'hami', 40], ['bangor', 'ordos', 30], ['bangor', 'pyongyang', 40], ['bangor', 'df41', 30],
-  // Russian ICBM divisions → US fields, command, cities
+  // Russian ICBM divisions -> US fields, command, cities
   ['kozelsk', 'malmstrom', 40], ['kozelsk', 'washington', 40],
   ['tatishchevo', 'minot', 40], ['tatishchevo', 'omaha', 40],
   ['uzhur', 'malmstrom', 60], ['uzhur', 'minot', 60], ['uzhur', 'warren', 60], ['uzhur', 'coloradosprings', 30], ['uzhur', 'omaha', 30],
@@ -235,14 +235,14 @@ export const ROUTES = [
   // Russian SSBN: the Northern Fleet at Europe and the US east coast, the Pacific Fleet at the west coast and Japan
   ['gadzhiyevo', 'london', 70], ['gadzhiyevo', 'paris', 60], ['gadzhiyevo', 'berlin', 40], ['gadzhiyevo', 'faslane', 50], ['gadzhiyevo', 'ilelongue', 50], ['gadzhiyevo', 'washington', 40], ['gadzhiyevo', 'newyork', 40],
   ['vilyuchinsk', 'losangeles', 60], ['vilyuchinsk', 'sanfrancisco', 60], ['vilyuchinsk', 'seattle', 50], ['vilyuchinsk', 'bangor', 50], ['vilyuchinsk', 'tokyo', 40], ['vilyuchinsk', 'houston', 40],
-  // China → the US and India
+  // China -> the US and India
   ['yumen', 'washington', 30], ['yumen', 'newyork', 30], ['yumen', 'losangeles', 20], ['yumen', 'malmstrom', 20],
   ['hami', 'minot', 30], ['hami', 'warren', 30], ['hami', 'seattle', 20], ['hami', 'chicago', 20],
   ['ordos', 'sanfrancisco', 30], ['ordos', 'losangeles', 30], ['ordos', 'omaha', 20], ['ordos', 'coloradosprings', 20],
   ['jilantai', 'delhi', 30], ['jilantai', 'mumbai', 30],
   ['df41', 'washington', 20], ['df41', 'houston', 20], ['df41', 'delhi', 20], ['df41', 'omaha', 20],
   ['yulin', 'losangeles', 20], ['yulin', 'seattle', 20], ['yulin', 'delhi', 15], ['yulin', 'mumbai', 15],
-  // the UK and France → Russia
+  // the UK and France -> Russia
   ['faslane', 'moscow', 50], ['faslane', 'stpetersburg', 30], ['faslane', 'kozelsk', 20], ['faslane', 'murmansk', 20],
   ['ilelongue', 'moscow', 80], ['ilelongue', 'stpetersburg', 50], ['ilelongue', 'yekaterinburg', 40], ['ilelongue', 'novosibirsk', 30], ['ilelongue', 'kozelsk', 40],
   // the regional exchanges
@@ -252,7 +252,7 @@ export const ROUTES = [
   ['pyongyang', 'seoul', 15], ['pyongyang', 'tokyo', 15], ['pyongyang', 'seattle', 10], ['pyongyang', 'washington', 10],
 ];
 
-// each arsenal its own ramp coordinate on the five-stop palette (0 hot core … 4 ash)
+// each arsenal its own ramp coordinate on the five-stop palette (0 hot core ... 4 ash)
 const SIDE_TINT = { US: 2.0, UK: 2.35, FR: 2.7, CN: 3.0, IN: 3.4, PK: 3.8, RU: 1.0, IL: 0.55, KP: 1.5 };
 
 // ---------------------------------------------------------------- constants
@@ -287,7 +287,7 @@ const GLSL_COMMON = /* glsl */ `
     return mix(p4, vec3(1.0), t - 4.0);
   }
   // Is the point p (globe-local, unit sphere at the origin) hidden behind the
-  // globe from the eye at uEyeL? The ray eye → p is tested against the
+  // globe from the eye at uEyeL? The ray eye -> p is tested against the
   // sphere: hidden when it enters the sphere before reaching p, softened over
   // the last half-percent of the miss distance (about a pixel at the limb).
   // Points on the front surface sit exactly at the entry and stay visible;
@@ -330,7 +330,7 @@ const SPHERE_FRAG = /* glsl */ `
     float land = texture(uLand, vec2(lon / TAU + 0.5, lat / PI + 0.5)).r;
     // a screen-space hatch for the land: the tactical-display fill, never aliasing with the turn
     float hatch = smoothstep(0.6, 0.85, fract((gl_FragCoord.x + gl_FragCoord.y) * 0.1));
-    // scanlines flowing up the sphere, and a broad sweep every twelve seconds — flows, not rotation
+    // scanlines flowing up the sphere, and a broad sweep every twelve seconds, flows, not rotation
     float scan = smoothstep(0.86, 1.0, sin(vL.y * 110.0 - uTime * 2.4));
     float sweepY = fract(uTime / 12.0) * 2.8 - 1.4;
     float sweep = exp(-(vL.y - sweepY) * (vL.y - sweepY) * 90.0);
@@ -508,7 +508,7 @@ export function createLaunchMap(THREE, opts = {}) {
   };
   const eyeL = new THREE.Vector3(0, 0, 4);
 
-  // ---- lat/lon → unit vector: lon 0 at +Z, east toward +X, north +Y (Europe right of the Americas from outside)
+  // ---- lat/lon -> unit vector: lon 0 at +Z, east toward +X, north +Y (Europe right of the Americas from outside)
   const ll = (lat, lon, out) => {
     const cl = Math.cos(lat * D2R);
     out.x = cl * Math.sin(lon * D2R);
@@ -518,7 +518,7 @@ export function createLaunchMap(THREE, opts = {}) {
   };
   const v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3(), v3 = new THREE.Vector3();
 
-  // ---- the land mask → a DataTexture
+  // ---- the land mask -> a DataTexture
   const landTex = (() => {
     const { w, h, runs } = LAND_MASK;
     const data = new Uint8Array(w * h);
@@ -678,7 +678,7 @@ export function createLaunchMap(THREE, opts = {}) {
       const [from, to, w] = ROUTES[r];
       rFrom[r] = nodeIdx.get(from);
       rTo[r] = nodeIdx.get(to);
-      if (rFrom[r] == null || rTo[r] == null) throw new Error(`launchmap: unknown node in route ${from} → ${to}`);
+      if (rFrom[r] == null || rTo[r] == null) throw new Error(`launchmap: unknown node in route ${from} -> ${to}`);
       rWar[r] = w;
       rWidth[r] = 1.0 + 5.5 * Math.sqrt(w / 480);
       rTint[r] = SIDE_TINT[NODES[rFrom[r]][4]] ?? 2.0;
@@ -692,7 +692,7 @@ export function createLaunchMap(THREE, opts = {}) {
       rMirv[r] = w <= 3 ? w : Math.max(3, Math.min(MIRV_MAX, 2 + Math.floor(Math.log2(w / 3))));
     }
     // the stacking: at every node the routes through it, sorted by the bearing
-    // they leave along, sit side by side with a little padding — out of the
+    // they leave along, sit side by side with a little padding, out of the
     // source along each route's right, into the target along its left
     const bearingAt = (node, other) => {
       // bearing from node toward other, clockwise from north, as seen from outside

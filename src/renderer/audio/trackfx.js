@@ -1,11 +1,11 @@
-// Track effects — the live Web Audio graph behind every kind in
+// Track effects, the live Web Audio graph behind every kind in
 // shared/trackfx.js. The transport builds one node per chain entry and wires
-// input → entries in order → track gain; this module knows how to build a
+// input -> entries in order -> track gain; this module knows how to build a
 // single entry and how to move its parameters smoothly.
 //
-// createFxNode(ctx, kind, params, env) → { kind, input, output, set(key, v),
+// createFxNode(ctx, kind, params, env) -> { kind, input, output, set(key, v),
 // retune(), dispose() }. `env.bpm()` returns the timeline tempo (0 when
-// unknown → 120) so tempo-synced params (delay time, gate rate, tremolo and
+// unknown -> 120) so tempo-synced params (delay time, gate rate, tremolo and
 // auto-filter rates) follow it; retune() re-derives them when it changes.
 // Pure module: no DOM, nothing persistent except the worklet registration.
 
@@ -49,7 +49,7 @@ function rampExp(param, value, ctx, time = SMOOTH) {
   param.exponentialRampToValueAtTime(Math.max(value, MIN), now + time);
 }
 
-// A dry/wet pair: input → dry → output, input → (chain) → wet → output.
+// A dry/wet pair: input -> dry -> output, input -> (chain) -> wet -> output.
 function dryWet(ctx, input, output) {
   const dry = ctx.createGain();
   const wet = ctx.createGain();

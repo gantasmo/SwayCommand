@@ -1,7 +1,7 @@
 // Factory MIDI map of the Audima Labs Sway (Base Project V2).
 // Recovered from Audima's own artifacts: the Base Project V2 .swayproj,
 // the official Ableton Live remote scripts, and the Cubase MIDI Remote script.
-// Not officially published by Audima — every binding here can be overridden
+// Not officially published by Audima, every binding here can be overridden
 // at runtime via MIDI-learn (see midi.js), which also makes any other
 // class-compliant controller usable.
 
@@ -27,10 +27,10 @@ export const FACTORY_MAP = {
   knobs: [20, 21, 22, 23, 24, 25, 26, 27],
 
   // 16 drum pads. Factory default is a B-minor Theory Engine grid;
-  // Audima's own Ableton demo packs remap pads to chromatic notes 24–39,
+  // Audima's own Ableton demo packs remap pads to chromatic notes 24 to 39,
   // which is also what we normalize to internally. Pads may arrive on
   // channel 1 or 16 depending on firmware/project (observed conflict
-  // between the .swayproj and the Ableton script) — we accept both.
+  // between the .swayproj and the Ableton script), we accept both.
   pads: {
     chromaticBase: 24, // notes 24..39 => pad index 0..15
     channels: [0, 15],

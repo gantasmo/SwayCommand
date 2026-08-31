@@ -1,4 +1,4 @@
-// SwayCommand main process — window lifecycle, permissions, IPC surface.
+// SwayCommand main process, window lifecycle, permissions, IPC surface.
 
 'use strict';
 
@@ -26,14 +26,14 @@ let win = null;
 // evicted each other and NEITHER was ever cached: a relaunch recompiled them
 // from scratch, 131 s and 99 s, every single time. Measured: with the default
 // cache, a second run of the same profile still cost 131 s / 99 s; with the
-// cache raised, 2.9 s / 1.6 s. (Alone in a profile either scene cached fine —
+// cache raised, 2.9 s / 1.6 s. (Alone in a profile either scene cached fine,
 // which is why this looked like a compile problem rather than an eviction one.)
 //
 // ANGLE BACKEND. On the default D3D11 backend every shader goes through fxc,
 // which fully unrolls constant-trip loops and inlines every call site; the
 // first compile of Nature's Tomb costs 132 s. ANGLE's OpenGL backend does not
 // use fxc: the same shader compiles in 12 s, and even a cache-warm first draw
-// falls from 2.9 s to 0.29 s. The trade is a small runtime cost — measured at
+// falls from 2.9 s to 0.29 s. The trade is a small runtime cost, measured at
 // 1080p tier med, between −0.1 and +1.9 ms a frame across nine scene states,
 // worst on the heaviest ones. A hundred-second freeze on a stage is worse than
 // a millisecond a frame, so GL is the default; SWAYCOMMAND_ANGLE overrides it
@@ -263,7 +263,7 @@ app.whenReady().then(() => {
   // System-audio capture. getDisplayMedia in Chromium always requires a video
   // source, so a screen source is supplied and the renderer discards the video
   // track immediately; only the loopback audio is kept. Loopback is a Windows
-  // capability — elsewhere the request resolves without audio and the renderer
+  // capability, elsewhere the request resolves without audio and the renderer
   // reports that system audio is unavailable on the platform.
   ses.setDisplayMediaRequestHandler(
     async (_request, callback) => {

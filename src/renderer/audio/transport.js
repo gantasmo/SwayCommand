@@ -1,4 +1,4 @@
-// Transport — timeline playback: any number of audio tracks (stems) and one
+// Transport, timeline playback: any number of audio tracks (stems) and one
 // visual track, on one clock. Audio clips are AudioBufferSourceNodes
 // scheduled against the AudioContext clock (sample-accurate seek, loop and
 // fades; the page CSP forbids file:// media, so buffers arrive decoded from
@@ -8,13 +8,13 @@
 //
 // Clock: position = ctx.currentTime - startedAt while playing, so the
 // transport cannot drift against the audio it schedules, and every stem on
-// every track is scheduled from that one clock — that is what keeps them in
+// every track is scheduled from that one clock, that is what keeps them in
 // sync. The loop seam is scheduled AHEAD on the context clock (the next pass
 // is queued a quarter second before the seam), so it is sample-accurate too.
 //
-// Per track: clips → [vst dry / wet mix] → track input → effect chain (live
-// Web Audio nodes from audio/trackfx.js, in chain order) → track gain → mute
-// / solo → master. A track's VST chain is rendered offline (main/vsthost.js)
+// Per track: clips -> [vst dry / wet mix] -> track input -> effect chain (live
+// Web Audio nodes from audio/trackfx.js, in chain order) -> track gain -> mute
+// / solo -> master. A track's VST chain is rendered offline (main/vsthost.js)
 // to a wet media per source file; clips that have one play dry and wet
 // together under `track.vst.mix`. Regions engage one parameter of one chain
 // entry while the playhead is inside them. Stems launched from pads
@@ -118,7 +118,7 @@ export function createTransport(ctx, destinationNodes) {
     return g;
   }
 
-  // Rewires input → enabled entries in order → gain. Nodes are kept across
+  // Rewires input -> enabled entries in order -> gain. Nodes are kept across
   // rewires by entry id, so a reorder or a toggle does not lose state.
   function wireChain(track, g) {
     g.input.disconnect();
@@ -683,7 +683,7 @@ export function createTransport(ctx, destinationNodes) {
     },
     beatSeconds: beatLen,
     // Snaps a time to the grid (beats when the tempo is known; half seconds
-    // otherwise — the old behaviour — so an untimed session still lines up).
+    // otherwise (the old behaviour) so an untimed session still lines up).
     snapTime(t) {
       const beats = SNAP_BEATS[state.snap] || 0;
       const q = beats > 0 ? (bpm() > 0 ? beats * beatLen() : 0.5) : 0;

@@ -1,6 +1,6 @@
 // Browser side of scripts/scene-harness.js: the scene registry and three.js,
 // bundled by esbuild and loaded into a hidden Electron window. Exposes
-// window.__h — init(width, height, tier) builds the renderer and the creation
+// window.__h, init(width, height, tier) builds the renderer and the creation
 // context the engine would pass (docs/SCENE_CONTRACT.md); run(id, frames, dt,
 // patch) drives one scene's update() for a number of frames with a patched
 // io snapshot, renders, times a burst, and returns the still as a PNG data
@@ -86,7 +86,7 @@ function sceneCtx() {
 }
 
 // Per-scene cost of coming up: build (createScene), the synchronous program
-// compile + link, and the FIRST draw — on a cold shader cache the first draw
+// compile + link, and the FIRST draw, on a cold shader cache the first draw
 // is where the D3D driver's real compile lands, and a shader that unrolls
 // into something huge shows up here as tens of seconds. Run the harness with
 // `"freshCache": true` in the plan to measure it cold.

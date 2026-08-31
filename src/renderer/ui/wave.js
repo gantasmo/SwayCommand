@@ -1,4 +1,4 @@
-// Layered sinewave activity display, driven by the real analyser bands —
+// Layered sinewave activity display, driven by the real analyser bands,
 // bass sets the slow deep wave, mids the body, highs the ripple. Draws only
 // when the canvas is visible; amplitudes ease so silence settles to calm
 // lines instead of freezing.

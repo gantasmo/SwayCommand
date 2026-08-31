@@ -1,4 +1,4 @@
-// Audio analysis — WebAudio FFT split into smoothed bands with slow auto-gain
+// Audio analysis, WebAudio FFT split into smoothed bands with slow auto-gain
 import { hostAudio } from '../host/host-channel.js';
 // and a bass-onset beat detector (the Lasp/Akvj role in web form).
 //

@@ -1,4 +1,4 @@
-// SwayCommand cockpit — one always-live page. The stage renders in the
+// SwayCommand cockpit, one always-live page. The stage renders in the
 // center from boot to quit; the timeline, the Sway deck, the rails, the
 // drawer, and every overlay work on top of it without ever stopping the
 // render loop. Projects are .sway files; the legacy screens are gone.
@@ -143,7 +143,7 @@ async function rendererChecks() {
     }
     checks.push(
       gl
-        ? { id: 'gpu', label: 'Graphics (WebGL2)', status: 'ok', detail: `Ready — ${info || 'WebGL2'}.` }
+        ? { id: 'gpu', label: 'Graphics (WebGL2)', status: 'ok', detail: `Ready, ${info || 'WebGL2'}.` }
         : { id: 'gpu', label: 'Graphics (WebGL2)', status: 'fail', detail: 'WebGL2 unavailable. Update your GPU drivers.' }
     );
   } catch (e) {
@@ -157,13 +157,13 @@ async function rendererChecks() {
       label: 'MIDI',
       status: 'ok',
       detail: c.isSway
-        ? `Sway online: “${c.portName}” — factory map armed.`
+        ? `Sway online: “${c.portName}”, factory map armed.`
         : c.connected
           ? `No Sway yet, but listening on: ${c.portName}. Incoming CC and note messages are matched against the Sway factory map.`
-          : 'No MIDI devices right now. Hot-plug any time — mouse & keyboard are fully mapped meanwhile.',
+          : 'No MIDI devices right now. Hot-plug any time, mouse & keyboard are fully mapped meanwhile.',
     });
   } else {
-    checks.push({ id: 'midi', label: 'MIDI', status: 'warn', detail: 'WebMIDI unavailable — mouse & keyboard control still work.' });
+    checks.push({ id: 'midi', label: 'MIDI', status: 'warn', detail: 'WebMIDI unavailable, mouse & keyboard control still work.' });
   }
 
   try {
@@ -173,8 +173,8 @@ async function rendererChecks() {
       label: 'Audio input',
       status: 'ok',
       detail: inputs.length
-        ? `${inputs.length} input(s) found — visuals will follow the music. No input? The internal groove takes over.`
-        : 'No audio inputs — the internal groove (silent, analysis-only) will drive the visuals.',
+        ? `${inputs.length} input(s) found, visuals will follow the music. No input? The internal groove takes over.`
+        : 'No audio inputs, the internal groove (silent, analysis-only) will drive the visuals.',
     });
   } catch {
     checks.push({ id: 'audio', label: 'Audio input', status: 'info', detail: 'Could not enumerate inputs; the internal groove will drive the visuals.' });
@@ -210,7 +210,7 @@ function settleCheck(promise, fallback, label) {
 }
 
 async function runDoctor() {
-  $('#boot-status').textContent = 'Checking your system…';
+  $('#boot-status').textContent = 'Checking your system...';
   const [main, local] = await Promise.all([
     settleCheck(window.swaycommand.doctor.run(), [], 'system'),
     settleCheck(rendererChecks(), [], 'renderer'),
@@ -231,14 +231,14 @@ async function runDoctor() {
     worst === 'ok'
       ? 'All clear.'
       : worst === 'warn'
-        ? 'Playable now — a couple of notes above.'
-        : 'Something needs attention above — you can still continue.';
+        ? 'Playable now, a couple of notes above.'
+        : 'Something needs attention above, you can still continue.';
   const enter = $('#btn-enter');
   enter.disabled = false;
   enter.focus();
   if (worst === 'ok' && !state._autoAdvanced && !state.entered) {
     state._autoAdvanced = true;
-    // The door opens by itself once the checks pass — but not onto a stage
+    // The door opens by itself once the checks pass, but not onto a stage
     // that is still compiling its visuals. It waits for the warm pipeline,
     // six seconds at most; ENTER opens it at once regardless.
     const t0 = performance.now();
@@ -257,14 +257,14 @@ function wireDoctor() {
     const check = state.checks.find((c) => c.fix && c.fix.id === fixId);
     if (!check) return;
     const el = $(`#progress-${check.id}`);
-    if (el) el.textContent = phase === 'download' ? `downloading… ${pct || 0}%` : `${phase}…`;
+    if (el) el.textContent = phase === 'download' ? `downloading... ${pct || 0}%` : `${phase}...`;
   });
 
   $('#check-list').addEventListener('click', async (e) => {
     const btn = e.target.closest('[data-fix]');
     if (!btn) return;
     btn.disabled = true;
-    btn.textContent = 'Working…';
+    btn.textContent = 'Working...';
     const result = await window.swaycommand.doctor.fix(btn.dataset.fix);
     const check = state.checks.find((c) => c.id === btn.dataset.check);
     if (check) {
@@ -302,7 +302,7 @@ function enterCockpit() {
   const door = $('#door');
   door.classList.add('open');
   setTimeout(() => door.classList.add('gone'), 1000);
-  notice('<b>H</b> — controls');
+  notice('<b>H</b>, controls');
 }
 
 // ---------------------------------------------------------------- samples / kit
@@ -333,7 +333,7 @@ async function addSamples() {
   let loaded = 0;
   const failures = [];
   for (const file of picked) {
-    note.textContent = `Loading ${file.name}…`;
+    note.textContent = `Loading ${file.name}...`;
     try {
       await state.projectStore.addMedia(file);
       loaded++;
@@ -448,7 +448,7 @@ function renderModMatrix() {
     .map(
       (r, i) => `<div class="mod-row">
         <select data-mod="${i}" data-field="source">${MOD_SOURCES.map((s) => `<option${s === r.source ? ' selected' : ''}>${s}</option>`).join('')}</select>
-        <span>→</span>
+        <span>-></span>
         <select data-mod="${i}" data-field="dest">${MOD_DESTS.map((d) => `<option${d === r.dest ? ' selected' : ''}>${d}</option>`).join('')}</select>
         <input type="range" data-mod="${i}" data-field="amount" min="-1" max="1" step="0.01" value="${r.amount}">
         <b>${r.amount.toFixed(2)}</b>
@@ -675,7 +675,7 @@ async function followDocLink(href) {
     try {
       await window.swaycommand.openExternal(href);
     } catch {
-      showExternalNote(`Link not on the allowlist — open manually: ${href}`);
+      showExternalNote(`Link not on the allowlist, open manually: ${href}`);
     }
     return;
   }
@@ -742,9 +742,9 @@ async function openProjectMenu() {
   ]);
   const rows = [
     '<button class="pop-item" data-choice="new">New</button>',
-    '<button class="pop-item" data-choice="open">Open…</button>',
+    '<button class="pop-item" data-choice="open">Open...</button>',
     '<button class="pop-item" data-choice="save">Save</button>',
-    '<button class="pop-item" data-choice="saveas">Save as…</button>',
+    '<button class="pop-item" data-choice="saveas">Save as...</button>',
   ];
   const recents = recent.filter((r) => r.path !== store.state.path);
   if (recents.length) {
@@ -832,7 +832,7 @@ async function openSourceMenu() {
 
 function updateSourceLabel() {
   const a = state.audio.state;
-  $('#input-src').textContent = a.deviceLabel || (a.source === 'internal' ? 'Internal groove' : a.source) || '—';
+  $('#input-src').textContent = a.deviceLabel || (a.source === 'internal' ? 'Internal groove' : a.source) || '-';
 }
 
 // ---------------------------------------------------------------- scenes / auto
@@ -920,7 +920,7 @@ function refreshDeck() {
       const p = state.projectStore.project();
       const m = p && p.media.find((x) => x.id === a.media);
       const st = state.transport.stemState(a.media);
-      labels.push((st === 'on' ? '▶ ' : st === 'pending' ? '… ' : '') + (m ? m.name.replace(/\.[a-z0-9]+$/i, '') : 'stem'));
+      labels.push((st === 'on' ? '▶ ' : st === 'pending' ? '... ' : '') + (m ? m.name.replace(/\.[a-z0-9]+$/i, '') : 'stem'));
     } else if (a.type === 'trackFx') {
       labels.push(a.fx === 'vst' ? 'vst mix' : a.param);
     } else {
@@ -1109,9 +1109,9 @@ function frameTick(now) {
   const c = state.midi.control;
   const link = $('#pill-link');
   // BUSY: the port is there but another process holds it (Windows allows one
-  // opener per MIDI input) — the Sway is plugged in and cannot reach us.
+  // opener per MIDI input), the Sway is plugged in and cannot reach us.
   link.textContent = c.busy ? 'BUSY' : c.isSway ? 'SWAY' : c.connected ? 'MIDI' : 'KEYS';
-  link.title = c.busy ? `${c.portName} is held by another process — close the other app or instance` : '';
+  link.title = c.busy ? `${c.portName} is held by another process, close the other app or instance` : '';
   link.classList.toggle('pill-on', !c.busy && (c.isSway || c.connected));
 
   const a = state.audio.state;
@@ -1139,7 +1139,7 @@ function frameTick(now) {
   }
 
   if (state.monitorVisible) {
-    $('#midi-monitor').textContent = state.midi.monitor.join('\n') || '(waiting for MIDI…)';
+    $('#midi-monitor').textContent = state.midi.monitor.join('\n') || '(waiting for MIDI...)';
   }
 }
 
@@ -1170,7 +1170,7 @@ async function importAudio(paths, opts = {}) {
   let longest = null;
   const failures = [];
   for (const file of files) {
-    ui.timeline.setHint(`Loading ${file.name}…`, 20000);
+    ui.timeline.setHint(`Loading ${file.name}...`, 20000);
     try {
       const media = await store.addMedia(file);
       const buffer = await store.loadMediaBuffer(media.id);
@@ -1178,7 +1178,7 @@ async function importAudio(paths, opts = {}) {
       if (!longest || buffer.duration > longest.buffer.duration) longest = { buffer, media };
       let track = single && placed === 0 && files.length === 1 ? single : null;
       if (!track) {
-        // A new track per stem — unless the first track is still empty.
+        // A new track per stem, unless the first track is still empty.
         const empty = transport.tracks().find((t) => !t.clips.length && !t.fx.length && !t.vst.plugins.length);
         track = empty || transport.addTrack();
         track.name = file.name.replace(/\.[a-z0-9]+$/i, '').slice(0, 28);
@@ -1240,7 +1240,7 @@ async function loadGan(ganPath) {
     plugins.activeUrl = info.url;
     state.projectStore.markDirty();
     renderPluginsPanel();
-    notice(`${info.name}: ${info.controls.length} control${info.controls.length === 1 ? '' : 's'} — click one to route it`);
+    notice(`${info.name}: ${info.controls.length} control${info.controls.length === 1 ? '' : 's'}, click one to route it`);
   } catch (err) {
     notice(`.gan: ${err.message}`, 7000);
   }
@@ -1312,10 +1312,10 @@ async function renderVstPanel(rescan) {
   note.textContent = s.ok ? s.python : s.error || '';
   const ul = $('#vst-list');
   if (!s.ok) {
-    ul.innerHTML = '<li class="none">VST3 needs a Python with pedalboard: theDAW’s own environment is found by itself; otherwise pick one with PYTHON…</li>';
+    ul.innerHTML = '<li class="none">VST3 needs a Python with pedalboard: theDAW’s own environment is found by itself; otherwise pick one with PYTHON...</li>';
     return;
   }
-  ul.innerHTML = '<li class="none">scanning…</li>';
+  ul.innerHTML = '<li class="none">scanning...</li>';
   try {
     plugins.vstList = await window.swaycommand.vst.scan(!!rescan);
   } catch (err) {
@@ -1337,7 +1337,7 @@ async function renderTrackVst(track, progress) {
   if (!track.vst.plugins.length) throw new Error('no plugins on this track');
   let n = 0;
   for (const m of medias) {
-    progress && progress(`RENDERING ${++n}/${medias.length}…`);
+    progress && progress(`RENDERING ${++n}/${medias.length}...`);
     const r = await window.swaycommand.vst.render(m.resolvedPath || m.path, track.vst.plugins, { tail: 3 });
     const wetPath = r.output;
     let wet = p.media.find((x) => (x.resolvedPath || x.path) === wetPath);
@@ -1460,7 +1460,7 @@ async function main() {
   state.synth = createSynth(state.audio.ctx, audioOuts);
   state.transport = createTransport(state.audio.ctx, audioOuts);
 
-  // Every MIDI event goes to the assignment router — one dispatch path for
+  // Every MIDI event goes to the assignment router, one dispatch path for
   // hardware, keyboard pads, and the timeline alike.
   state.midi = await createMidi({
     onEvent: (e) => state.router && state.router.handleMidiEvent(e),
@@ -1598,7 +1598,7 @@ async function main() {
   };
 
   // The stage runs from the first frame; the door covers it until ENTER.
-  // Auto rotation stays off until a project decides — otherwise the engine
+  // Auto rotation stays off until a project decides, otherwise the engine
   // free-runs the full registry during a slow boot and races the project's
   // start scene.
   state.engine.autoVJ.enabled = false;

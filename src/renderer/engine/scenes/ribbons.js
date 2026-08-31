@@ -1,12 +1,12 @@
-// Ribbons — a bundle of glowing triangle-strip trails on per-ribbon
+// Ribbons, a bundle of glowing triangle-strip trails on per-ribbon
 // lissajous paths, blended toward the Sway hand so the whole swarm
 // chases it. Mid band + press fatten the strips, beats spike them,
 // pads teleport a ribbon's head with a flash. Sway morphs the ribbon
-// geometry itself — the lissajous rate accumulates faster while the
+// geometry itself, the lissajous rate accumulates faster while the
 // amplitudes and strip width pull in, so the field glides from long
-// silk sweeps to tight coils — and a strike is a whipcrack: one
+// silk sweeps to tight coils, and a strike is a whipcrack: one
 // amplitude impulse travels head -> tail down every strip. The camera
-// holds a fixed eye (bass dollies it, the hand lifts it) — nothing in the
+// holds a fixed eye (bass dollies it, the hand lifts it), nothing in the
 // scene turns by itself; the lissajous travel is path motion, not a spin.
 // One draw call for all strips + one for the head sprites.
 // (docs/SCENE_CONTRACT.md)
@@ -177,7 +177,7 @@ export function createScene(ctx) {
     blending: THREE.AdditiveBlending,
     depthWrite: false,
     uniforms: {
-      uPalette: mat.uniforms.uPalette, // shared — copied once per frame
+      uPalette: mat.uniforms.uPalette, // shared, copied once per frame
       uFlash: { value: flash },
       uBeat: { value: 0 },
       uIntensity: { value: 0 },
@@ -229,7 +229,7 @@ export function createScene(ctx) {
       // sway morphs the ribbon geometry: the lissajous angles accumulate
       // faster (shorter wavelength, more twist) while the amplitudes pull
       // in, so the field glides from long silk sweeps to tight coils.
-      // Integrating the angle keeps the morph phase-continuous — scaling
+      // Integrating the angle keeps the morph phase-continuous, scaling
       // t * freq directly would teleport every head on a sway move.
       swayS += (io.gestures.sway - swayS) * (1 - Math.exp(-dt * 4));
       const rateXY = 1 + swayS * 2.6;
@@ -322,7 +322,7 @@ export function createScene(ctx) {
       headMat.uniforms.uBeat.value = io.beat;
       headMat.uniforms.uIntensity.value = io.intensity;
 
-      // fixed eye — nothing orbits by itself; bass breathes the dolly
+      // fixed eye, nothing orbits by itself; bass breathes the dolly
       // distance and the hand lifts the eye (sway morphs the field above)
       const radius = 30 - io.bands.bass * 4;
       camera.position.x = 0;

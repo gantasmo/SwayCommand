@@ -23,7 +23,7 @@ Each check returns `{ id, label, status, detail, fix? }`. The four status values
 | `ok` | `●` | The item is present and working. | None. |
 | `warn` | `▲` | Playable, but something merits attention (DFU mode, no network, no WebMIDI). | Blocks auto-advance; manual advance remains available. |
 | `fail` | `✕` | A hard requirement is missing (WebGL2). | Blocks auto-advance; manual advance remains available. |
-| `info` | `○` | Neutral observation about an optional item. | None — treated the same as `ok`. |
+| `info` | `○` | Neutral observation about an optional item. | None, treated the same as `ok`. |
 
 The aggregate is `fail` if any check fails, otherwise `warn` if any check warns, otherwise `ok`. The boot status line summarizes the aggregate in one sentence.
 
@@ -49,10 +49,10 @@ Results:
 
 | Condition | Status | Fix offered |
 |---|---|---|
-| Normal-mode device present | `ok` | — (USB-MIDI is driverless) |
+| Normal-mode device present | `ok` |, (USB-MIDI is driverless) |
 | DFU-mode device present | `warn` | `install-dfu-driver` on Windows; none elsewhere. The detail recommends a power-cycle to return to normal mode when no firmware update is in progress. |
-| Neither present | `info` | — (hot-attach is automatic; mouse, keyboard, and generic MIDI substitute) |
-| Scan threw | `info` | — (MIDI detection in the renderer is independent of the USB scan) |
+| Neither present | `info` |, (hot-attach is automatic; mouse, keyboard, and generic MIDI substitute) |
+| Scan threw | `info` |, (MIDI detection in the renderer is independent of the USB scan) |
 
 ### Audima Sway Software
 
@@ -107,7 +107,7 @@ Clicking a fix button disables it, invokes `doctor:fix` with the fix id, and app
 
 Downloads and verifies the Sway Software installer.
 
-1. Resolve the platform key: `windows-x86_64` on Windows; `darwin-aarch64` or `darwin-x86_64` on macOS by `process.arch`. On Linux the fix returns failure immediately — no companion build exists.
+1. Resolve the platform key: `windows-x86_64` on Windows; `darwin-aarch64` or `darwin-x86_64` on macOS by `process.arch`. On Linux the fix returns failure immediately, no companion build exists.
 2. Fetch `latest.json` and read `platforms[key].url` and `platforms[key].signature`. If the manifest is unreachable or malformed, fall back to a pinned URL from `constants.js` (`v1.2.1` MSI for Windows, `v1.2.0` DMGs for macOS); pinned fallbacks carry no signature.
 3. Download to the system Downloads folder (`app.getPath('downloads')`), named from the URL path. The stream writes to a `.part` file and renames on completion; the fetch enforces a 10-minute timeout and the host allowlist (`cdn.audima.com.au`, `audima.com.au`, `www.audima.com.au`, HTTPS only).
 4. When a signature is present, verify it with the minisign algorithm below. Verification failure deletes the download (`fs.rmSync`) and returns failure with manual-download guidance.
@@ -121,7 +121,7 @@ Minisign verification (`minisignVerify`):
 4. For tag `ED` (prehashed) the signed message is the BLAKE2b-512 digest of the file; for legacy tag `Ed` it is the file bytes.
 5. Ed25519 verification runs through `node:crypto` with the raw key wrapped in SPKI DER. Any failure raises, which triggers the download deletion described in the outer procedure.
 
-The BLAKE2b-512 prehash in step 4 comes from [`src/main/blake2b.js`](../src/main/blake2b.js), not from `node:crypto`. Electron links BoringSSL rather than OpenSSL, and BoringSSL implements no BLAKE2 — `process.versions.openssl` reads `0.0.0` and `crypto.getHashes()` returns nothing matching `blake`. So `crypto.createHash('blake2b512')` throws `Digest method not supported` in the main process while succeeding under plain Node, and because Audima signs with the modern `ED` tag, every `fetch-companion` attempt failed at step 4 with `Deleted download — Digest method not supported`. The replacement is a dependency-free RFC 7693 implementation that hashes the file as a stream, so a large installer is never held in memory. It is checked against Node's native `blake2b512` and the published vectors by `scripts/test-blake2b.js`, and the whole verification path — including tamper, wrong-key, wrong-key-id and prehash-confusion rejections — by `scripts/test-minisign.js`; both are meant to be run under Electron as well as Node, since the defect only appears in one of them.
+The BLAKE2b-512 prehash in step 4 comes from [`src/main/blake2b.js`](../src/main/blake2b.js), not from `node:crypto`. Electron links BoringSSL rather than OpenSSL, and BoringSSL implements no BLAKE2, `process.versions.openssl` reads `0.0.0` and `crypto.getHashes()` returns nothing matching `blake`. So `crypto.createHash('blake2b512')` throws `Digest method not supported` in the main process while succeeding under plain Node, and because Audima signs with the modern `ED` tag, every `fetch-companion` attempt failed at step 4 with `Deleted download, Digest method not supported`. The replacement is a dependency-free RFC 7693 implementation that hashes the file as a stream, so a large installer is never held in memory. It is checked against Node's native `blake2b512` and the published vectors by `scripts/test-blake2b.js`, and the whole verification path, including tamper, wrong-key, wrong-key-id and prehash-confusion rejections, by `scripts/test-minisign.js`; both are meant to be run under Electron as well as Node, since the defect only appears in one of them.
 
 ### install-dfu-driver
 
@@ -152,7 +152,7 @@ Long-running fixes report progress on the `fix:progress` channel. `main.js` wrap
 | `verify` | `downloadCompanion` | `{ pct: 100 }` before signature verification. |
 | `install` | `installDfuDriver` | `{ pct: 100 }` before the elevated `pnputil` call. |
 
-The renderer subscribes through `window.swaycommand.doctor.onFixProgress`, matches the event to the check owning that fix id, and writes into the check's progress element: `downloading… <pct>%` for the download phase, `<phase>…` otherwise.
+The renderer subscribes through `window.swaycommand.doctor.onFixProgress`, matches the event to the check owning that fix id, and writes into the check's progress element: `downloading... <pct>%` for the download phase, `<phase>...` otherwise.
 
 ## Failure isolation
 

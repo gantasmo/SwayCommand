@@ -1,4 +1,4 @@
-// .sway project file I/O — the application's only write channel. Reads and
+// .sway project file I/O, the application's only write channel. Reads and
 // writes validated documents at user-chosen paths; bundled templates are
 // id-gated the same way DOC_ORDER gates docs:read, so no caller-supplied path
 // reaches the filesystem through the template surface.
@@ -50,7 +50,7 @@ function readProject(filePath) {
   if (raw.format !== FORMAT) throw new Error(`${path.basename(filePath)} is not a .sway project`);
   const fv = Number(raw.format_version);
   if (fv > FORMAT_VERSION) {
-    throw new Error(`This project uses format v${fv}; this build supports up to v${FORMAT_VERSION} — update SwayCommand to open it.`);
+    throw new Error(`This project uses format v${fv}; this build supports up to v${FORMAT_VERSION}, update SwayCommand to open it.`);
   }
   const { doc, warnings } = validateProject(raw);
   const dir = path.dirname(filePath);

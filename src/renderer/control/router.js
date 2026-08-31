@@ -1,12 +1,12 @@
-// Assignment router — the single dispatch point between the control surface
+// Assignment router, the single dispatch point between the control surface
 // (hardware MIDI, keyboard pads) and everything that can be played: sampler,
 // synth, engine, fx rack, transport. Owns the project's assignment table and
 // applies it three ways:
-//   * events   — pad strikes, button CCs, note routing (handleMidiEvent)
-//   * frames   — knob positions (change-driven) and gesture routes (every
+//   * events  , pad strikes, button CCs, note routing (handleMidiEvent)
+//   * frames  , knob positions (change-driven) and gesture routes (every
 //                frame; gestures win over knobs on the same target), via the
 //                engine frame hook
-//   * timeline — the transport's visual-lane events (cut vs crossfade), with
+//   * timeline, the transport's visual-lane events (cut vs crossfade), with
 //                autoVJ suspended while the timeline drives the stage
 // It also records the last physically touched control, which is what lets the
 // on-screen surface follow the hardware.
@@ -104,8 +104,8 @@ export function createRouter({ engine, sampler, synth, transport, midi, onDirty 
         else if (t.key === 'fadeTime') engine.autoVJ.fadeTime = mapped;
         break;
       case 'fx':
-        // A control reaching for the rack turns the rack on — a knob mapped
-        // to glitch must never turn silently in a disabled chain — and
+        // A control reaching for the rack turns the rack on, a knob mapped
+        // to glitch must never turn silently in a disabled chain, and
         // reconcileFx() turns it off again once nothing drives it.
         rackOnByControl();
         engine.setFxParam(t.key, mapped);
@@ -191,7 +191,7 @@ export function createRouter({ engine, sampler, synth, transport, midi, onDirty 
       if (a.transition.type === 'crossfade') engine.setScene(a.scene, a.transition.duration);
       else engine.cutTo(a.scene);
     } else if (a.type === 'sceneAction') {
-      // The event reaches the named scene only while it is on screen — a
+      // The event reaches the named scene only while it is on screen, a
       // black hole fired at a scene nobody can see has nowhere to land.
       engine.sceneAction(a.scene, a.action);
     } else if (a.type === 'fxPunch' && !heldPunches.has(idx)) {
@@ -313,7 +313,7 @@ export function createRouter({ engine, sampler, synth, transport, midi, onDirty 
       }
     },
 
-    // Registered via engine.setFrameHook — runs inside the frame, after
+    // Registered via engine.setFrameHook, runs inside the frame, after
     // control ingestion, before the palette/intensity update.
     frame(dt, t, io) {
       transport.update();
@@ -343,7 +343,7 @@ export function createRouter({ engine, sampler, synth, transport, midi, onDirty 
         if (a) driveTarget(a.target, a.min + applyCurve(a.curve, v) * (a.max - a.min));
       }
 
-      // Gesture routes: applied after knobs — gestures win on a shared target.
+      // Gesture routes: applied after knobs, gestures win on a shared target.
       for (let gi = 0; gi < assignments.gestures.length; gi++) {
         const g = assignments.gestures[gi];
         if (!g.enabled) continue;

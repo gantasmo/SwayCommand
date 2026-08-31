@@ -2,26 +2,26 @@
 
 SwayCommand is an Electron application with two processes. The main process owns operating-system integration: window lifecycle, USB and registry inspection, downloads from Audima's CDN, driver installation, the settings file, and `.sway` project file I/O. The renderer process owns everything visible and audible: the cockpit interface, MIDI input, audio analysis, sample and synth playback, timeline transport, and the WebGL render pipeline. The two communicate over a fixed IPC surface exposed through a context-isolated preload script.
 
-The application is one page — the cockpit — and it is always live. There is no screen flow: the stage renders from the first frame to quit, and every panel, drawer, and modal works on top of it without stopping the render loop. At startup the stage is covered by a line-art blast door while the SYSTEM modal runs the Doctor checks; ENTER (or auto-advance when every check passes) opens the door onto a loaded project — the most recent one, or the First Flight template on a fresh install.
+The application is one page, the cockpit, and it is always live. There is no screen flow: the stage renders from the first frame to quit, and every panel, drawer, and modal works on top of it without stopping the render loop. At startup the stage is covered by a line-art blast door while the SYSTEM modal runs the Doctor checks; ENTER (or auto-advance when every check passes) opens the door onto a loaded project, the most recent one, or the First Flight template on a fresh install.
 
 ## The cockpit
 
 | Region | Contents |
 |---|---|
 | Top bar | Wordmark; the project button (opens the project menu: New, Open, Save, Save as, recent files, templates); the transport (play/pause, stop, clock, LOOP); the current scene readout; status pills (`SWAY`/`MIDI`/`KEYS` link, `LOOPBACK`/`LINE`/`GROOVE`/`MUTE` input, fps); the deck buttons SYNTH, RACK, KIT, DOCS, HELP |
-| Left rail | The SCENES bank — all sixteen registry scenes, with digit hints on the first nine of the active pool; a click switches the stage, a drag onto the timeline lays a clip. The AUTO group — RUN toggle, HOLD min–max seconds, FADE seconds |
+| Left rail | The SCENES bank (all sixteen registry scenes, with digit hints on the first nine of the active pool; a click switches the stage, a drag onto the timeline lays a clip. The AUTO group) RUN toggle, HOLD min-max seconds, FADE seconds |
 | Center | The stage canvas. The blast door covers it at boot and opens once |
 | Right rail | The assignment panel for the selected control, and the INPUT box: the analysis-source button, a level meter, and an audio-reactive band display |
 | Bottom band | The timeline: a toolbar (IMPORT, + TRACK, BPM, TAP, SNAP), a head column (SCENES, then one head per audio track with M / S), a ruler in bars and beats (scrub, loop region, locators), a VISUAL lane of scene clips, one lane per audio track with waveforms and effect sections, and the playhead |
-| Below the band | The Sway deck: a stroke line-art schematic of the hardware. Clicking any control on it — or touching the control on the hardware, with FOLLOW on — selects it for assignment |
+| Below the band | The Sway deck: a stroke line-art schematic of the hardware. Clicking any control on it (or touching the control on the hardware, with FOLLOW on) selects it for assignment |
 
-Every region around the stage is adjustable (`src/renderer/ui/layout.js`). Thin grips on the inner edge of each rail, the top edge of the timeline band and of the deck, and the seam between the assignment panel and the INPUT box drag to resize; double-clicking a grip restores that dimension's default. A chevron chip in each region's top corner collapses it to a thin strip — a rail to an 18 px column, a band to its ruler line or an 18 px bar, a right-rail panel to its header line — and expands it again at the size it had. Sizes and collapsed states persist across sessions in the settings file (`layout` key) and compose with solo view: `O` hides everything, and the collapsed states are still there when it returns.
+Every region around the stage is adjustable (`src/renderer/ui/layout.js`). Thin grips on the inner edge of each rail, the top edge of the timeline band and of the deck, and the seam between the assignment panel and the INPUT box drag to resize; double-clicking a grip restores that dimension's default. A chevron chip in each region's top corner collapses it to a thin strip (a rail to an 18 px column, a band to its ruler line or an 18 px bar, a right-rail panel to its header line) and expands it again at the size it had. Sizes and collapsed states persist across sessions in the settings file (`layout` key) and compose with solo view: `O` hides everything, and the collapsed states are still there when it returns.
 
 Three surfaces overlay the cockpit:
 
-- **Drawer** — SYNTH (`S`), RACK (`R`), KIT (`E`). Opens inboard of the right rail; the stage keeps rendering behind it.
-- **Modals** — SYSTEM (the Doctor), CONTROLS (`H`), DOCS (`D`). The SYSTEM modal is also reachable from the CONTROLS modal.
-- **Popovers** — the project menu and the analysis-source list.
+- **Drawer**, SYNTH (`S`), RACK (`R`), KIT (`E`). Opens inboard of the right rail; the stage keeps rendering behind it.
+- **Modals**, SYSTEM (the Doctor), CONTROLS (`H`), DOCS (`D`). The SYSTEM modal is also reachable from the CONTROLS modal.
+- **Popovers**, the project menu and the analysis-source list.
 
 `Esc` peels one layer at a time: popover, then drawer, then the topmost modal, then the timeline selection, then the deck selection.
 

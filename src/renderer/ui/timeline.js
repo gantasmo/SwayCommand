@@ -1,4 +1,4 @@
-// Timeline band — a toolbar (import, add track, tempo, snap), a head column
+// Timeline band, a toolbar (import, add track, tempo, snap), a head column
 // (one row per lane: scenes, then every audio track with mute / solo), the
 // ruler with bar / beat grid, loop region and locators, one visual lane of
 // scene clips (DOM), N audio lanes with waveforms and effect regions (one
@@ -10,7 +10,7 @@
 // onto the band) lays every file down as its own track at the playhead,
 // snapped to the grid; the first import sets the tempo from the audio when
 // the session has none. Dragging a kit sample onto a track lays it as a clip
-// on that track. Shift+drag on a track marks a SECTION — a region that
+// on that track. Shift+drag on a track marks a SECTION, a region that
 // engages one effect parameter while the playhead crosses it.
 
 import { uid } from '../../shared/swayproject.js';
@@ -346,7 +346,7 @@ export function createTimeline({ transport, engine, store, onEdit, onSelect, onI
     for (const t of list) {
       const selected = sel && sel.kind === 'track' && sel.id === t.id;
       html.push(
-        `<div class="tl-head${selected ? ' selected' : ''}" data-track="${esc(t.id)}" style="height:${rowH}px;flex:0 0 ${rowH}px" title="${esc(t.name)} — click to edit effects, double-click to rename">` +
+        `<div class="tl-head${selected ? ' selected' : ''}" data-track="${esc(t.id)}" style="height:${rowH}px;flex:0 0 ${rowH}px" title="${esc(t.name)}, click to edit effects, double-click to rename">` +
           `<span class="nm">${esc(t.name)}</span>` +
           `<button class="ms${t.muted ? ' on' : ''}" data-m title="mute">M</button>` +
           `<button class="ms${t.solo ? ' on' : ''}${anySolo && !t.solo ? ' dim' : ''}" data-s title="solo">S</button>` +
@@ -762,7 +762,7 @@ export function createTimeline({ transport, engine, store, onEdit, onSelect, onI
       edited();
       setHint(`${bpm} bpm`);
     } else {
-      setHint('tap…');
+      setHint('tap...');
     }
   });
   snapSel.addEventListener('change', () => {

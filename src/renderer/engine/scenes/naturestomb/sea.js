@@ -1,14 +1,14 @@
-// Nature's Tomb — THE DAY: a port of Luis Alberto Martinez Riancho's
+// Nature's Tomb, THE DAY: a port of Luis Alberto Martinez Riancho's
 // (lessrain) CodePen "WebGL Scroll Sync V3" (MIT, notice below). A
 // scene-private module of Nature's Tomb (never registered, no meta); the
 // factory builds one GLSL3 quad and returns it with an update the Tomb drives.
 //
-// The pen: a raymarched ocean in a fragment shader — a heightfield of seven
+// The pen: a raymarched ocean in a fragment shader, a heightfield of seven
 // sines on three swell directions plus a micro noise, marched (22 steps) and
 // refined by bisection (5), shaded with a fresnel reflection of the sky, a
 // sun specular and a sun line, sparkle, foam from the curvature, fog; a sky
-// with a sun on an arc, a moon, stars, a cloud band, a horizon mist, grain —
-// through five phases DAWN / MIDDAY / DUSK / NIGHT / STORM, the scroll 0–1
+// with a sun on an arc, a moon, stars, a cloud band, a horizon mist, grain,
+// through five phases DAWN / MIDDAY / DUSK / NIGHT / STORM, the scroll 0 to 1
 // picking the phase pair (uSc) and the blend (uBl) for every stop table
 // (sky top, sky horizon, sun, sea deep, sea shallow, fog; wave amplitude, fog
 // density, moon amount), with the camera height, z and pitch following the
@@ -16,7 +16,7 @@
 //
 // Here:
 //   TIME OF DAY   the Tomb's development level is the pen's scroll: 0 DAWN
-//               → 1 STORM through the same stop tables; a pad steps it a
+//               -> 1 STORM through the same stop tables; a pad steps it a
 //               phase.
 //   CAMERA      the pen's camY / camZ / pitch follow the level as in the pen;
 //               the hand's X YAWS the look and Y sets the height; PRESS
@@ -25,18 +25,18 @@
 //   SWAY        the storm amount and the wave amplitude.
 //   SPECIES     the swell directions and the cloud band, seeded.
 //   AUDIO       bass lifts the waves a little, the beat flashes the foam.
-//   PALETTE     the pen's stop tables keep their STRUCTURE — which stop is
-//               warm, which cool, how light each is — but are tinted from
+//   PALETTE     the pen's stop tables keep their STRUCTURE, which stop is
+//               warm, which cool, how light each is, but are tinted from
 //               io.palette: the palette is sorted by warmth (as wormholept1
 //               does) and each pen colour is re-drawn as the palette entry at
 //               its own warmth rank, at the pen colour's luminance and
 //               saturation. The sun and the horizon warmth therefore take the
 //               palette's warmest stops, the sea deep its coolest.
 //   NOTE        the storm's swell rotation (rot(storm · 0.18)) is a change of
-//               wave DIRECTION with the phase — not a spin — and is kept.
+//               wave DIRECTION with the phase (not a spin) and is kept.
 //
 // Upstream: https://codepen.io/luis-lessrain/pen/LERxVqv
-// The MIT License (MIT) — Copyright (c) 2026 Luis Alberto Martinez Riancho
+// The MIT License (MIT), Copyright (c) 2026 Luis Alberto Martinez Riancho
 // (https://codepen.io/luis-lessrain/pen/LERxVqv). Permission is hereby
 // granted, free of charge, to any person obtaining a copy of this software
 // and associated documentation files (the "Software"), to deal in the
@@ -56,7 +56,7 @@
 // CHANGES FROM THE ORIGINAL
 //   - GLSL3 (in/out, fragColor, no gl_FragColor) on a three.js quad; the
 //     pen's scroll, wheel, HUD, theme and quality-scaling plumbing are not
-//     used — the scroll is the Tomb's development level.
+//     used, the scroll is the Tomb's development level.
 //   - MARCH_STEPS / REFINE_STEPS by quality tier (the pen's 22 / 5 at med).
 //   - The six colour stop tables are uniforms, tinted from io.palette on the
 //     CPU every frame (structure kept, see PALETTE above); the moon, star and
@@ -64,7 +64,7 @@
 //   - The camera takes the hand (yaw, height) and press (down to the water)
 //     on top of the pen's scroll-driven path; sway adds storm and amplitude;
 //     bass and the beat breathe the water.
-//   - The pen's clamp(col, 0, 1) is dropped — the compositor owns tone; the
+//   - The pen's clamp(col, 0, 1) is dropped, the compositor owns tone; the
 //     pen's scroll smoother is not applied to the level (the pad's fifths
 //     land on the five phases).
 
@@ -326,7 +326,7 @@ const PEN_FIXED = new Float32Array([0.72, 0.80, 0.95, 0.80, 0.88, 1.0, 1.0, 0.82
 
 // S is the Tomb's per-frame plate state: { dt, t, weight, level, sway, press,
 // hx, hy, openS, openDim, speciesHash, warm, bass, pulse }; S.order is the
-// palette sorted cool → warm (indices into io.palette).
+// palette sorted cool -> warm (indices into io.palette).
 export function createSea(THREE, ctx) {
   const tier = ctx.quality.tier;
   const MARCH_STEPS = tier === 'low' ? 16 : tier === 'high' ? 30 : 22;
@@ -369,7 +369,7 @@ export function createSea(THREE, ctx) {
   const approach = (v, to, tau, dt) => v + (to - v) * (1 - Math.exp(-dt / tau));
   const lum3 = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
   // a pen colour re-drawn from the palette: the entry at the pen colour's
-  // warmth rank (the palette sorted cool → warm, interpolated), scaled to the
+  // warmth rank (the palette sorted cool -> warm, interpolated), scaled to the
   // pen colour's luminance, pulled toward grey by the pen colour's own
   // saturation so a near-grey stop stays near grey
   const tmp = new THREE.Color();
@@ -414,7 +414,7 @@ export function createSea(THREE, ctx) {
         const h = spHash;
         U.uSwell.value.set(2.07 + (h - 0.5) * 1.6, -0.19 + (h * 7.3 % 1 - 0.5) * 1.4, h * 23.1, 0.6 + 0.9 * (h * 3.7 % 1));
       }
-      // the stop tables, tinted from the palette sorted cool → warm
+      // the stop tables, tinted from the palette sorted cool -> warm
       const pl = io.palette, o = S.order;
       for (let i = 0; i < 30; i++) tint(PEN_STOPS[i * 3], PEN_STOPS[i * 3 + 1], PEN_STOPS[i * 3 + 2], pl, o, stops, i * 3);
       for (let i = 0; i < 4; i++) tint(PEN_FIXED[i * 3], PEN_FIXED[i * 3 + 1], PEN_FIXED[i * 3 + 2], pl, o, fixed, i * 3);

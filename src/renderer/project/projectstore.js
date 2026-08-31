@@ -1,4 +1,4 @@
-// Project store — owns the current .sway document and its lifecycle: open,
+// Project store, owns the current .sway document and its lifecycle: open,
 // hydrate the live modules, load media, reassemble on save. The document is
 // the single source of truth for meta, palette, media, timeline, and
 // assignments; the timeline and assignment objects are handed to the
@@ -46,7 +46,7 @@ export function createProjectStore(deps) {
 
   // Loads every media file the kit or timeline references. Sequential on
   // purpose: one decode at a time keeps the render loop breathing. Never
-  // awaited by open — the show starts while stems stream in.
+  // awaited by open, the show starts while stems stream in.
   async function loadMediaAsync() {
     const p = project();
     if (!p) return;

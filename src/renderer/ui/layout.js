@@ -39,7 +39,7 @@ function clamp(v, lo, hi) {
 }
 
 export function createLayout({ root, settings }) {
-  const sizes = {}; // user-set px per dimension; absent → CSS default
+  const sizes = {}; // user-set px per dimension; absent -> CSS default
   const collapsed = {};
   const grips = {};
   const chips = {};

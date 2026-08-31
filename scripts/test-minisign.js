@@ -5,7 +5,7 @@
 // drives the real verifier with them. It must accept a good signature and
 // reject every way of tampering with one.
 //
-// Run it under BOTH runtimes — the failure it exists to catch only appears in
+// Run it under BOTH runtimes, the failure it exists to catch only appears in
 // one of them:
 //   node scripts/test-minisign.js
 //   ELECTRON_RUN_AS_NODE=1 ./node_modules/electron/dist/electron.exe scripts/test-minisign.js

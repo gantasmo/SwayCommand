@@ -1,4 +1,4 @@
-// SwayCommand synth — a Vital-class wavetable synthesizer in Web Audio.
+// SwayCommand synth, a Vital-class wavetable synthesizer in Web Audio.
 //
 // WHY VITAL: Audima's downloads page recommends Vital to first-timers ("Vital
 // Synth Pack Free · Best for Beginners") and ships a Sway project for it. This
@@ -7,7 +7,7 @@
 //
 // THEDAW ALIGNMENT: this module is deliberately shaped to lift into theDAW.
 //   * `voiceTrigger()` returns a function with theDAW's exact VoiceTrigger
-//     signature — (ctx, dest, midi, velocity, when, duration, master) — so a
+//     signature ((ctx, dest, midi, velocity, when, duration, master)) so a
 //     patch drops into every place theDAW uses a voice: piano-roll preview,
 //     offline bounce, init render, timeline.
 //   * `controlManifest()` returns theDAW's VisualControl shape
@@ -323,7 +323,7 @@ export function createSynth(ctx, destinationNodes) {
   delayDamp.type = 'lowpass';
   delayDamp.frequency.value = 6000;
 
-  // reverb (generated impulse — no asset, matching the no-assets rule)
+  // reverb (generated impulse, no asset, matching the no-assets rule)
   const reverbDry = ctx.createGain();
   const reverbWet = ctx.createGain();
   const convolver = ctx.createConvolver();
@@ -951,7 +951,7 @@ export function createSynth(ctx, destinationNodes) {
     /**
      * theDAW VoiceTrigger adapter. Same signature as its synthVoiceKit voices:
      * (ctx, dest, midi, velocity, when, duration, master). Scheduling a note in
-     * the future — which the offline bounce does — is handled by passing `when`
+     * the future (which the offline bounce does) is handled by passing `when`
      * straight through to noteOn/noteOff.
      */
     voiceTrigger() {

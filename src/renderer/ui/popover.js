@@ -1,4 +1,4 @@
-// Shared anchored popover — one #popover root, one open at a time. Items are
+// Shared anchored popover, one #popover root, one open at a time. Items are
 // plain buttons carrying data-choice; the opener's callback receives the
 // chosen value. Dismissed by outside click, Esc (via the overlay stack), or
 // choosing an item.

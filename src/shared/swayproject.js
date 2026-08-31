@@ -1,4 +1,4 @@
-// The .sway project document — schema, defaults, validation, legacy conversion.
+// The .sway project document, schema, defaults, validation, legacy conversion.
 // Shared between the main process (CommonJS require) and the renderer bundle
 // (esbuild interops the require form), so this file must stay dependency-free
 // and must not touch fs, DOM, or Electron.
@@ -19,8 +19,8 @@ const { FX_KINDS, fxDefaults, fxClamp } = require('./trackfx');
 
 const PALETTE_FALLBACK = ['#ff2d95', '#7a0bc0', '#2de1fc', '#f9f871', '#ff6b35'];
 const GESTURE_SOURCES = ['xy:x', 'xy:y', 'gesture:pulse', 'gesture:press', 'gesture:sway'];
-// Routes also accept a .gan plugin's control outputs as sources —
-// `gan:<pluginId>:<controlId>` — declared per plugin in project.plugins.
+// Routes also accept a .gan plugin's control outputs as sources,
+// `gan:<pluginId>:<controlId>`, declared per plugin in project.plugins.
 const GAN_SOURCE = /^gan:[^:]+:[^:]+(:[xyz])?$/; // an xy/xyz control routes per axis
 const TARGET_NAMESPACES = ['engine', 'fx', 'synth', 'sampler', 'transport', 'scene', 'track'];
 const PAD_ACTION_TYPES = ['sample', 'scene', 'fxPunch', 'sceneAction', 'stem', 'trackFx'];
@@ -117,7 +117,7 @@ function defaultProject() {
 }
 
 // An audio track: clips, a live effect chain, an offline VST chain played as
-// a wet/dry mix, and regions — sections of the track where an effect
+// a wet/dry mix, and regions, sections of the track where an effect
 // parameter takes a value (the "effect on a section" of the brief).
 function defaultAudioTrack(id, name) {
   return {
@@ -143,7 +143,7 @@ function parseTarget(str) {
   if (!TARGET_NAMESPACES.includes(ns) || !key) return null;
   // Scene targets carry the scene id: two scenes may name a parameter the
   // same, and a control reaching for one must never move the other.
-  // `scene:<sceneId>:<param>` — the scene declares the parameter in
+  // `scene:<sceneId>:<param>`, the scene declares the parameter in
   // meta.controls (docs/SCENE_CONTRACT.md).
   if (ns === 'scene') {
     const at2 = key.indexOf(':');
@@ -198,7 +198,7 @@ function bool(v, fallback) {
 // keeps keys it does not recognize so a newer minor version's data survives a
 // round-trip. Never throws on content: problems land in `warnings`, matching
 // the sampler.setKit posture. Structural rejection (wrong format, newer
-// format_version) is the caller's job — see projectfile.readProject.
+// format_version) is the caller's job, see projectfile.readProject.
 function validateProject(input) {
   const warnings = [];
   const doc = isObj(input) ? input : {};
@@ -244,7 +244,7 @@ function validateProject(input) {
   p.synth.preset = str(p.synth.preset, null);
   if (!isObj(p.synth.patch)) p.synth.patch = null;
 
-  // Media table — the only path-bearing structure in the document.
+  // Media table, the only path-bearing structure in the document.
   const mediaIds = new Set();
   p.media = (Array.isArray(p.media) ? p.media : []).filter((m) => {
     if (!isObj(m) || typeof m.id !== 'string' || !m.id || typeof m.path !== 'string' || !m.path) {
@@ -285,7 +285,7 @@ function validateProject(input) {
   const kn = (p.sampler.knobs = { ...dp.sampler.knobs, ...(isObj(p.sampler.knobs) ? p.sampler.knobs : {}) });
   for (const k of ['master', 'cutoff', 'rate', 'send']) kn[k] = num(kn[k], 0.5, 0, 1);
 
-  // Linked .gan surfaces — control sources for the route table.
+  // Linked .gan surfaces, control sources for the route table.
   const pluginIds = new Set();
   p.plugins = (Array.isArray(p.plugins) ? p.plugins : []).filter((g) => {
     if (!isObj(g) || typeof g.id !== 'string' || !g.id || typeof g.path !== 'string' || !g.path) return false;

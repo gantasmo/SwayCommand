@@ -1,4 +1,4 @@
-// Tempo estimate for an imported stem — onset envelope autocorrelation. Runs
+// Tempo estimate for an imported stem, onset envelope autocorrelation. Runs
 // once at import when the timeline's bpm is unknown, over at most the first
 // ninety seconds, so a dropped stem lands on a bar grid instead of a blank
 // ruler. Returns { bpm, confidence } or null when nothing periodic is found.
@@ -48,7 +48,7 @@ export function estimateBpm(buffer) {
     for (let f = lag; f < frames; f++) s += onset[f] * onset[f - lag];
     ac[lag] = s / (frames - lag);
   }
-  // Mild preference for the 90–150 region: weight by a wide Gaussian in bpm.
+  // Mild preference for the 90 to 150 region: weight by a wide Gaussian in bpm.
   let best = -1;
   let bestV = -Infinity;
   for (let lag = minLag; lag <= maxLag; lag++) {
@@ -71,7 +71,7 @@ export function estimateBpm(buffer) {
     if (denom !== 0) lag = best + (0.5 * (a - c)) / denom;
   }
   let bpm = (60 * fps) / lag;
-  // Octave fold: a strong half-time reading at 60–80 usually means 120–160.
+  // Octave fold: a strong half-time reading at 60 to 80 usually means 120 to 160.
   if (bpm < 80) {
     const dbl = Math.round(lag / 2);
     if (dbl >= minLag && ac[dbl] > bestV * 0.6) bpm *= 2;

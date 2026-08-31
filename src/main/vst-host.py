@@ -1,4 +1,4 @@
-"""SwayCommand VST3 sidecar — one-shot commands over stdin/stdout JSON.
+"""SwayCommand VST3 sidecar, one-shot commands over stdin/stdout JSON.
 
 Hosts VST3 plugins through pedalboard (Spotify), the same library theDAW's MIX
 chain uses, so a plugin dialled in there sounds the same here. SwayCommand has

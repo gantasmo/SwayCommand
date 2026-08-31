@@ -1,4 +1,4 @@
-// Ferrofluid Orb — the real cymatics "orb" mode from GANTASMO's theDAW.
+// Ferrofluid Orb, the real cymatics "orb" mode from GANTASMO's theDAW.
 //
 // Ported from theDAW frontend/src/components/audio/cymatics/sphere-shader.ts
 // and backdrop-shader.ts, composed after the orb branch of
@@ -10,10 +10,10 @@
 // statement of changes.
 //
 // CHANGES FROM THE ORIGINAL:
-//   * The whole sphere vertex shader — rosensweig() with its pole-field
+//   * The whole sphere vertex shader, rosensweig() with its pole-field
 //     dropoff, Fibonacci (13/21/34) phyllotaxis cross-hatch, witch's-hat
 //     foot/apex/sharpTip profile and stillness-on-silence guard, calc(), and
-//     the tangent-frame normal rebuild at inc = 0.005 — is carried over and
+//     the tangent-frame normal rebuild at inc = 0.005, is carried over and
 //     installed exactly the way upstream installs it: onBeforeCompile swaps
 //     MeshStandardMaterial's vertexShader for the ported string. TWO
 //     deviations inside the GLSL: (1) upstream declares `uniform float
@@ -22,7 +22,7 @@
 //     d = 1.0 and the arm expressions are upstream's verbatim; the uniform
 //     merely gains its evidently intended effect so the morphs below can
 //     restructure the field. (2) The phyllotaxis longitude no longer carries
-//     upstream's `t * 0.08` background drift — see the no-autonomous-rotation
+//     upstream's `t * 0.08` background drift, see the no-autonomous-rotation
 //     bullet below.
 //   * Shader language: the backdrop is a RawShaderMaterial in GLSL3
 //     (glslVersion: THREE.GLSL3, `in` / `out vec4 fragmentColor`), as upstream
@@ -32,8 +32,8 @@
 //     the <chunk> includes); three.js compiles and versions that program
 //     itself.
 //   * Upstream reflects piz_compressed.exr through PMREMGenerator. Scenes may
-//     not load assets, so the chrome reflects ctx.environment — the engine's
-//     shared PMREM-filtered RoomEnvironment — through material.envMap.
+//     not load assets, so the chrome reflects ctx.environment, the engine's
+//     shared PMREM-filtered RoomEnvironment, through material.envMap.
 //   * Upstream's UnrealBloomPass (strength 1.65, radius 0.4, threshold 0.6)
 //     is requested through the engine's per-scene bloom: meta.bloom carries
 //     the base numbers and the live instance.bloom surges with pulse/strikes.
@@ -42,14 +42,14 @@
 //     frame (contract rule 1).
 //   * IcosahedronGeometry detail 64 becomes 32/48/64 by quality tier.
 //   * Upstream's calc() returns a perfectly still ball whenever volume is
-//     under 0.01 — right for a reactive art piece, wrong for a VJ scene that
+//     under 0.01, right for a reactive art piece, wrong for a VJ scene that
 //     must hold the screen between cues. A small floor on the CPU-side band
 //     values fed into inputData keeps a standing spike field alive; the
 //     shader itself is untouched.
 //   * Sway-gesture morphs drive the spike PARAMETERS, not mere motion:
-//     STRIKE re-magnetizes (spikeDensity jumps through 3→5→7→9, amplitude
+//     STRIKE re-magnetizes (spikeDensity jumps through 3->5->7->9, amplitude
 //     surges +0.5 decaying ~1.5 s), SWAY glides density 2..9 and viscosity
-//     2.0..0.6 (oily swells → needle forest), PRESS squeezes amplitude toward
+//     2.0..0.6 (oily swells -> needle forest), PRESS squeezes amplitude toward
 //     0.1 while envMapIntensity rises (crushed chrome), PULSE surges bloom
 //     and amplitude.
 //   * No autonomous rotation (project rule): the slow camera azimuth drift
@@ -159,7 +159,7 @@ float rosensweig(vec3 p, float t, vec4 audio) {
   grid = grid * 0.5 + 0.5; // Map to [0.0, 1.0]
 
   // Implement the physical double-curvature Hershey's Kiss / "Witch's Hat" silhouette:
-  // 1. Broad candle-foot flare near base (low exponent) — widened so adjacent
+  // 1. Broad candle-foot flare near base (low exponent), widened so adjacent
   //    spike bases flare out and touch.
   float foot = pow(grid, 1.3);
 
@@ -269,7 +269,7 @@ void main() {
 }`;
 
 // Upstream backdrop-shader.ts, verbatim: the dark-plasma void the orb floats
-// in — a faint radial gradient with temporal dither, in screen space.
+// in, a faint radial gradient with temporal dither, in screen space.
 const BACKDROP_VS = /* glsl */ `precision highp float;
 
 in vec3 position;
@@ -315,7 +315,7 @@ export function createScene(ctx) {
 
   // --- backdrop: upstream's BackSide icosahedron with the raw GLSL3 shader.
   //     gl_FragCoord runs over the engine's render target, which is sized
-  //     canvas × the renderer's pixel ratio — resolution tracks that.
+  //     canvas × the renderer's pixel ratio, resolution tracks that.
   const pr0 = ctx.renderer.getPixelRatio();
   const backdropGeo = new THREE.IcosahedronGeometry(12, 5);
   const backdropMat = new THREE.RawShaderMaterial({
@@ -334,7 +334,7 @@ export function createScene(ctx) {
 
   // --- the orb: pristine high-gloss wet-obsidian black chrome. The near-zero
   //     albedo means facing surfaces stay black while grazing angles mirror
-  //     the environment — the whole look depends on envMap being present.
+  //     the environment, the whole look depends on envMap being present.
   const orbGeo = new THREE.IcosahedronGeometry(1.0, detail);
   const orbMat = new THREE.MeshStandardMaterial({
     color: 0x010101,
@@ -379,7 +379,7 @@ export function createScene(ctx) {
   // --- preallocated state
   const bloom = { strength: 1.65, radius: 0.4, threshold: 0.6 };
   const prevPads = new Float32Array(PADS);
-  let cycleIdx = 1; // DENSITY_CYCLE[1] = 5 — the upstream default
+  let cycleIdx = 1; // DENSITY_CYCLE[1] = 5, the upstream default
   let density = SPIKE_DENSITY;
   let viscosity = NOISE_VISCOSITY;
   let surge = 0; // strike amplitude surge, decays ~1.5 s
@@ -406,7 +406,7 @@ export function createScene(ctx) {
       envM += (io.bands.mid - envM) * envK;
       envH += (io.bands.high - envH) * envK;
 
-      // STRIKE — re-magnetization. A pad rising edge cycles spikeDensity to a
+      // STRIKE, re-magnetization. A pad rising edge cycles spikeDensity to a
       // new value (an instant jump: the field restructures, then glides back
       // toward the sway target) and fires a decaying amplitude surge.
       for (let i = 0; i < PADS; i++) {
@@ -421,13 +421,13 @@ export function createScene(ctx) {
       surge *= Math.exp(-dt / 0.5); // ~1.5 s to fade out
       strikeFlash *= Math.exp(-dt / 0.35);
 
-      // SWAY — continuous field morph: density glides 2..9, viscosity 2.0..0.6
+      // SWAY, continuous field morph: density glides 2..9, viscosity 2.0..0.6
       // (calm oily swells at the bottom, needle forests at the top).
       density = approach(density, 2 + io.gestures.sway * 7, 0.45, dt);
       viscosity = approach(viscosity, 2.0 - 1.4 * io.gestures.sway, 0.45, dt);
 
-      // PRESS — squeeze: amplitude compresses toward 0.1 while the chrome
-      // crushes brighter below. PULSE — amplitude surge (bloom surges below).
+      // PRESS, squeeze: amplitude compresses toward 0.1 while the chrome
+      // crushes brighter below. PULSE, amplitude surge (bloom surges below).
       const amp =
         SPIKE_AMPLITUDE + (0.1 - SPIKE_AMPLITUDE) * io.gestures.press +
         surge * 0.5 +
@@ -442,7 +442,7 @@ export function createScene(ctx) {
 
       // Pack the bands into upstream's vec4 layout, over the idle floor
       // (adaptation, see header). The floor breathes slowly (±25 %, ~9 s) so
-      // the standing field swells and settles between cues — non-rotational
+      // the standing field swells and settles between cues, non-rotational
       // idle life in place of the drifts this port no longer carries.
       // outputData stays zero as in the orb branch.
       const breath = 1 + 0.25 * Math.sin(t * 0.7);
@@ -454,7 +454,7 @@ export function createScene(ctx) {
       // Upstream sphere scale.
       orb.scale.setScalar(1 + 0.04 * envB);
 
-      // Camera: upstream's 3.3 orbit, steered by io.xy alone — no autonomous
+      // Camera: upstream's 3.3 orbit, steered by io.xy alone, no autonomous
       // drift (project rule: nothing rotates by itself).
       azS = approach(azS, io.xy.x * Math.PI * 2, 0.25, dt);
       elS = approach(elS, (io.xy.y - 0.5) * 2.2, 0.25, dt);
@@ -474,7 +474,7 @@ export function createScene(ctx) {
       rimLight.intensity = (0.9 + io.beat * 0.6) * io.intensity;
       fillLight.intensity = 0.4 * io.intensity;
 
-      // PRESS crushes the chrome brighter; base sits in the 1.2–1.6 band the
+      // PRESS crushes the chrome brighter; base sits in the 1.2 to 1.6 band the
       // RoomEnvironment needs to make black chrome read at all.
       orbMat.envMapIntensity = 1.45 + io.gestures.press * 1.15;
 
@@ -492,7 +492,7 @@ export function createScene(ctx) {
     },
     dispose() {
       orbGeo.dispose();
-      orbMat.dispose(); // ctx.environment is engine-owned — not disposed here
+      orbMat.dispose(); // ctx.environment is engine-owned, not disposed here
       backdropGeo.dispose();
       backdropMat.dispose();
       keyLight.dispose();

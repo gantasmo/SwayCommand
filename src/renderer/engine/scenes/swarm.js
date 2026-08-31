@@ -1,15 +1,15 @@
-// Swarm — a stateless GPU particle cloud orbiting an attractor that chases
+// Swarm, a stateless GPU particle cloud orbiting an attractor that chases
 // the hand. Every particle's position is computed in the vertex shader from
 // pure random seeds + time (layered sin/cos pseudo-curl), so the CPU only
 // pushes uniforms: bass swells the orbits, beats detonate a radial burst,
-// press clenches the swarm, and sway morphs the flocking itself — one tight
+// press clenches the swarm, and sway morphs the flocking itself, one tight
 // murmuration glides apart into five sub-flock cells parked on a fixed ring
 // while each cell's cohesion radius pulls in. A strike is a scatter shock: a
 // velocity burst plus an attractor re-seed the swarm reforms from over ~2 s,
 // with the cells re-slotting on their ring. Nothing turns by itself: the
 // ring never revolves (the cells breathe radially and bob instead), and the
 // camera holds a fixed eye, only easing its look toward the attractor as it
-// chases the hand — each particle's pseudo-curl path is per-particle flow,
+// chases the hand, each particle's pseudo-curl path is per-particle flow,
 // not a turning cloud. One Points draw call.
 // Scene contract: docs/SCENE_CONTRACT.md.
 
@@ -98,7 +98,7 @@ export function createScene(ctx) {
         p *= 1.0 + uBurst * (0.4 + aSeed.z * 0.9); // beat: expanding radial shell
 
         // flocking morph: aSeed.x assigns one of five sub-flock cells on a
-        // fixed ring around the attractor — the ring never revolves by
+        // fixed ring around the attractor, the ring never revolves by
         // itself; each cell breathes radially and bobs so the split still
         // reads alive. uMorph glides the cell offset from zero (one tight
         // murmuration) to full separation (several cells); uCellSeed
@@ -151,7 +151,7 @@ export function createScene(ctx) {
     update(dt, t, io) {
       const u = mat.uniforms;
 
-      // strike: scatter shock — a velocity burst plus an attractor re-seed
+      // strike: scatter shock, a velocity burst plus an attractor re-seed
       // that decays over ~2 s, so the swarm blows apart and reforms; the
       // sub-flock cells re-slot on their ring at the same instant
       if (io.strike > strikePrev + 0.25) {
@@ -194,7 +194,7 @@ export function createScene(ctx) {
       u.uColorA.value.copy(io.palette[ia]).multiplyScalar(io.intensity);
       u.uColorB.value.copy(io.palette[ib]).multiplyScalar(io.intensity);
 
-      // fixed eye at (0, 4, 30) — nothing orbits or bobs by itself; the beat
+      // fixed eye at (0, 4, 30), nothing orbits or bobs by itself; the beat
       // lifts it a touch and the look-at eases toward the attractor as it
       // chases the hand
       camera.position.y = 4 + io.beat * 0.5;

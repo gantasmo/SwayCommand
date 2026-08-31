@@ -1,4 +1,4 @@
-﻿# Common.ps1 — shared plumbing for the SwayCommand bootstrapper.
+﻿# Common.ps1, shared plumbing for the SwayCommand bootstrapper.
 #
 # Windows PowerShell 5.1 compatible on purpose: this code has to run on a
 # machine where nothing is installed yet, so it may not assume Node, pwsh 7,
@@ -344,7 +344,7 @@ function Invoke-TrackedProcess {
     <#
       Runs a console tool, streaming its output to the log and (optionally) to
       a line callback so a step can turn tool chatter into progress. Returns
-      @{ ExitCode; Output }. Never throws on a non-zero exit — callers decide.
+      @{ ExitCode; Output }. Never throws on a non-zero exit, callers decide.
     #>
     param(
         [Parameter(Mandatory = $true)]$Context,
@@ -444,7 +444,7 @@ function Get-FreeDiskGb {
 
 function Format-Duration {
     param([double]$Seconds)
-    if ($null -eq $Seconds -or $Seconds -lt 0) { return '—' }
+    if ($null -eq $Seconds -or $Seconds -lt 0) { return '--' }
     $s = [int][math]::Round($Seconds)
     if ($s -lt 60) { return ('{0}s' -f $s) }
     $m = [int][math]::Floor($s / 60)

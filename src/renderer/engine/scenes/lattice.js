@@ -1,4 +1,4 @@
-// Quantum Lattice — the real lattice engine from GANTASMO's theDAW: an
+// Quantum Lattice, the real lattice engine from GANTASMO's theDAW: an
 // instanced node-and-beam structure that MORPHS between four sacred
 // geometries (Grand Torus, Cubic Frame, Merkabah Star, Cosmos Cage) around a
 // cuboctahedron core with a reactor at its heart, under UnrealBloom.
@@ -18,7 +18,7 @@
 //     bloom multipliers.
 //   * Bloom is real now: the engine runs UnrealBloomPass per scene, and this
 //     instance mutates its live bloom (base 0.2 × shape multiplier, + volume,
-//     + morph shockwave, radius 0.35, threshold 0.82 — upstream's numbers).
+//     + morph shockwave, radius 0.35, threshold 0.82, upstream's numbers).
 //   * Both fragment shaders' maths verbatim (fresnel/energyFlux/grid/burst
 //     beams, thermal/storm/reactor nodes), upstream fresnel powers (beams 3.0,
 //     nodes 2.5) and heartbeat default 6.5, written in GLSL3 form
@@ -185,7 +185,7 @@ export function createScene(ctx) {
   const GOLDEN = (1 + Math.sqrt(5)) / 2;
 
   // Cuboctahedron core: 12 vertices; edges are the vertex pairs at squared
-  // distance 2 (upstream's 1.9..2.1 window) — 24 of them.
+  // distance 2 (upstream's 1.9..2.1 window), 24 of them.
   const CUBO_V = [
     [1, 1, 0], [1, -1, 0], [-1, 1, 0], [-1, -1, 0],
     [1, 0, 1], [1, 0, -1], [-1, 0, 1], [-1, 0, -1],
@@ -330,7 +330,7 @@ export function createScene(ctx) {
       bassEnv += (io.bands.bass - bassEnv) * (io.bands.bass > bassEnv ? tcUp : tcDn);
       volEnv += (io.level - volEnv) * (io.level > volEnv ? tcUp : tcDn);
 
-      // A STRIKE advances the geometry and fires the full morph shockwave —
+      // A STRIKE advances the geometry and fires the full morph shockwave,
       // upstream's beat-cycle mechanism, triggered by the hand. The bass
       // hysteresis gate keeps working underneath it.
       beatCooldown = Math.max(0, beatCooldown - dt);

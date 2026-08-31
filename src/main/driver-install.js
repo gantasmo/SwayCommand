@@ -1,7 +1,7 @@
 // Windows DFU driver installation. Uses Audima's official driver package
 // (ST-signed WinUSB INF for the STM32 bootloader, VID_0483&PID_DF11) and
 // stages it with pnputil under a user-approved UAC elevation. Only ever
-// invoked from an explicit Doctor "Fix" click — never silently.
+// invoked from an explicit Doctor "Fix" click, never silently.
 
 'use strict';
 
@@ -21,7 +21,7 @@ function runPS(command, timeout = 180000) {
 
 async function installDfuDriver(progress) {
   if (process.platform !== 'win32') {
-    return { ok: true, detail: 'No driver needed on this OS — DFU uses built-in class drivers.' };
+    return { ok: true, detail: 'No driver needed on this OS, DFU uses built-in class drivers.' };
   }
   try {
     if (progress) progress({ phase: 'download', pct: 0 });
@@ -45,7 +45,7 @@ async function installDfuDriver(progress) {
     return {
       ok: false,
       detail: cancelled
-        ? 'Elevation was declined — the driver was not installed. You can run this fix again any time.'
+        ? 'Elevation was declined, the driver was not installed. You can run this fix again any time.'
         : `Driver install failed: ${err.message}. You can install manually from audima.com.au/downloads (Windows DFU Driver).`,
     };
   }

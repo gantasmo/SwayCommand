@@ -1,18 +1,18 @@
-// Track effects — the specification table shared by the .sway validator, the
+// Track effects, the specification table shared by the .sway validator, the
 // audio graph (renderer/audio/trackfx.js) and the assignment panel. Shared
 // between the main process (CommonJS require) and the renderer bundle, so it
 // stays dependency-free and touches no DOM, fs or Electron.
 //
 // A track's chain is an ordered list of entries { id, kind, enabled, params }
 // where `kind` names a row below and `params` holds one number per key. The
-// kinds here are the LIVE effects — Web Audio graphs the transport builds per
+// kinds here are the LIVE effects, Web Audio graphs the transport builds per
 // track. VST3 plugins are the separate `track.vst` chain, rendered offline
 // through the pedalboard sidecar (main/vsthost.js) and played as a wet/dry
 // mix; they have no row here.
 //
 // Param spec: [min, max, default, unit?]. Units: 'hz' (log mapped on the UI
 // slider), 'beats' (a tempo-synced division, converted with the timeline's
-// bpm — 120 when unknown), 'db', 'enum' (an integer pick from `options`).
+// bpm, 120 when unknown), 'db', 'enum' (an integer pick from `options`).
 
 'use strict';
 
@@ -159,7 +159,7 @@ function fxClamp(kind, key, value) {
   return v < lo ? lo : v > hi ? hi : v;
 }
 
-// A tempo-synced division in beats → seconds at the given bpm.
+// A tempo-synced division in beats -> seconds at the given bpm.
 function beatsToSeconds(beats, bpm) {
   const b = Number(bpm) > 0 ? Number(bpm) : 120;
   return (60 / b) * beats;

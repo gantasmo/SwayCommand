@@ -1,4 +1,4 @@
-// VST3 hosting — drives the pedalboard sidecar (vst-host.py) from the main
+// VST3 hosting, drives the pedalboard sidecar (vst-host.py) from the main
 // process. There is no native host in SwayCommand; a Python that can import
 // pedalboard is found once (theDAW's own environment beside this repo, a
 // user-picked interpreter, or whatever `py`/`python3`/`python` resolves to),
@@ -46,7 +46,7 @@ function candidates(settings) {
   if (settings && typeof settings.vstPython === 'string' && settings.vstPython) list.push(settings.vstPython);
   const home = os.homedir();
   const exe = process.platform === 'win32' ? path.join('Scripts', 'python.exe') : path.join('bin', 'python');
-  // theDAW's environment — the same pedalboard the MIX chain runs on.
+  // theDAW's environment, the same pedalboard the MIX chain runs on.
   for (const base of [
     path.join(home, 'Documents', 'Dev', 'theDAW', '.venv'),
     path.join(home, 'Dev', 'theDAW', '.venv'),

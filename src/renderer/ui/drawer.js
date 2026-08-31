@@ -14,7 +14,7 @@ export function createDrawer({ onOpenTab }) {
     for (const tab of TABS) {
       $(`#deck-${tab}`).hidden = tab !== current;
     }
-    // The deckbar is the drawer's tab strip — its buttons show the open tab.
+    // The deckbar is the drawer's tab strip, its buttons show the open tab.
     for (const btn of document.querySelectorAll('#deckbar [data-drawer]')) {
       btn.classList.toggle('on', btn.dataset.drawer === current);
     }

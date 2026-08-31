@@ -1,37 +1,37 @@
-// Nature's Tomb — MICROSCOPY: a port of Matthias Hurrle's (@atzedent)
+// Nature's Tomb, MICROSCOPY: a port of Matthias Hurrle's (@atzedent)
 // CodePen "Microscopy" (MIT, notice below). A scene-private module of
 // Nature's Tomb (never registered, no meta); the factory builds one GLSL3 quad
 // and returns it with an update the Tomb drives.
 //
-// The pen: stacked layers of Worley noise — a two-octave fbm of the F1
+// The pen: stacked layers of Worley noise, a two-octave fbm of the F1
 // distance to cell points that drift on a sine (p = .5 + .5·sin(t + 6.3·p))
-// — domain-warped by two more Worley samples, lit as a heightfield with a
+//, domain-warped by two more Worley samples, lit as a heightfield with a
 // normal whose z term breathes on sin(sin(T)), which is what makes it read as
 // the lens focus being adjusted; a deep colour under a bright one by height
 // thresholds, a specular, tanh tone, a vignette.
 //
 // Here:
 //   FOCUS       the Tomb's development level IS the focus pull: out of focus
-//               → focused → through focus. The pen's sin(sin(T)) normal term
+//               -> focused -> through focus. The pen's sin(sin(T)) normal term
 //               is driven by the level instead of the clock (the relief's
 //               contrast is what sharpens and softens), and the two Worley
-//               layers take the focus with their DEPTH — the coarse layer is
+//               layers take the focus with their DEPTH, the coarse layer is
 //               sharp before focus, both at focus, the fine layer past it.
 //               Nothing animates itself but the slow Worley drift, which is
 //               the cells' own flow. When the organism knob dissolves the
 //               plate in or out, the dissolve runs THROUGH a short focus
-//               pull (defocus → refocus), so every change of plate reads as
-//               the microscope being refocused — one uniform, no cost.
+//               pull (defocus -> refocus), so every change of plate reads as
+//               the microscope being refocused, one uniform, no cost.
 //   SWAY        magnification (the uv scale).
 //   PRESS       aperture: the pen's vignette (the scene applies none at rest
-//               — the compositor owns tone) and a contrast lift.
+//              , the compositor owns tone) and a contrast lift.
 //   HAND        pans the slide.
 //   PALETTE     the pen's vec3(.05,.1,.2) and vec3(.1,.7,.8) become the
 //               palette's two coolest stops at the pen's luminances; the
 //               specular is the warmest stop lifted to white.
 //
 // Upstream: https://codepen.io/atzedent/pen/NPbMpWQ
-// The MIT License (MIT) — Copyright (c) 2026 Matthias Hurrle
+// The MIT License (MIT), Copyright (c) 2026 Matthias Hurrle
 // (https://codepen.io/atzedent/pen/NPbMpWQ). Permission is hereby granted,
 // free of charge, to any person obtaining a copy of this software and
 // associated documentation files (the "Software"), to deal in the Software
@@ -55,7 +55,7 @@
 //     pen's 5 × 5: every cell point lies inside its own cell and the pen caps
 //     the distance at .25, so the nearest point is always in the 3 × 3 and
 //     the result is identical at a third of the cost.
-//   - The pen's fbm turned its domain by cos(T·.01) per octave — a slow
+//   - The pen's fbm turned its domain by cos(T·.01) per octave, a slow
 //     rotation of the whole pattern; that turn is a CONSTANT here (the
 //     scene contract: nothing rotates by itself). The cell drift stays.
 //   - The focus (the normal's z term) follows the development level, not
@@ -77,7 +77,7 @@ const FRAG = /* glsl */ `
     p += dot(p, p.yzx + 33.33);
     return fract((p.x + p.y) * p.z);
   }
-  // Worley F1: the cell points drift on a sine of t — the cells' own flow
+  // Worley F1: the cell points drift on a sine of t, the cells' own flow
   float noise(vec2 p, float t) {
     vec2 i = floor(p), f = fract(p);
     float d = .25;
@@ -153,7 +153,7 @@ const VERT = /* glsl */ `
 
 // S is the Tomb's per-frame plate state: { dt, t, weight, level, sway, press,
 // hx, hy, openS, openDim, species, warm }; the Tomb hands its palette sorted
-// cool → warm in S.order (indices into io.palette).
+// cool -> warm in S.order (indices into io.palette).
 export function createMicroscopy(THREE, ctx) {
   const U = {
     uRes: { value: new THREE.Vector2(ctx.width, ctx.height) },
@@ -209,7 +209,7 @@ export function createMicroscopy(THREE, ctx) {
       shown = true;
       quad.visible = true;
       const dt = S.dt;
-      // the species: the cell scale and the layer mix — a seeded magnification base
+      // the species: the cell scale and the layer mix, a seeded magnification base
       const spMag = 0.7 + 0.7 * S.speciesHash;
       mag = approach(mag, spMag * (1.35 - 0.9 * S.sway), 0.3, dt);
       ap = approach(ap, S.press, 0.15, dt);

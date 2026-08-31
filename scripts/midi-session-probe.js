@@ -1,25 +1,25 @@
-// Hardware monitor session probe — one SWAYCOMMAND_PROBE expression.
+// Hardware monitor session probe, one SWAYCOMMAND_PROBE expression.
 //
 // Launched by scripts/midi-session.ps1. It wraps the MIDI monitor ring buffer
-// (src/renderer/midi/midi.js pushMonitor → monitor.unshift) so every incoming
+// (src/renderer/midi/midi.js pushMonitor -> monitor.unshift) so every incoming
 // line is captured with a timestamp for window.__midiSessionMs milliseconds,
-// then resolves one JSON report the main process prints as `[probe] …`.
+// then resolves one JSON report the main process prints as `[probe] ...`.
 //
 // The report answers the three open hardware questions in HANDOFF.md §4:
-//   padStrikeOrder — the pads in the order they were first struck, each with
+//   padStrikeOrder, the pads in the order they were first struck, each with
 //                    the raw note and the pad index the app resolved it to.
 //                    Struck in the deck's order (left cluster top row
-//                    left→right = 0-3, right cluster top row = 4-7, left
+//                    left->right = 0-3, right cluster top row = 4-7, left
 //                    bottom row = 8-11, right bottom row = 12-15) the `pad`
 //                    column must read 0..15; anything else is the reorder
 //                    PAD_CELLS needs (src/renderer/ui/surface.js).
-//   unmappedCCs    — every CC number the factory map has no target for, in
+//   unmappedCCs   , every CC number the factory map has no target for, in
 //                    first-seen order: the eight buttons and the knob presses,
 //                    if the hardware sends them as CCs. Buttons should show
 //                    min 0 / max 127 value pairs.
-//   mappedCCs      — factory-mapped CCs that also moved (sanity: the knobs,
+//   mappedCCs     , factory-mapped CCs that also moved (sanity: the knobs,
 //                    xy, gestures), without their value samples.
-//   raw            — the first 400 captured lines, for anything unexpected.
+//   raw           , the first 400 captured lines, for anything unexpected.
 //
 // The file is a single expression (an async IIFE) so it can be handed to
 // webContents.executeJavaScript verbatim; executeJavaScript awaits the promise.
@@ -43,7 +43,7 @@
   const padSeen = new Set();
   const ccs = new Map();
   for (const [ms, l] of captured) {
-    let m = /^NOTE (\d+) vel(\d+) ch(\d+)(?: → pad(\d+))?$/.exec(l);
+    let m = /^NOTE (\d+) vel(\d+) ch(\d+)(?: -> pad(\d+))?$/.exec(l);
     if (m) {
       const note = +m[1];
       if (!padSeen.has(note)) {
@@ -52,7 +52,7 @@
       }
       continue;
     }
-    m = /^CC(\d+)=(\d+) ch(\d+)(?: → (.+))?$/.exec(l);
+    m = /^CC(\d+)=(\d+) ch(\d+)(?: -> (.+))?$/.exec(l);
     if (m) {
       const cc = +m[1];
       const v = +m[2];
