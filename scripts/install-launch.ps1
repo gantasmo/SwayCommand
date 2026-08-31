@@ -1,11 +1,18 @@
-# install-launch.ps1 - SwayCommand from-source bootstrap (Windows)
+# install-launch.ps1 - SUPERSEDED. Nothing invokes this any more.
 #
+# "SwayCommand.bat" now calls scripts\bootstrap\Install-SwayCommand.ps1.
+# This script is kept only for reference; it cannot successfully start the app,
+# for the reasons written up in docs\INSTALLER-DIAGNOSIS.md. In short: it treats
+# the presence of node_modules as proof that dependencies are installed, but
+# electron >= 43 ships no postinstall hook, so npm leaves the runtime binary
+# undownloaded and this script reports success and then launches nothing.
+#
+# ---- original header ----
 # Checks for Node.js >= 18 (installs it via winget when possible), installs
 # npm dependencies when needed, then launches the app with 'npm run start'.
 #
 # Compatible with Windows PowerShell 5.1. Does not require admin (the winget
 # Node.js installer may show a User Account Control prompt of its own).
-# Normally launched by "Install & Launch SwayCommand.bat" in the repo root.
 
 $ErrorActionPreference = 'Stop'
 $MinNodeMajor = 18
@@ -79,7 +86,7 @@ if ($null -ne $major -and $major -ge $MinNodeMajor) {
             Write-Ok "Node.js v$major installed and detected."
         } else {
             Write-Fail 'Node.js was installed but is not detected in this window yet.'
-            Write-Host "Close this window, then double-click 'Install & Launch SwayCommand.bat' again."
+            Write-Host "Close this window, then double-click 'SwayCommand.bat' again."
             exit 1
         }
     } else {
@@ -87,7 +94,7 @@ if ($null -ne $major -and $major -ge $MinNodeMajor) {
         Write-Host ''
         Write-Host "  1. Download the Node.js LTS installer:  $NodeDownloadUrl"
         Write-Host '  2. Run the installer (the default options are fine).'
-        Write-Host "  3. Double-click 'Install & Launch SwayCommand.bat' again."
+        Write-Host "  3. Double-click 'SwayCommand.bat' again."
         Write-Host ''
         Open-NodeDownloadPage
         exit 1

@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
-# install-launch.sh - SwayCommand from-source bootstrap (macOS / Linux)
+# SwayCommand.sh - from-source bootstrap (macOS / Linux)
 #
 # Checks for Node.js >= 18, installs npm dependencies when needed, then
 # launches the app with 'npm run start'.
 #
-# Run from a terminal:   ./install-launch.sh
-# macOS double-click:    "Install & Launch SwayCommand.command"
+# Run from a terminal:   ./SwayCommand.sh
+# macOS double-click:    "SwayCommand.command"
 set -euo pipefail
 
 MIN_NODE_MAJOR=18
 NODE_DOWNLOAD_URL="https://nodejs.org/en/download"
+
+# Any Electron-hosted terminal exports ELECTRON_RUN_AS_NODE=1. Inherited, it
+# makes require('electron') return a path string instead of the API object and
+# the app dies on startup. See docs/INSTALLER-DIAGNOSIS.md.
+unset ELECTRON_RUN_AS_NODE ELECTRON_NO_ATTACH_CONSOLE ELECTRON_OVERRIDE_DIST_PATH ELECTRON_NO_ASAR NODE_OPTIONS 2>/dev/null || true
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -100,12 +105,14 @@ if [ ! -f package.json ]; then
 fi
 
 need_install=0
-if [ ! -d node_modules ]; then
+if [ ! -d node_modules ] || [ ! -f node_modules/.package-lock.json ]; then
+  # npm writes node_modules/.package-lock.json only when a reify completes, so
+  # its absence means the last install did not finish.
   need_install=1
-  fix "node_modules is missing - installing dependencies (first run may take a few minutes)..."
-elif [ package.json -nt node_modules ]; then
+  fix "Dependencies are missing or incomplete - installing (first run may take a few minutes)..."
+elif [ -f package-lock.json ] && [ package-lock.json -nt node_modules/.package-lock.json ]; then
   need_install=1
-  fix "package.json is newer than node_modules - refreshing dependencies..."
+  fix "package-lock.json changed - refreshing dependencies..."
 else
   ok "Dependencies are already installed."
 fi
@@ -116,6 +123,33 @@ if [ "$need_install" -eq 1 ]; then
     exit 1
   fi
   ok "Dependencies installed."
+fi
+
+# --- Step (b2): the Electron runtime itself ---
+# electron >= 43 publishes no postinstall hook, so `npm install` creates
+# node_modules/electron without ever downloading the ~200 MB runtime and still
+# exits 0. Left alone, the download ambushes the user at launch time with no
+# progress and no explanation. Do it here, where it can be announced.
+electron_binary() {
+  [ -f node_modules/electron/path.txt ] || return 1
+  printf 'node_modules/electron/dist/%s' "$(cat node_modules/electron/path.txt)"
+}
+
+if [ -d node_modules/electron ]; then
+  bin="$(electron_binary || true)"
+  if [ -z "$bin" ] || [ ! -e "$bin" ]; then
+    fix "The Electron runtime was not downloaded by npm - fetching it now (about 200 MB, one time)..."
+    # Keep the download in Electron's own cache so wiping node_modules never
+    # costs a second download.
+    export ELECTRON_CACHE="${ELECTRON_CACHE:-$HOME/.cache/electron}"
+    if ! node node_modules/electron/install.js; then
+      fail "Could not download the Electron runtime. Check your internet connection or proxy settings, then run this again."
+      exit 1
+    fi
+    ok "Electron runtime installed."
+  else
+    ok "Electron runtime is present."
+  fi
 fi
 
 # --- Step (c): launch ---

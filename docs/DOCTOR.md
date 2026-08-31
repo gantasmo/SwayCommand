@@ -121,6 +121,8 @@ Minisign verification (`minisignVerify`):
 4. For tag `ED` (prehashed) the signed message is the BLAKE2b-512 digest of the file; for legacy tag `Ed` it is the file bytes.
 5. Ed25519 verification runs through `node:crypto` with the raw key wrapped in SPKI DER. Any failure raises, which triggers the download deletion described in the outer procedure.
 
+The BLAKE2b-512 prehash in step 4 comes from [`src/main/blake2b.js`](../src/main/blake2b.js), not from `node:crypto`. Electron links BoringSSL rather than OpenSSL, and BoringSSL implements no BLAKE2 — `process.versions.openssl` reads `0.0.0` and `crypto.getHashes()` returns nothing matching `blake`. So `crypto.createHash('blake2b512')` throws `Digest method not supported` in the main process while succeeding under plain Node, and because Audima signs with the modern `ED` tag, every `fetch-companion` attempt failed at step 4 with `Deleted download — Digest method not supported`. The replacement is a dependency-free RFC 7693 implementation that hashes the file as a stream, so a large installer is never held in memory. It is checked against Node's native `blake2b512` and the published vectors by `scripts/test-blake2b.js`, and the whole verification path — including tamper, wrong-key, wrong-key-id and prehash-confusion rejections — by `scripts/test-minisign.js`; both are meant to be run under Electron as well as Node, since the defect only appears in one of them.
+
 ### install-dfu-driver
 
 Windows only; on other platforms the fix returns success, reporting that built-in class drivers cover DFU.
