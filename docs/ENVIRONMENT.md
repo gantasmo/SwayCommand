@@ -14,7 +14,7 @@ All seven variables are read in `src/main/main.js`. Four exist for automated ver
 | `SWAYCOMMAND_WINDOW` | `<width>x<height>`, e.g. `960x600` | unset | Forces the initial window size so narrow layouts can be screenshot-tested headlessly. |
 | `SWAYCOMMAND_AUTOPLAY` | Template id, or a `.sway` file path | unset | Forwarded to the renderer as the `autoplay` query parameter of `dist/index.html`. |
 | `SWAYCOMMAND_SCENE` | Scene id | unset | Forwarded to the renderer as the `scene` query parameter. |
-| `SWAYCOMMAND_ANGLE` | ANGLE backend name (`gl`, `d3d11`, `vulkan`), or `default` | `gl` | The graphics backend ANGLE translates the shaders through, applied as Chromium's `--use-angle` before the app is ready. The default is **`gl`** because the D3D11 backend compiles through fxc, which fully unrolls and inlines: the first draw of Nature's Tomb cost 132 s on D3D11 against 12 s on GL, and a cache-warm first draw 2.9 s against 0.29 s, for between −0.1 and +1.9 ms a frame at 1080p tier med. Set `d3d11` to restore the old backend, or `default` to let Chromium choose. The program cache is raised to 512 MB at the same point and is not configurable — at Chromium's default the two big scenes' binaries evict each other and neither is ever cached, so every launch pays the full compile. |
+| `SWAYCOMMAND_ANGLE` | ANGLE backend name (`gl`, `d3d11`, `vulkan`), or `default` | `gl` | The graphics backend ANGLE translates the shaders through, applied as Chromium's `--use-angle` before the app is ready. The default is **`gl`** because the D3D11 backend compiles through fxc, which fully unrolls and inlines: the first draw of Nature's Tomb cost 132 s on D3D11 against 12 s on GL, and a cache-warm first draw 2.9 s against 0.29 s, for between −0.1 and +1.9 ms a frame at 1080p tier med. Set `d3d11` to restore the old backend, or `default` to let Chromium choose. The program cache is raised to 512 MB at the same point and is not configurable, at Chromium's default the two big scenes' binaries evict each other and neither is ever cached, so every launch pays the full compile. |
 
 `SWAYCOMMAND_SHOT` and `SWAYCOMMAND_PROBE` register independent `did-finish-load` timers and can be combined; screenshot mode quits the application once its own delay elapses, so a probe result appears only when the probe timer (3000 ms) fires first. Launch examples:
 
@@ -30,7 +30,7 @@ SWAYCOMMAND_AUTOPLAY="$HOME/Documents/SwayCommand Projects/My Set.sway" SWAYCOMM
 
 ### ELECTRON_RUN_AS_NODE caveat
 
-When `ELECTRON_RUN_AS_NODE` is present in the environment — typically inherited when the application is launched from a tool that is itself an Electron process — the `electron` binary behaves as a plain Node.js interpreter. `require('electron')` then does not return the Electron API, `app` is `undefined`, and startup fails at the `app.whenReady()` call in `src/main/main.js` with:
+When `ELECTRON_RUN_AS_NODE` is present in the environment (typically inherited when the application is launched from a tool that is itself an Electron process) the `electron` binary behaves as a plain Node.js interpreter. `require('electron')` then does not return the Electron API, `app` is `undefined`, and startup fails at the `app.whenReady()` call in `src/main/main.js` with:
 
 ```
 TypeError: Cannot read properties of undefined (reading 'whenReady')
@@ -64,7 +64,7 @@ The renderer exposes `window.__swaycommand` for `SWAYCOMMAND_PROBE` expressions 
   transport, projectStore, router, selectControl, openProject, saveProject }
 ```
 
-`state` carries the live modules (`engine`, `midi`, `audio`, `sampler`, `synth`, `transport`, `router`, `projectStore`) plus the `entered` flag (whether the blast door has opened). There is no `state.screen` — the cockpit is one page; probes that branched on the active screen should read `state.entered`, the drawer, or the modal states instead. Working probe examples:
+`state` carries the live modules (`engine`, `midi`, `audio`, `sampler`, `synth`, `transport`, `router`, `projectStore`) plus the `entered` flag (whether the blast door has opened). There is no `state.screen`, the cockpit is one page; probes that branched on the active screen should read `state.entered`, the drawer, or the modal states instead. Working probe examples:
 
 ```powershell
 # scene registry size and current scene
@@ -92,7 +92,7 @@ $env:SWAYCOMMAND_PROBE = "__swaycommand.openStudio('kit'); __swaycommand.selectC
 
 ## The offscreen scene harness
 
-Scene work does not need the app at all. `node scripts/scene-harness.js <plan.json>` bundles the scene registry with esbuild, opens a **hidden** Electron window (no focus steal, no MIDI port taken, the app untouched), creates scenes with the same creation context the engine passes, drives `update()` with a patched `io` per planned shot, saves a PNG still per shot, and prints one JSON report: per shot `updateMs` (CPU, per frame), `msPerFrame` (a 40-frame burst closed by a pipeline-draining `readPixels`), `gpuMs` (the GPU's own per-frame time from `EXT_disjoint_timer_query_webgl2`, `null` where the driver does not expose it), and the hooked console errors and warnings — a shader that fails to compile shows there. The plan format is in the file's header; a shot's `io` patch takes `knobs`, `xy`, `gestures`, `bands`, `level`, `beat`, `intensity`, `palette`, `strike` (one pad) or `strikes` (several together), `transport` (`{ playing, time }`), and — for scenes that declare a control surface ([SCENE_CONTRACT.md](SCENE_CONTRACT.md#the-scene-control-surface)) — `actions` (fired through `action()` on the first frame) and `params` (set through `setParam()` before the frames). Shots run in order on cached instances, so state carries from one to the next. Clear `ELECTRON_RUN_AS_NODE` before running it, as for any Electron launch.
+Scene work does not need the app at all. `node scripts/scene-harness.js <plan.json>` bundles the scene registry with esbuild, opens a **hidden** Electron window (no focus steal, no MIDI port taken, the app untouched), creates scenes with the same creation context the engine passes, drives `update()` with a patched `io` per planned shot, saves a PNG still per shot, and prints one JSON report: per shot `updateMs` (CPU, per frame), `msPerFrame` (a 40-frame burst closed by a pipeline-draining `readPixels`), `gpuMs` (the GPU's own per-frame time from `EXT_disjoint_timer_query_webgl2`, `null` where the driver does not expose it), and the hooked console errors and warnings, a shader that fails to compile shows there. The plan format is in the file's header; a shot's `io` patch takes `knobs`, `xy`, `gestures`, `bands`, `level`, `beat`, `intensity`, `palette`, `strike` (one pad) or `strikes` (several together), `transport` (`{ playing, time }`), and, for scenes that declare a control surface ([SCENE_CONTRACT.md](SCENE_CONTRACT.md#the-scene-control-surface)), `actions` (fired through `action()` on the first frame) and `params` (set through `setParam()` before the frames). Shots run in order on cached instances, so state carries from one to the next. Clear `ELECTRON_RUN_AS_NODE` before running it, as for any Electron launch.
 
 ## Settings file
 
@@ -110,7 +110,7 @@ Keys in use:
 | `recentProjects` | The main process on every project open and save (up to 10 entries; missing paths pruned on read) | The project menu's RECENT section and the startup project selection |
 | `lastProjectDir` | The main process after every open/save dialog | The next dialog's starting directory |
 | `kit` | No current writer (pre-cockpit builds wrote it) | Restored once at startup as a legacy kit; the kit now lives in the project file |
-| `layout` | The layout module (`src/renderer/ui/layout.js`) ~300 ms after a grip drag, a grip double-click, or a collapse chip | Applied at startup: `{ railLeft, railRight, tl, deck, input, collapsed: { railLeft, railRight, tl, deck, assign, input } }` — panel sizes in px (a missing key means the CSS default) and which regions are collapsed |
+| `layout` | The layout module (`src/renderer/ui/layout.js`) ~300 ms after a grip drag, a grip double-click, or a collapse chip | Applied at startup: `{ railLeft, railRight, tl, deck, input, collapsed: { railLeft, railRight, tl, deck, assign, input } }`, panel sizes in px (a missing key means the CSS default) and which regions are collapsed |
 
 ## Data locations
 
@@ -121,11 +121,11 @@ Keys in use:
 | `userData` (Linux) | `~/.config/SwayCommand` |
 | Settings file | `<userData>/settings.json` |
 | Default `.sway` save directory | `~/Documents/SwayCommand Projects` (created on first save; the dialogs accept any location outside the application directory) |
-| Bundled templates | `projects/templates/*.sway` at the package root — the repository root in development, the `resources/app.asar` root when packaged |
+| Bundled templates | `projects/templates/*.sway` at the package root, the repository root in development, the `resources/app.asar` root when packaged |
 | Downloaded Sway Software installer | The system Downloads folder (`app.getPath('downloads')`); the file name is taken from the download URL |
 | DFU driver package | `<userData>/audima/dfu-driver.zip`, extracted to `<userData>/audima/dfu-driver/` |
 | Installed application (Windows) | `%LOCALAPPDATA%\Programs\swaycommand` |
-| Bundled documentation read by the in-application modal | `README.md` and `docs/*.md` at the package root — the repository root in development, the `resources/app.asar` root when packaged |
+| Bundled documentation read by the in-application modal | `README.md` and `docs/*.md` at the package root, the repository root in development, the `resources/app.asar` root when packaged |
 
 In-progress downloads use a `.part` suffix next to the destination and are renamed only on completion. Project saves are atomic: a `.tmp` file next to the destination, renamed into place.
 
@@ -153,8 +153,8 @@ Every HTTP request the application makes goes through `audimaFetch` in `src/main
 | `win32` | `windows-x86_64` |
 | `darwin` / `arm64` | `darwin-aarch64` |
 | `darwin` / other | `darwin-x86_64` |
-| `linux` | none — the `fetch-companion` fix reports that Audima ships no Linux companion build |
+| `linux` | none, the `fetch-companion` fix reports that Audima ships no Linux companion build |
 
 The Doctor's network check reports the manifest's version on success; on failure it downgrades to a warning and offers the `open-downloads-page` fix instead of retrying.
 
-No other host is ever contacted. The renderer cannot reach the network at all (`connect-src 'self'` in the page CSP), and the `shell:openExternal` channel only hands allowlisted `https:` URLs to the system browser — the fifteen `EXTERNAL_ALLOW` entries tabulated in [ARCHITECTURE.md](ARCHITECTURE.md), including their subdomains. The list covers the hosts cited by the bundled documentation, so a link followed in the documentation modal reaches the system browser; a target outside the list is refused and the modal shows an inline notice with the URL instead. The documentation modal issues no network request of its own: `docs:list` and `docs:read` read Markdown from the package. Signature verification runs locally against the Ed25519 public key embedded in `src/shared/constants.js` and issues no additional request. The application contains no telemetry and performs no update check for itself; the version resolved from `latest.json` concerns Sway Software only.
+No other host is ever contacted. The renderer cannot reach the network at all (`connect-src 'self'` in the page CSP), and the `shell:openExternal` channel only hands allowlisted `https:` URLs to the system browser, the fifteen `EXTERNAL_ALLOW` entries tabulated in [ARCHITECTURE.md](ARCHITECTURE.md), including their subdomains. The list covers the hosts cited by the bundled documentation, so a link followed in the documentation modal reaches the system browser; a target outside the list is refused and the modal shows an inline notice with the URL instead. The documentation modal issues no network request of its own: `docs:list` and `docs:read` read Markdown from the package. Signature verification runs locally against the Ed25519 public key embedded in `src/shared/constants.js` and issues no additional request. The application contains no telemetry and performs no update check for itself; the version resolved from `latest.json` concerns Sway Software only.

@@ -1,4 +1,4 @@
-﻿# Graph.ps1 — the dependency graph, its resolver, and the run loop.
+﻿# Graph.ps1, the dependency graph, its resolver, and the run loop.
 #
 # Every prerequisite is a node with a Test (is it already satisfied?) and an
 # Install (make it so). Nodes declare what they Require; the resolver
@@ -19,7 +19,7 @@ function New-BootstrapStep {
         [double]$EstimateSeconds = 10,
         [double]$DownloadBytes = 0,
         # First-run estimates per variant (see $step.Variant below). A step whose
-        # cost depends on what it finds — a warm download cache versus a cold one —
+        # cost depends on what it finds, a warm download cache versus a cold one,
         # cannot be described by a single number.
         [hashtable]$VariantEstimates = @{}
     )
@@ -89,7 +89,7 @@ function Invoke-DetectionPass {
       Runs every Test in dependency order. A step whose prerequisite is missing
       cannot be probed meaningfully (you cannot ask npm for its version before
       Node exists), so it is left 'pending' and assumed to need work.
-      A Test that throws is treated as "not satisfied" — never as a crash.
+      A Test that throws is treated as "not satisfied", never as a crash.
     #>
     param(
         [Parameter(Mandatory = $true)]$Context,
@@ -132,7 +132,7 @@ function Invoke-DetectionPass {
         } catch {
             Write-BootstrapLog -Context $Context -Level warn -Message "Test for '$($step.Id)' failed: $($_.Exception.Message)"
             $step.State = 'pending'
-            $step.Detail = 'Could not verify — will install'
+            $step.Detail = 'Could not verify, will install'
             $satisfied[$step.Id] = $false
         }
     }
@@ -185,7 +185,7 @@ function Get-RemainingSeconds {
         if ($s.State -eq 'done' -or $s.State -eq 'failed') { continue }
         if ($s.State -eq 'running') {
             if ($null -ne $s.SecondsRemaining) {
-                # Measured, not modelled — trust it as-is.
+                # Measured, not modelled, trust it as-is.
                 $remaining += [double]$s.SecondsRemaining
             } else {
                 $left = [double]$s.EstimateSeconds * (1.0 - [double]$s.Progress)

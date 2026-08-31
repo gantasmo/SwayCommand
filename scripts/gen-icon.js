@@ -1,7 +1,7 @@
 // Generate the SwayCommand icon with zero image dependencies: raw RGBA is
 // painted in JS, PNG-encoded by hand (zlib + CRC32), and wrapped in a
-// PNG-flavored .ico (valid on Vista+). Motif: sixteen beam stripes — one per
-// Sway IR sensor — rising through the brand gradient on near-black.
+// PNG-flavored .ico (valid on Vista+). Motif: sixteen beam stripes, one per
+// Sway IR sensor, rising through the brand gradient on near-black.
 
 'use strict';
 

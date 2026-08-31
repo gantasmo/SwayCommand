@@ -12,7 +12,7 @@ The Sway is a gesture MIDI controller made by Audima Labs Pty Ltd (Australia; fo
 | Lighting | 16 RGB LED beam and motion-reactive LEDs |
 | Display | 3.2" OLED |
 | Knobs | 8 click knobs |
-| Pads and buttons | 16 drum pads plus 8 mappable buttons — not "20 pads"; confirmed from manual Fig. 14 |
+| Pads and buttons | 16 drum pads plus 8 mappable buttons, not "20 pads"; confirmed from manual Fig. 14 |
 | Preset buttons | 6 |
 | Power control | Scroll-click power wheel |
 | Dimensions | 45 × 17 × 4 cm |
@@ -27,7 +27,7 @@ Commercial and community status:
 |---|---|
 | Retail price | US$830 |
 | Crowdfunding | A$213,900 raised on Indiegogo from 244 backers |
-| Delivery | Batches 1–3 delivered; Batch 4 pre-orders opened approximately 2026-08-18, shipping November–December 2026 |
+| Delivery | Batches 1 to 3 delivered; Batch 4 pre-orders opened approximately 2026-08-18, shipping November-December 2026 |
 | Community size | 244 Indiegogo backers plus batch sales; a Discord server of approximately 1,500 members |
 
 Commercial sources: <https://audima.com.au/faqs/> , <https://audima.com.au/updates/>. Community sources: the Indiegogo page above, <https://discord.com/invite/CYUrJXjjN4>.
@@ -36,7 +36,7 @@ Community assessment: forum discussion characterizes the tracking as effectively
 
 ## Downloads inventory
 
-The inventory below is complete as of the verification date. All Audima downloads are hosted on `cdn.audima.com.au`. The CDN and audima.com.au return HTTP 403 for User-Agents containing curl, python, or Go tool signatures; any other User-Agent — including a custom honest one — passes (verified empirically). Range/206 requests are supported; no authentication is required. Sources: <https://audima.com.au/downloads/> (behavior), <https://cdn.audima.com.au/robots.txt>.
+The inventory below is complete as of the verification date. All Audima downloads are hosted on `cdn.audima.com.au`. The CDN and audima.com.au return HTTP 403 for User-Agents containing curl, python, or Go tool signatures; any other User-Agent (including a custom honest one) passes (verified empirically). Range/206 requests are supported; no authentication is required. Sources: <https://audima.com.au/downloads/> (behavior), <https://cdn.audima.com.au/robots.txt>.
 
 ### Sway Software
 
@@ -56,7 +56,7 @@ The version endpoint <https://cdn.audima.com.au/software/latest.json> is a stand
 | Item | URL | Notes |
 |---|---|---|
 | Windows DFU driver | <https://cdn.audima.com.au/software/Windows%20DFU%20Driver.zip> | STM32Bootloader.inf (WinUSB for `USB\VID_0483&PID_DF11`), ST-signed .cat, installer exes, pnputil .bat. Required only for firmware updates on Windows; normal MIDI use is driverless on Windows 10+, macOS, and Linux. Licensed under ST **SLA0048** (embedded in the INF), which permits redistribution with notices retained |
-| Firmware v1.3.0 (latest) | <https://cdn.audima.com.au/firmware/v1.3.0.zip> | CM7.bin plus CM4.bin; v1.0.0–v1.2.0 at the same URL pattern. The site publishes no standalone firmware link; firmware is normally flashed via the Sway Software |
+| Firmware v1.3.0 (latest) | <https://cdn.audima.com.au/firmware/v1.3.0.zip> | CM7.bin plus CM4.bin; v1.0.0 to v1.2.0 at the same URL pattern. The site publishes no standalone firmware link; firmware is normally flashed via the Sway Software |
 | User manual (37 pp, 14.8 MB) | <https://cdn.audima.com.au/docs/Audima%20Labs%20The%20Sway%20User%20Manual.pdf> | |
 | Firmware update guide (18.5 MB) | <https://cdn.audima.com.au/docs/Audima%20Labs%20The%20Sway%20Firmware%20Update%20Guide.pdf> | |
 
@@ -69,7 +69,7 @@ Index: <https://audima.com.au/downloads/>.
 | Base Project V2 (.swayproj, factory map) | <https://cdn.audima.com.au/software/Audima%20Labs%20The%20Sway%20V2.swayproj> |
 | Ableton Live 12 remote script (compiled .pyc; Live 10/11 at sibling URLs) | <https://cdn.audima.com.au/daws/ableton/Audima%20Labs%20The%20Sway%20Ableton%20Live%2012.zip> |
 | Cubase MIDI Remote | <https://cdn.audima.com.au/daws/cubase/Audima%20Labs%20The%20Sway%20Cubase.midiremote> |
-| Demo packs | Vital (.swayproj), Logic (.logicx.zip plus Mappings.cs plus .swayproj), Ableton **Garage** (255 MB) / **DNB** (60.6 MB) / **Hip Hop** (69.2 MB), each with a matching .swayproj — all under `https://cdn.audima.com.au/daws/…` |
+| Demo packs | Vital (.swayproj), Logic (.logicx.zip plus Mappings.cs plus .swayproj), Ableton **Garage** (255 MB) / **DNB** (60.6 MB) / **Hip Hop** (69.2 MB), each with a matching .swayproj, all under `https://cdn.audima.com.au/daws/...` |
 
 Audima publishes no SDK, no public API, no GitHub organization, no OSC support, and no MPE specification. Sources: <https://audima.com.au/downloads/> , <https://github.com/wavestat3/SwayAI> (the only third-party repository, confirming the absence).
 
@@ -79,12 +79,12 @@ Audima's terms and conditions prohibit redistributing Audima content without wri
 
 ## USB identity and MIDI integration
 
-The runtime USB identity comes from the official firmware descriptors, is authoritative, and is stable across firmware v1.0.0–v1.3.0:
+The runtime USB identity comes from the official firmware descriptors, is authoritative, and is stable across firmware v1.0.0 to v1.3.0:
 
 | Attribute | Value |
 |---|---|
 | VID / PID (normal operation) | `0x0483` / `0x52A4`, composite device (IAD) |
-| Interface 1 | CDC-ACM serial — the proprietary companion-app protocol |
+| Interface 1 | CDC-ACM serial, the proprietary companion-app protocol |
 | Interface 2 | Class-compliant USB-MIDI, single 1×1 port pair |
 | Manufacturer string | "Audima Labs" |
 | Product / MIDI port name | Exactly "Audima Labs The Sway" on Windows and macOS; the Cubase script's cross-platform equals-match filter confirms the exact string |
@@ -92,7 +92,7 @@ The runtime USB identity comes from the official firmware descriptors, is author
 
 Sources: <https://cdn.audima.com.au/firmware/v1.3.0.zip> , <https://cdn.audima.com.au/daws/cubase/Audima%20Labs%20The%20Sway%20Cubase.midiremote>.
 
-Integration is plain MIDI: notes, CC, Program Change, plus a per-region MPE flag in projects. Reliable device detection reads the USB VID/PID device node (`pnputil`/`Get-PnpDevice` on Windows, `system_profiler` on macOS, `lsusb` on Linux — the method implemented in `src/main/doctor.js`); matching serial ports by friendly name is unreliable and is not used.
+Integration is plain MIDI: notes, CC, Program Change, plus a per-region MPE flag in projects. Reliable device detection reads the USB VID/PID device node (`pnputil`/`Get-PnpDevice` on Windows, `system_profiler` on macOS, `lsusb` on Linux, the method implemented in `src/main/doctor.js`); matching serial ports by friendly name is unreliable and is not used.
 
 ## Factory MIDI map
 
@@ -106,8 +106,8 @@ Integration is plain MIDI: notes, CC, Program Change, plus a per-region MPE flag
 | Gesture isolation: Press | CC 36 |
 | Gesture isolation: Sway | CC 37 |
 | X-trigger / Y-mod region pairs | e.g. CC 73 / CC 74 |
-| Knobs 1–8 (rotation) | CC 20–27 |
-| 16 drum pads | B-minor Theory Engine notes by default; Audima's Ableton demo projects remap pads to chromatic notes 24–39 |
+| Knobs 1 to 8 (rotation) | CC 20 to 27 |
+| 16 drum pads | B-minor Theory Engine notes by default; Audima's Ableton demo projects remap pads to chromatic notes 24 to 39 |
 | Sleep / wake | Program Change bank 0, PC 37 / PC 38 |
 
 **[UNCERTAIN]** The following items require one hardware MIDI-monitor session to resolve:
@@ -121,7 +121,7 @@ Integration is plain MIDI: notes, CC, Program Change, plus a per-region MPE flag
 
 ### Serial and EEPROM write prohibition
 
-Programmatic device configuration was evaluated and rejected. The Sway Software's serial protocol (Handshake, SendProjectFragment*, EEPROM upload, ACK/retry) was recovered from the Tauri executable, but the wire framing — CRC polynomial, baud rate, ACK bytes — is not statically recoverable. The `.swayproj` format is a versioned raw EEPROM image whose layout has already changed once (`FF 02` prefix). The Sway Software ships a deliberate `corrupt_eeprom` test demonstrating that bad writes **soft-brick the stored configuration**. SwayCommand does not write to the device; the write-prohibition policy is recorded in [SWAY_INTEGRATION.md](SWAY_INTEGRATION.md). Source: binary analysis of <https://cdn.audima.com.au/software/v1.2.0/The.Sway_1.2.0_x64_en-US.msi>.
+Programmatic device configuration was evaluated and rejected. The Sway Software's serial protocol (Handshake, SendProjectFragment*, EEPROM upload, ACK/retry) was recovered from the Tauri executable, but the wire framing (CRC polynomial, baud rate, ACK bytes) is not statically recoverable. The `.swayproj` format is a versioned raw EEPROM image whose layout has already changed once (`FF 02` prefix). The Sway Software ships a deliberate `corrupt_eeprom` test demonstrating that bad writes **soft-brick the stored configuration**. SwayCommand does not write to the device; the write-prohibition policy is recorded in [SWAY_INTEGRATION.md](SWAY_INTEGRATION.md). Source: binary analysis of <https://cdn.audima.com.au/software/v1.2.0/The.Sway_1.2.0_x64_en-US.msi>.
 
 ## Prior art
 
@@ -147,7 +147,7 @@ No VJ or visualizer application for the Sway has shipped. The niche is empty.
 
 | Finding | Detail |
 |---|---|
-| Only genuine third-party Sway software | <https://github.com/wavestat3/SwayAI> — a web configuration editor (React/TypeScript); 1 star, no releases, device-push is a stub, and its JSON schema diverges from the Sway Software's |
+| Only genuine third-party Sway software | <https://github.com/wavestat3/SwayAI>, a web configuration editor (React/TypeScript); 1 star, no releases, device-push is a stub, and its JSON schema diverges from the Sway Software's |
 | Adjacent project | <https://github.com/SenProduction/virtual-dj-gesture-mixer> is "inspired by" the Sway (webcam/MediaPipe); no device integration |
 | Physical accessories | One stand exists: <https://st3nd.com/product/stand-audima-labs-sway-30-dual/> |
 | Owner practice | Owners hand-map the Sway into TouchDesigner, Pangolin, and projection rigs; nothing has been released (<https://audima.com.au/reviews/>) |

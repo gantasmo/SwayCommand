@@ -1,13 +1,13 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// EFFECTS RACK — a GPU post-processing chain reproducing the GANTASMO VJ-9000
+// EFFECTS RACK, a GPU post-processing chain reproducing the GANTASMO VJ-9000
 // effect decks (GEOMETRICS / CORRUPTION / CHROMATICS / TIMECODE / ASCII).
 //
-// PORTED FROM — GANTASMO VJ-9000, the three.js/WebGL VJ engine that ships inside
+// PORTED FROM, GANTASMO VJ-9000, the three.js/WebGL VJ engine that ships inside
 // the author's own prior project theDAW (https://github.com/gantasmo/theDAW),
 // which this repository records as MIT-licensed in README.md ("theDAW by
 // GANTASMO (MIT)") and docs/RESEARCH.md. Reused here by the same author under
 // those MIT terms; SwayCommand is itself MIT (package.json). Files drawn on:
-//   • src/components/VideoOutput.tsx   — the whole 2D-canvas effect pipeline:
+//   • src/components/VideoOutput.tsx  , the whole 2D-canvas effect pipeline:
 //       feedback wash, tiling/kaleidoscope/mirror, softEdges gradients, the
 //       radial-spoke wheel, pixelate downscale, glitch slice tearing, rgbGhost
 //       screen smear, strobe, echo trails, posterize-time frame hold, backskip
@@ -15,31 +15,31 @@
 //       brightness/invert/sepia/grayscale/blur) and the SVG filters it appends
 //       (feConvolveMatrix edge, feTurbulence+feDisplacementMap wave warp,
 //       feOffset+feBlend rgb split), plus the scanline / CRT / vignette overlays.
-//   • src/asciiline/AsciilineRenderer.ts — the ASCII pass: the 93-char ramp,
+//   • src/asciiline/AsciilineRenderer.ts, the ASCII pass: the 93-char ramp,
 //       the baked glyph atlas, the cell/atlas sampling shader, mono/accent
 //       modes and the audio ink term. (That file is itself a port of ASCILINE
 //       by YusufB5, distributed under an MIT-style permission grant carrying an
-//       ADDED USE RESTRICTION — it is therefore NOT plain MIT: this code must
+//       ADDED USE RESTRICTION, it is therefore NOT plain MIT: this code must
 //       not be used to render advertising. That restriction travels with this
 //       file and binds anyone who reuses it. Attribution: YusufB5/ASCILINE.)
 //   • src/pluginRegistry.ts, src/components/VJControls.tsx, src/types.ts
-//       — effect ids, neutral values, control ranges and DEFAULT_VJ_STATE.
+//      , effect ids, neutral values, control ranges and DEFAULT_VJ_STATE.
 //
 // SUMMARY OF CHANGES (full detail in the per-effect comments below):
-//   1. 2D canvas → GPU. Every per-pixel canvas op became a fragment-shader
+//   1. 2D canvas -> GPU. Every per-pixel canvas op became a fragment-shader
 //      stage; forward canvas transforms (rotate/scale/clip/drawImage) became
 //      inverse UV maps. The maths and constants are reproduced verbatim.
 //   2. GLSL route: GLSL3 (GLSL ES 3.00, `glslVersion: THREE.GLSL3` on every
 //      material). The upstream ASCII shader was already `#version 300 es`; it
-//      keeps `texture()` and its own fragment output (`out vec4 O` → `out vec4
-//      fragColor`), and `gl_FragCoord.xy/u_resolution` → an `in vec2 vUv`. No
+//      keeps `texture()` and its own fragment output (`out vec4 O` -> `out vec4
+//      fragColor`), and `gl_FragCoord.xy/u_resolution` -> an `in vec2 vUv`. No
 //      array constructors were needed.
 //   3. Pass folding. All the cheap per-pixel work lives in four mega-shaders
 //      (geometry+feedback, corruption, the colour grade+blur, and optics+
 //      overlays) with uniform toggles. Only trails/feedback (persistent
 //      targets) and ASCII (glyph atlas) get passes of their own, and every
 //      optional pass is skipped when neutral. The grade is split off from
-//      optics purely for cost — see PASS SPLIT at FRAG_GRADE.
+//      optics purely for cost, see PASS SPLIT at FRAG_GRADE.
 //   4. Frame-history effects are the one place cost forced a real deviation:
 //      upstream keeps a 60-frame full-resolution ring of canvases. Echo trails
 //      became an exponential accumulator (same operator, see ECHO TRAILS) and
@@ -47,41 +47,41 @@
 //   5. Additions for SwayCommand, all marked `// [SwayCommand]`: io.beat/io.gestures.pulse
 //      as extra strobe triggers, an optional palette-driven ASCII accent, an
 //      optional radial mode for the chromatic-aberration offset, and the
-//      audio-sweetening ARM GATE — upstream lets bass push glitch/ghost/split/
+//      audio-sweetening ARM GATE, upstream lets bass push glitch/ghost/split/
 //      warp up from a fader parked at zero, which "autoplays" a deck the VJ has
 //      switched off; here each push is gated on its own fader being > 0. The
 //      push VALUE is upstream's (see the render() block); only the gate is new.
 //      Two rack-native effects are additions outright (no upstream source):
 //      `anaglyph`, a depth-scaled red/cyan stereo split in FRAG_FINAL, and
-//      `mosaic`, a grouted tile quantiser in FRAG_GEO — both marked at their
+//      `mosaic`, a grouted tile quantiser in FRAG_GEO, both marked at their
 //      sites and both taking the same arm-gated bass sweetening.
 //
-// NOT PORTED (out of scope for this rack — they are sources or whole-frame
+// NOT PORTED (out of scope for this rack, they are sources or whole-frame
 // compositors, not the effect decks): equirect projection, stereo SBS/TB,
 // slit-scan, time displacement, the Category A/B plugin passes (reaction-
 // diffusion, SDF portal, topographic, fluid displacement, depth fog, z-planes,
 // tilt-shift, depth outline), autopilot, playback speed/reverse, recording.
 //
 // CONTRACT
-//   createFxRack(THREE, renderer, width, height, opts?) → {
+//   createFxRack(THREE, renderer, width, height, opts?) -> {
 //     render(inputTexture, outputTarget, dt, io), params, setParam(k, v),
 //     reset(), resize(w, h), dispose()
 //   }
 //   `opts` is optional and keeps the four-argument call working:
-//     { tier: 'low'|'med'|'high' }  — default 'med'. Scales the blur tap count,
+//     { tier: 'low'|'med'|'high' } , default 'med'. Scales the blur tap count,
 //     the ASCII cell-average tap grid and the backskip ring depth (see TIERS).
 //     (createFxRack has no ctx, so the host passes its quality tier here.)
-//   ZERO allocation in render() — verified at zero bytes/frame in steady state,
+//   ZERO allocation in render(), verified at zero bytes/frame in steady state,
 //   after the lazily-created targets exist. dispose() frees every target,
 //   geometry, material and texture the rack created.
 //   `setParam` is the guarded entry point: it clamps to the table below and
 //   rejects non-finite input. Writing `params` directly is supported (the UI
 //   binds to it) but is trusted to supply finite numbers; the two values that
-//   would amplify a stray NaN into a blank frame — the geometry zoom and the
-//   tile count — are guarded at their use sites regardless.
+//   would amplify a stray NaN into a blank frame, the geometry zoom and the
+//   tile count, are guarded at their use sites regardless.
 //
 // ─────────────────────────────────────────────────────────────────────────────
-// PARAMETER TABLE — key: default (range) — source of each default/range noted.
+// PARAMETER TABLE (key: default (range)) source of each default/range noted.
 // (`params` is a plain mutable object; a UI can be generated straight from this.)
 //
 //   GEOMETRICS
@@ -214,7 +214,7 @@ export const DECKS = Object.freeze([
   { name: 'ASCII', keys: ['ascii', 'asciiCols', 'asciiMono', 'asciiAccent', 'asciiPalette'] },
 ]);
 
-// ── ASCII constants — AsciilineRenderer.ts, verbatim ────────────────────────
+// ── ASCII constants, AsciilineRenderer.ts, verbatim ────────────────────────
 /** ASCILINE's 93-char ramp, dark (space) to light (@). Verbatim. */
 const RAMP = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
 const RAMP_N = RAMP.length;       // 93
@@ -228,7 +228,7 @@ const MAX_SLICES = 12;
 const TAU = Math.PI * 2;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SHADERS — GLSL3 (GLSL ES 3.00) throughout: every material below sets
+// SHADERS, GLSL3 (GLSL ES 3.00) throughout: every material below sets
 // `glslVersion: THREE.GLSL3` (through MAT_OPTS), so the vertex stage uses
 // in/out, each fragment stage declares its own `out vec4 fragColor`, and
 // sampling is `texture()`. three.js supplies `#version 300 es`, the precision
@@ -250,7 +250,7 @@ const VERT = /* glsl */ `
     gl_Position = vec4(position.xy, 0.0, 1.0); // fullscreen, no matrices
   }`;
 
-/** Straight copy — used for the posterize-time hold and the backskip ring write. */
+/** Straight copy, used for the posterize-time hold and the backskip ring write. */
 const FRAG_COPY = /* glsl */ `
   precision highp float;
   uniform sampler2D tSrc;
@@ -266,7 +266,7 @@ const FRAG_COPY = /* glsl */ `
 // Canvas source-over with a constant globalAlpha a is exactly the recurrence
 //     c <- a * f + (1 - a) * c
 // so the upstream composite is a truncated exponential accumulation with
-// a = 1/(N+1), total weight g = 1 - (1-a)^(N+1)  (g < 1 — the frame genuinely
+// a = 1/(N+1), total weight g = 1 - (1-a)^(N+1)  (g < 1, the frame genuinely
 // darkens; that is part of the look and is reproduced).
 //
 // DEVIATION: upstream feeds the ring newest-frame-first, so the OLDEST frame
@@ -302,7 +302,7 @@ const FRAG_ECHO = /* glsl */ `
 //                   in x, BL mirrored in y, BR both)
 //   • mirrorX/Y     scale(±1, ±1) about the tile centre
 //   • softEdges     two sequential black linear-gradient fills, stops
-//                   0→1, 0.15→0, 0.85→0, 1→1, over the drawn rect
+//                   0->1, 0.15->0, 0.85->0, 1->1, over the drawn rect
 //   • feedback      the black-fill + lowered-globalAlpha accumulation
 //
 // drawVideoCover's aspect "cover" fit collapses to the identity here: the input
@@ -311,15 +311,15 @@ const FRAG_ECHO = /* glsl */ `
 // ratio. (Upstream's equirect sliver branch is out of scope, see the header.)
 //
 // FEEDBACK, derived from the canvas ops verbatim:
-//     fillRect(black) at globalAlpha (1-fb)        → c = prev * fb
+//     fillRect(black) at globalAlpha (1-fb)        -> c = prev * fb
 //     then the geometry draw at globalAlpha 1-0.95*fb (source-over)
-//                                                   → c = geo*a + prev*fb*(1-a)
+//                                                   -> c = geo*a + prev*fb*(1-a)
 //   with a = 1 - 0.95*fb, so
 //     out = geo * (1 - 0.95*fb) + prev * 0.95*fb*fb
-//   At the 0.85 default that is 0.1925*geo + 0.6864*prev — a decaying wash, not
+//   At the 0.85 default that is 0.1925*geo + 0.6864*prev, a decaying wash, not
 //   a unity-gain feedback loop. Reproduced exactly, fb-squared and all.
 //
-// [SwayCommand] MOSAIC — rack-native, no upstream source; deliberately distinct
+// [SwayCommand] MOSAIC, rack-native, no upstream source; deliberately distinct
 // from pixelate above. The frame is quantised into square tiles (4..64 px,
 // ramped by the fader), each tile samples its own CENTRE, a thin grout line is
 // darkened on the tile borders and each tile takes a subtle brightness
@@ -351,7 +351,7 @@ const FRAG_GEO = /* glsl */ `
     return clamp(lo + hi, 0.0, 1.0);
   }
 
-  // [SwayCommand] per-tile hash for the mosaic tint — the same construction
+  // [SwayCommand] per-tile hash for the mosaic tint, the same construction
   // FRAG_FINAL's value noise uses, so the rack keeps a single hash flavour.
   float hash21(vec2 p) {
     p = fract(p * vec2(123.34, 456.21));
@@ -406,8 +406,8 @@ const FRAG_GEO = /* glsl */ `
     if (uMosCells.x > 0.0) geo *= mosShade;
 
     if (uSoft > 0.5) {
-      geo *= 1.0 - softAlpha(e.x);     // the X gradient fill…
-      geo *= 1.0 - softAlpha(e.y);     // …then the Y gradient fill
+      geo *= 1.0 - softAlpha(e.x);     // the X gradient fill...
+      geo *= 1.0 - softAlpha(e.y);     // ...then the Y gradient fill
     }
 
     vec3 prev = texture(tPrev, vUv).rgb;
@@ -415,11 +415,11 @@ const FRAG_GEO = /* glsl */ `
   }`;
 
 // ── CORRUPTION (post-geometry canvas stage) ─────────────────────────────────
-// Radial-spoke wheel → glitch slice tearing → rgbGhost screen smear → strobe.
+// Radial-spoke wheel -> glitch slice tearing -> rgbGhost screen smear -> strobe.
 // This is upstream's draw order on the canvas, and it matters: the wheel reads
 // the geometry composite, the slices read the wheel, the ghost reads the slices.
 //
-// RADIAL SPOKE WHEEL — VideoOutput.tsx "RADIAL MIRROR / KALEIDOSCOPE WHEEL".
+// RADIAL SPOKE WHEEL, VideoOutput.tsx "RADIAL MIRROR / KALEIDOSCOPE WHEEL".
 // Upstream snapshots the canvas, fills black, then for i = 0..spokes-1:
 //     translate(w/2,h/2); rotate(baseRotation + i*sectorAngle);
 //     if (i % 2 === 1) scale(1,-1);            // mirror every other sector
@@ -431,12 +431,12 @@ const FRAG_GEO = /* glsl */ `
 // this shader needs is  srcRel = Flip_i( Rot(-R_i) · screenRel ).  Flip is an
 // involution, hence no separate inverse. The wedges tile the circle exactly, so
 // the sector that owns a pixel is the nearest one:  i = round((θ - R)/sector).
-// i is then wrapped into 0..spokes-1 with mod() — NOT just used raw — because
+// i is then wrapped into 0..spokes-1 with mod() (NOT just used raw) because
 // the y-flip depends on i's parity and upstream only ever draws indices
 // 0..spokes-1. With an odd spoke count that leaves a parity seam where the
 // wheel closes; the seam is upstream's and is reproduced rather than smoothed.
 //
-// GLITCH SLICE TEARING — VideoOutput.tsx "PIXEL TEARING (DATAMOSH)".
+// GLITCH SLICE TEARING, VideoOutput.tsx "PIXEL TEARING (DATAMOSH)".
 //     if (Math.random() < glitch) {
 //       slices = floor(random()*12*glitch) + 1
 //       for each: srcY = random()*h
@@ -453,7 +453,7 @@ const FRAG_GEO = /* glsl */ `
 // compound their shifts. Here the last slice covering a row wins (matching the
 // draw order) with a single tap; compounding would need one pass per slice.
 //
-// RGB GHOST — VideoOutput.tsx "GHOSTING (DELAY BUFFER SMEAR)".
+// RGB GHOST, VideoOutput.tsx "GHOSTING (DELAY BUFFER SMEAR)".
 //     globalCompositeOperation = 'screen'; globalAlpha = a = 0.5 * rgbGhost
 //     sx = ghost*w*0.08; sy = ghost*h*0.02
 //     drawImage(canvas,  sx,  sy, w, h)      // then, over that result:
@@ -466,7 +466,7 @@ const FRAG_GEO = /* glsl */ `
 //     c2(p)   = mix(c1(p),  screen(c1(p),  c1(p+d)), a)
 // so the two-draw sequence is reproduced exactly, not approximated.
 //
-// STROBE — VideoOutput.tsx "STROBE": fills white (black when the invert toggle
+// STROBE, VideoOutput.tsx "STROBE": fills white (black when the invert toggle
 // is on) at globalAlpha 0.9. The trigger is resolved on the CPU; see render().
 const FRAG_CORRUPT = /* glsl */ `
   precision highp float;
@@ -479,7 +479,7 @@ const FRAG_CORRUPT = /* glsl */ `
   uniform vec4  uSlices[MAX_SLICES];   // (srcY, sliceH, shiftX, ·) canvas px
   uniform float uGhost;         // 0..1
   uniform vec2  uGhostShift;    // (sx, sy) canvas px
-  uniform float uStrobe;        // 0/1 — fire this frame
+  uniform float uStrobe;        // 0/1, fire this frame
   uniform vec3  uStrobeCol;     // white, or black when invert is on
   in vec2 vUv;
   out vec4 fragColor;
@@ -564,19 +564,19 @@ const FRAG_CORRUPT = /* glsl */ `
 
 // ── ASCII ───────────────────────────────────────────────────────────────────
 // AsciilineRenderer.ts FRAG, kept GLSL3 (GLSL ES 3.00):
-//   `#version 300 es` is supplied by three.js, `out vec4 O` → `out vec4
-//   fragColor`, `texture()` stays, and `gl_FragCoord.xy / u_resolution` → the
+//   `#version 300 es` is supplied by three.js, `out vec4 O` -> `out vec4
+//   fragColor`, `texture()` stays, and `gl_FragCoord.xy / u_resolution` -> the
 //   vUv input (the same value; upstream needed the fragcoord form because its
 //   quad carried no attributes). The luma weights, the mono/accent branch and the
 //   `col *= 0.85 + 0.25*u_volume + 0.15*u_bass` audio term are verbatim. The
 //   glyph-index line is the even-spread form `clamp(floor(luma*N), 0, N-1)`,
 //   which gives all 93 glyphs an equal 1/N slice of luma and folds the
-//   luma == 1.0 case back onto the last glyph — see the note at the line.
+//   luma == 1.0 case back onto the last glyph, see the note at the line.
 //
 // DEVIATION: upstream downscales the frame to the cell grid with a Canvas2D
 // drawImage (a box filter) and uploads that as a NEAREST texture, so each texel
 // is one averaged cell. Here the source is already a GPU texture, so the cell
-// average is taken with a small tap grid at the cell's own footprint —
+// average is taken with a small tap grid at the cell's own footprint,
 // ASCII_TAPS² bilinear taps spread across the cell. Same intent (one averaged
 // value per cell), no CPU readback.
 const FRAG_ASCII = /* glsl */ `
@@ -633,36 +633,36 @@ const FRAG_ASCII = /* glsl */ `
 //     [sepia(x%)] [grayscale(x%)] [blur(Npx)]
 //     [url(#fvj-edge)] [url(#fvj-warp)] [url(#fvj-rgb)]
 // then layers three DOM overlays on top: scanlines, CRT flicker, vignette.
-// CSS filter functions are applied left to right, so the SVG filters run LAST —
+// CSS filter functions are applied left to right, so the SVG filters run LAST,
 // after the colour grade, not before it. That order is preserved here.
 //
 // COLOUR GRADE. hue-rotate / saturate / sepia / grayscale are the Filter
 // Effects colour matrices, verbatim from the spec (they are what the browser
-// runs, so "reproduce the maths" means reproduce those matrices — see
+// runs, so "reproduce the maths" means reproduce those matrices, see
 // buildColourMatrices()). contrast(c) = c·x + (0.5 - 0.5c), brightness(b) = b·x,
 // invert = 1 - x. The four matrices collapse on the CPU into two mat3 uniforms
 // (uM1 = saturate·hueRotate, uM2 = grayscale·sepia); between them sit TWO
-// clamped affines, not one — uAff.xy is contrast and uAff.zw is brightness with
+// clamped affines, not one, uAff.xy is contrast and uAff.zw is brightness with
 // invert folded in. The spec clamps each primitive to [0,1], and the clamp
 // between contrast and brightness is load-bearing: contrast(300%) on a white
 // pixel yields 2.0, which the spec clamps to 1.0, so brightness(25%) must give
 // 0.25 and not 0.5. Invert then folds into brightness exactly, because
 // clamp(1 - clamp(z)) == clamp(1 - z).
 // MICRO-DEVIATION: collapsing the matrix PAIRS still drops the clamp between
-// hue↔saturate and between sepia↔grayscale. Those two only differ on
+// hue<->saturate and between sepia<->grayscale. Those two only differ on
 // out-of-gamut intermediates that the very next clamp catches.
 //
-// BLUR — upstream `blur(fxBlur * 20 px)`, a true Gaussian. Reproduced as a
+// BLUR, upstream `blur(fxBlur * 20 px)`, a true Gaussian. Reproduced as a
 // ring-of-taps disc of the same pixel radius (BLUR_TAPS by tier). DEVIATION:
 // the tap count, and nothing else. Blur now runs in every combination,
-// edgeDetect included — see PASS SPLIT for why that became affordable.
+// edgeDetect included, see PASS SPLIT for why that became affordable.
 //
 // PASS SPLIT (a performance change, not a fidelity one). The grade and the blur
 // are pointwise / small-kernel operations on the source; edge, warp and the rgb
 // split each RE-EVALUATE everything upstream of them at several offsets. Folded
 // into one shader those multiply out: the 9-tap edge kernel inside the 3-tap
 // split is 27 evaluations of the full grade per pixel, roughly 1,600 ALU ops
-// per pixel, about half an Intel HD 630 at 1080p60 for this pass alone —
+// per pixel, about half an Intel HD 630 at 1080p60 for this pass alone,
 // before the scene that feeds the rack has been drawn at all. So the grade and
 // blur run ONCE per pixel into their own target (FRAG_GRADE) and every tap in
 // FRAG_FINAL is a plain texture fetch: the same worst case is 27 fetches with
@@ -671,22 +671,22 @@ const FRAG_ASCII = /* glsl */ `
 // edgeDetect is on" deviation be deleted, so the chain is now closer to
 // upstream than the single-shader version was.
 //
-// EDGE — `<feConvolveMatrix order="3 3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1">`
+// EDGE, `<feConvolveMatrix order="3 3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1">`
 // verbatim. Kernel sum is 0, so per spec the divisor falls back to 1; the result
 // is clamped. (The kernel is symmetric, so the spec's 180° kernel rotation is a
 // no-op here.)
 //
-// WAVE WARP — `<feTurbulence type="fractalNoise" baseFrequency=F numOctaves=2>`
+// WAVE WARP, `<feTurbulence type="fractalNoise" baseFrequency=F numOctaves=2>`
 // into `<feDisplacementMap scale=S xChannelSelector="R" yChannelSelector="G">`
 // with the upstream drive values S = waveWarp*150 and F = 0.01 + waveWarp*0.04
 // (cycles per pixel), both reproduced exactly. feDisplacementMap is defined as
 //     result(x,y) = in(x + S*(XC-0.5), y + S*(YC-0.5))
 // which is what the shader computes. DEVIATION: the turbulence itself is a
 // 2-octave value-noise fbm normalised to 0..1 rather than SVG's Perlin
-// generator — same octave count, same lacunarity/gain, same output range, a
+// generator, same octave count, same lacunarity/gain, same output range, a
 // different (unspecified-by-us) noise basis.
 //
-// RGB SPLIT / CHROMA AB — `<feOffset>` pairs, verbatim:
+// RGB SPLIT / CHROMA AB, `<feOffset>` pairs, verbatim:
 //     dx = rgbSplit*100 + chromaAb*20      dy = chromaAb*15     (CSS pixels)
 //     red  offset (+dx, +dy), blue offset (-dx, -dy), green untouched,
 //     then feBlend mode="screen" of the three single-channel images.
@@ -694,17 +694,17 @@ const FRAG_ASCII = /* glsl */ `
 // from its own source, so the three-way blend is exact, not an approximation.
 // feOffset by (dx,dy) means result(p) = in(p - d), hence red samples at -d.
 // [SwayCommand] `chromaAbRadial` (default false, off = pure upstream) sends the
-// chromaAb component along the radial direction instead of a fixed diagonal —
+// chromaAb component along the radial direction instead of a fixed diagonal,
 // the plugin registry describes this effect as "radial per-channel RGB offsets"
 // even though the implementation upstream is a uniform feOffset. Off by default
 // so the ported behaviour is what you get unless you ask for the other one.
 //
-// [SwayCommand] ANAGLYPH — rack-native, no upstream source (upstream's stereo
+// [SwayCommand] ANAGLYPH, rack-native, no upstream source (upstream's stereo
 // SBS/TB compositor is out of scope, see the header). Deliberately distinct
 // from the flat feOffset split above: red is displaced left and slightly down,
 // green+blue (cyan) right and slightly up, and the parallax scales with the
-// distance from a screen-centre convergence plane — zero at the centre, full
-// at the corners — so the separation reads as depth rather than a channel
+// distance from a screen-centre convergence plane, zero at the centre, full
+// at the corners, so the separation reads as depth rather than a channel
 // shift. At high drive the red and cyan images also counter-rotate slightly
 // about the centre (uAnaRot ramps cubically, so it only wakes near the top of
 // the fader). The anaglyph taps JOIN the split's own taps, so split+anaglyph
@@ -712,22 +712,22 @@ const FRAG_ASCII = /* glsl */ `
 // positions collapse to the split's exact previous expressions, which is the
 // no-op-on-a-uniform branch this always-on pass requires.
 //
-// SCANLINES / CRT / VIGNETTE — the DOM overlays, index.css:
+// SCANLINES / CRT / VIGNETTE, the DOM overlays, index.css:
 //   .scanlines-overlay  4px tile, top 2px clear, bottom 2px rgba(0,0,0,0.3),
 //                       mix-blend-mode: overlay, element opacity 0.8
 //   .crt-flicker-overlay rgba(0,0,0,0.1), mix-blend-mode: overlay,
-//                       @keyframes crt 0.15s: opacity 0.8 → 1 → 0.8
+//                       @keyframes crt 0.15s: opacity 0.8 -> 1 -> 0.8
 //   vignette            inset 0 0 250px rgba(0,0,0,0.9); reproduced through the
 //                       author's own GPU-shaped equivalent from the record-canvas
 //                       path ("match div radial shadow"): a radial gradient from
 //                       alpha 0 at r = w*0.35 to alpha 0.85 at r = max(w,h)*0.6.
 // CSS `overlay` with a pure black source simplifies to 0 below 0.5 and 2·Cb-1
-// above, per channel — that identity is what the shader evaluates.
+// above, per channel, that identity is what the shader evaluates.
 // The CRT deck also gets the rolling bright bar from the record-canvas path
 // (rgba(255,255,255,0.04), height 5..25px, random y, on ~half the frames);
 // its randomness is drawn on the CPU and passed in as a uniform.
 /**
- * CHROMATICS pass 1 — the CSS colour functions and blur(), evaluated once per
+ * CHROMATICS pass 1, the CSS colour functions and blur(), evaluated once per
  * pixel into their own target. See COLOUR GRADE, BLUR and PASS SPLIT above.
  */
 const FRAG_GRADE = /* glsl */ `
@@ -772,7 +772,7 @@ const FRAG_GRADE = /* glsl */ `
   }`;
 
 /**
- * CHROMATICS pass 2 — the SVG filters (edge, warp, rgb split) and the DOM
+ * CHROMATICS pass 2, the SVG filters (edge, warp, rgb split) and the DOM
  * overlays. `tSrc` is FRAG_GRADE's output, so every tap here is a bare fetch.
  */
 const FRAG_FINAL = /* glsl */ `
@@ -866,7 +866,7 @@ const FRAG_FINAL = /* glsl */ `
       // [SwayCommand] send the chromaAb term along the radius instead
       vec2 rel = (vUv - 0.5) * uRes;
       float len = length(rel);
-      // Unconditional guard rather than a ?: — both sides of a GLSL ternary are
+      // Unconditional guard rather than a ?:, both sides of a GLSL ternary are
       // commonly evaluated by the driver, so a plain rel/len would still
       // compute a NaN at the exact centre pixel. Dividing by max(len, eps)
       // yields dir = (0,0) there, harmless because rn is 0 at the centre too.
@@ -886,7 +886,7 @@ const FRAG_FINAL = /* glsl */ `
         // parallax grows with distance from the screen-centre convergence
         // plane (same normalisation as the radial chromaAb / vignette)
         float depth = clamp(length(rel) / max(0.5 * length(uRes), 1.0), 0.0, 1.0);
-        // sampling red at +a displays the red image shifted by -a — left and
+        // sampling red at +a displays the red image shifted by -a, left and
         // down in y-up uv space; cyan mirrors it to the right and up
         vec2 a = uAnaPx * depth * uTexel;
         // slight opposing per-eye rotation about the centre at high drive
@@ -991,7 +991,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
   }
 
   // Always live: the two chain scratch buffers, the feedback accumulator, and
-  // the colour-grade target (see PASS SPLIT — the grade runs every frame).
+  // the colour-grade target (see PASS SPLIT, the grade runs every frame).
   let ping = makeRT();
   let pong = makeRT();
   let fbA = makeRT();
@@ -999,7 +999,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
   let gradeRT = makeRT();
   // Created once, the first time their effect is switched on, and kept for the
   // rack's lifetime. Upstream does the same thing for its frame ring (it parks
-  // on slot 0 until a history effect is active) — allocating all of these up
+  // on slot 0 until a history effect is active), allocating all of these up
   // front would cost ~100 MB of VRAM at 1080p for decks that are usually off.
   let echoA = null, echoB = null;      // echo trails accumulator (ping-pong)
   let holdRT = null;                   // posterize-time frame hold
@@ -1014,7 +1014,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
   quad.frustumCulled = false;          // clip-space quad, skip culling
   passScene.add(quad);
 
-  // GLSL ES 3.00 for every pass — see SHADERS above.
+  // GLSL ES 3.00 for every pass, see SHADERS above.
   const MAT_OPTS = { depthTest: false, depthWrite: false, glslVersion: THREE.GLSL3 };
 
   const copyMat = new THREE.ShaderMaterial({
@@ -1247,7 +1247,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
     gradeMat.uniforms.uM1.value.copy(matSat).multiply(matHue);
     gradeMat.uniforms.uM2.value.copy(matGray).multiply(matSepia);
 
-    // contrast(c), then brightness(b), then invert — TWO clamped affines, in
+    // contrast(c), then brightness(b), then invert, TWO clamped affines, in
     // the CSS filter order. The spec clamps after contrast, so brightness must
     // not see the unclamped product (see the FRAG_FINAL note). invert folds
     // into brightness exactly: clamp(1 - clamp(b·x)) == clamp(1 - b·x).
@@ -1272,7 +1272,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
       clockMs += Math.max(0, Math.min(0.05, dt || 0)) * 1000;
 
       // ---- audio, from io ----------------------------------------------------
-      // Every read goes through aud(): see its note — an unwritten band would
+      // Every read goes through aud(): see its note, an unwritten band would
       // otherwise turn powBass into NaN and blank the frame via uZoom.
       const bands = io && io.bands ? io.bands : null;
       const bass = bands ? aud(bands.bass) : 0;
@@ -1284,7 +1284,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
 
       // VideoOutput.tsx: powBass = Math.pow(audio.bass, 3). (Upstream also keeps
       // a bassSmooth EMA, but only the autopilot drop detector reads it, and
-      // autopilot is not part of this rack — so it is not carried here.)
+      // autopilot is not part of this rack, so it is not carried here.)
       const powBass = bass * bass * bass;
 
       // ---- resolved (audio-sweetened) parameter values ----------------------
@@ -1307,7 +1307,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
         //
         // NOTE FOR FUTURE EDITORS: do NOT reintroduce a `* p.X` scale on the
         // pushed value. powBass * K is always < 1, so max(fader, powBass*K*fader)
-        // === fader for every fader in (0,1] — scaling makes this whole block a
+        // === fader for every fader in (0,1], scaling makes this whole block a
         // no-op and silently kills the bass reactivity of four decks.
         if (p.glitch > 0) cGlitch = Math.max(cGlitch, powBass * 0.9);
         if (p.rgbGhost > 0) cGhost = Math.max(cGhost, powBass * 0.7);
@@ -1352,7 +1352,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
 
       // ---- CORRUPTION: backskip (frame ring) --------------------------------
       // Upstream: backFrames = floor(backskip * (bufferSize - 1)) over a
-      // 60-canvas ring. DEVIATION: the ring here is tier.ring deep (3/5/8) —
+      // 60-canvas ring. DEVIATION: the ring here is tier.ring deep (3/5/8),
       // 60 full-resolution targets is ~500 MB at 1080p. The mapping keeps its
       // shape, floor(backskip * (depth - 1)), so the fader still sweeps from
       // "now" to "as far back as the rack remembers"; the reachable jump is
@@ -1433,7 +1433,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
       // ---- CORRUPTION: radial wheel, glitch slices, ghost, strobe -----------
       const spokes = Math.round(p.radialSpokes);
 
-      // Slice draw, VideoOutput.tsx verbatim — the randomness is redrawn every
+      // Slice draw, VideoOutput.tsx verbatim, the randomness is redrawn every
       // frame exactly as upstream does, into a preallocated array.
       let sliceCount = 0;
       if (cGlitch > 0 && Math.random() < cGlitch) {
@@ -1464,8 +1464,8 @@ export function createFxRack(THREE, renderer, width, height, opts) {
         cu.tSrc.value = src;
         cu.uSpokes.value = spokes >= 2 ? spokes : 0;
         // Upstream: baseRotation = (timestamp/1000)*0.15, plus (mid+high)*PI
-        // when reactive. SwayCommand holds the wheel still — nothing in the
-        // rack auto-rotates (user rule) — so the spoke pattern is static and
+        // when reactive. SwayCommand holds the wheel still, nothing in the
+        // rack auto-rotates (user rule), so the spoke pattern is static and
         // only the spoke count moves.
         const baseRotation = 0;
         cu.uSpokeRot.value = baseRotation;
@@ -1509,7 +1509,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
 
       // ---- CHROMATICS pass 1: colour grade + blur ---------------------------
       // Its own pass so the edge/warp/split taps below do not each re-run it;
-      // see PASS SPLIT above. Always runs — it is also the only writer of
+      // see PASS SPLIT above. Always runs, it is also the only writer of
       // gradeRT, so no ping-pong is needed.
       buildColourMatrices();
       gradeMat.uniforms.tSrc.value = src;
@@ -1526,7 +1526,7 @@ export function createFxRack(THREE, renderer, width, height, opts) {
       fu.uChromaPx.value.set(p.chromaAb * 20, p.chromaAb * 15);
       fu.uChromaRadial.value = p.chromaAbRadial ? 1 : 0;
       // [SwayCommand] anaglyph drive: (x,y) parallax in canvas px at full
-      // depth, plus the counter-rotation — cubic so it only wakes near 1.
+      // depth, plus the counter-rotation, cubic so it only wakes near 1.
       fu.uAnaPx.value.set(cAnaglyph * 30, cAnaglyph * 10);
       fu.uAnaRot.value = cAnaglyph * cAnaglyph * cAnaglyph * 0.05;
       fu.uScan.value = p.scanlines ? 1 : 0;

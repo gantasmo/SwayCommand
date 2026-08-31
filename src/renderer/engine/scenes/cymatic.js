@@ -1,4 +1,4 @@
-// Cymatic Orb — a sphere carrying standing waves, Chladni-plate style.
+// Cymatic Orb, a sphere carrying standing waves, Chladni-plate style.
 // Three spherical-harmonic-like modes are summed in the vertex shader and
 // displace the surface; their mode numbers are driven by bass / mid / high,
 // so the resonance figure literally re-tunes with the music. The fragment
@@ -6,14 +6,14 @@
 // crossings as hair-thin neon nodal lines over a near-black interior.
 // Sway is the resonance morph: it re-tunes all four mode numbers at once,
 // gliding the orb from a sparse low-order figure to a dense high-order
-// weave — the standing-wave pattern reorganises, the orb does not spin.
+// weave, the standing-wave pattern reorganises, the orb does not spin.
 // A strike (pad rising edge) is a mode jump: the whole mode stack snaps to
 // a fresh figure and the amplitude hit rings down over ~1.2 s, the way a
 // struck bell settles. Beats and pads also fire travelling ripples, press
 // collapses the resonance back toward a perfect sphere while the lines
 // burn white. A second back-facing shell adds the aura. Nothing turns on
 // its own: no orb spin, no camera drift, and the azimuthal phases hold
-// still (re-seated only by a strike) — the figure's motion is the polar
+// still (re-seated only by a strike), the figure's motion is the polar
 // phases flowing pole to pole and the hand alone orbits the eye. Two draw
 // calls, everything procedural. See docs/SCENE_CONTRACT.md.
 
@@ -33,8 +33,8 @@ const RIPPLES = 4; // preallocated ripple pool, round-robin reuse
 // pixel from the interpolated direction, and across a heavily displaced
 // triangle that interpolation drifts from the true sphere direction, so too
 // few triangles print their own facets onto the figure. Past d=26 the return
-// is nil — the cost of this scene is per-pixel, not per-vertex (med is ~22k
-// verts of trig against ~700k shaded pixels) — while the non-indexed build
+// is nil, the cost of this scene is per-pixel, not per-vertex (med is ~22k
+// verts of trig against ~700k shaded pixels), while the non-indexed build
 // cost and the static VBO both grow as d^2, and that build runs on the
 // scene's first activation, mid-set.
 const DETAIL = { low: 12, med: 18, high: 26 };
@@ -43,7 +43,7 @@ const TAU = Math.PI * 2;
 // Framing: at fov 46 the visible half-height at the origin is
 // CAM_R * tan(23deg) = 1.83. The orb peaks near r = 1.5 under a stacked
 // ripple and the aura sits at 1.30 (x1.26 at full pulse = 1.64), so the
-// whole form stays inside the frame with black around it — no full-screen
+// whole form stays inside the frame with black around it, no full-screen
 // fill. The aura hugs the orb deliberately: pushed out further it stops
 // reading as a rim and becomes a dim disc behind everything.
 const CAM_R = 4.3;
@@ -92,7 +92,7 @@ const FIELD_GLSL = /* glsl */ `
   vec3 sphAngles(vec3 dir) {
     float ct = clamp(dir.y, -1.0, 1.0);
     float st = sqrt(max(0.0, 1.0 - ct * ct));
-    // At a pole dir.xz is (0,0) and atan(0.0, 0.0) is undefined — NaN on some
+    // At a pole dir.xz is (0,0) and atan(0.0, 0.0) is undefined, NaN on some
     // drivers. The sin(theta) factor in modeTerm cannot rescue that, since
     // NaN * 0.0 is still NaN and one bad pixel would blow out the whole
     // fragment. st is zero exactly on that degenerate set, so nudge x to 1.0
@@ -103,7 +103,7 @@ const FIELD_GLSL = /* glsl */ `
 
   // One standing-wave mode of fractional azimuthal order m. A fractional m
   // fed straight into sin(m*phi) tears along the atan branch cut, so the
-  // two neighbouring integer orders — both of which wrap seamlessly — are
+  // two neighbouring integer orders (both of which wrap seamlessly) are
   // blended by frac(m) instead: the figure morphs continuously, no seam.
   // The st factor makes every term vanish at the poles, where phi is
   // undefined and the term would otherwise be discontinuous.
@@ -179,7 +179,7 @@ export function createScene(ctx) {
       uRipR: { value: ripRad },
       uDisp: { value: 0.24 },   // displacement gain; press collapses it
       uBreathe: { value: 0 },   // uniform radial swell on bass/beat
-      uNorm: { value: 2.5 },    // 1 / total amplitude — keeps lines alive when quiet
+      uNorm: { value: 2.5 },    // 1 / total amplitude, keeps lines alive when quiet
       uNode: { value: 0.05 },   // half-width of the nodal band (~9% coverage)
       uMicro: { value: new THREE.Vector3(10, 0, 0) }, // fine figure: order, phase a, phase b
       uTime: { value: 0 },
@@ -266,7 +266,7 @@ export function createScene(ctx) {
         // --- treble: a much higher-order figure, strobing in hard cells.
         // The band is deliberately wide relative to the order: any thinner
         // and lines this fine fall under a pixel and alias into noise.
-        // The sa.z gate matters — modeTerm carries a sin(theta) factor, so
+        // The sa.z gate matters, modeTerm carries a sin(theta) factor, so
         // near the poles the term degenerates to zero and the smoothstep
         // would otherwise light the entire polar cap as one hot disc.
         float mic = modeTerm(sa, uMicro.x, uMicro.x * 1.4 + 5.0, uMicro.y, uMicro.z);
@@ -380,7 +380,7 @@ export function createScene(ctx) {
   let prevBeat = 0, beatCount = 0, poleSign = 1;
 
   // Phase wrap. Every phase enters the shader only as `sin(k*x + p)` with
-  // integer k, so subtracting a whole turn is exact — no visible jump, and
+  // integer k, so subtracting a whole turn is exact, no visible jump, and
   // float precision never decays over a long set.
   const wrap = (p) => (p >= TAU ? p - TAU : p < 0 ? p + TAU : p);
   // The strobe clock is used only as sin(uTime*40.0 + ...), and 40*20*PI is
@@ -407,7 +407,7 @@ export function createScene(ctx) {
 
       // --- camera: hand x orbits in azimuth, hand y in elevation, both
       // smoothed so sensor jitter never shakes the frame. The orbit is the
-      // hand's alone — no drift term advances it on its own.
+      // hand's alone, no drift term advances it on its own.
       azim += ((io.xy.x - 0.5) * 2.6 - azim) * k;
       elev += ((io.xy.y - 0.5) * 1.9 - elev) * k;
       const ce = Math.cos(elev);
@@ -447,10 +447,10 @@ export function createScene(ctx) {
       const jZo = Math.sin(jumpPhase * 1.3) * 3.0;
 
       // --- mode numbers: bass picks the coarse figure, mid the middle,
-      // high the fine one, and sway is the resonance morph — it lifts all
+      // high the fine one, and sway is the resonance morph, it lifts all
       // four orders at once, gliding the orb from a sparse low-order figure
       // to a dense high-order weave. The numbers are fractional and travel
-      // continuously, so the figure morphs rather than stepping — except on
+      // continuously, so the figure morphs rather than stepping, except on
       // a strike frame, where km goes to 1 and the jump lands as a jump.
       swaySm += (io.gestures.sway - swaySm) * Math.min(1, dt * 1.8);
       const lift = swaySm - 0.5;
@@ -478,7 +478,7 @@ export function createScene(ctx) {
 
       // --- phases. The polar phases flow pole to pole at their own
       // band-driven rates, alternating direction per term, so the figure
-      // churns along the axis. The azimuthal phases do NOT advance — an
+      // churns along the axis. The azimuthal phases do NOT advance, an
       // azimuthal phase running in sin(m*phi + pa) would turn the whole lobe
       // pattern about the axis, and nothing here rotates on its own. They
       // sit on three distinct constants (so no two terms share a nodal
@@ -523,13 +523,13 @@ export function createScene(ctx) {
       // --- press: resonance collapse. The displacement gain folds toward
       // zero (the orb becomes a perfect sphere) while the field driving the
       // nodal lines is untouched, so the figure stays painted on and burns
-      // brighter — rather than the whole surface flashing white.
+      // brighter, rather than the whole surface flashing white.
       press += (io.gestures.press - press) * k;
       u.uPress.value = press;
       // knobs 3 and 4 trim the look; 0.5 (their default) is the tuned value.
       // uNode stays small on purpose: the band covers ~9% of the surface at
       // the default, and because the field is amplitude-normalised that
-      // figure barely moves between a silent bar and a loud one — the lines
+      // figure barely moves between a silent bar and a loud one, the lines
       // stay the same weight instead of pumping the whole orb.
       u.uDisp.value = (0.10 + io.knobs[4] * 0.28) * (1 - press * 0.94);
       u.uNode.value = 0.02 + io.knobs[3] * 0.06 + press * 0.03 + flash * 0.03;
@@ -563,7 +563,7 @@ export function createScene(ctx) {
         * (0.55 + io.gestures.pulse * 0.9);
       au.uIntensity.value = io.intensity;
 
-      // palette animates upstream — copy all five every frame, never mutate
+      // palette animates upstream, copy all five every frame, never mutate
       for (let i = 0; i < 5; i++) palette[i].copy(io.palette[i]);
     },
     resize(w, h) {

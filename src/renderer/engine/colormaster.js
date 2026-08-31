@@ -1,4 +1,4 @@
-// ColorMaster — one global 5-color palette every scene reads each frame,
+// ColorMaster, one global 5-color palette every scene reads each frame,
 // after Akvj's ColorMaster (which syncs palette properties across all VFX).
 // Palettes crossfade smoothly; knob 0 applies a live global hue rotation.
 

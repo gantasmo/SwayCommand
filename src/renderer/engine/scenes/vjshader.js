@@ -1,19 +1,19 @@
-// VJ Shader — the five GANTASMO VJ-9000 fragment-shader presets plus its
+// VJ Shader, the five GANTASMO VJ-9000 fragment-shader presets plus its
 // eight-material picker, ported into one SwayCommand scene.
 //
 // ============================ PROVENANCE / LICENSING =========================
 // Ported from GANTASMO VJ-9000 (the author's own project), files:
-//   src/shader/shaderPresets.ts  — the shared raymarch() template, the four
+//   src/shader/shaderPresets.ts , the shared raymarch() template, the four
 //     distance-field fractals (Mandelbulb / Julia Bulb / Mandelbox / Kaleido
 //     IFS), the yotta Menger flythrough, the eight-material branch, the env()
 //     analytic sky, the hueShift() Rodrigues rotation and the per-preset
 //     parameter tables (min / max / default / audio band / audio amount).
-//   src/shader/ShaderRenderer.ts — the uniform feed, the 25 ms / 180 ms audio
+//   src/shader/ShaderRenderer.ts, the uniform feed, the 25 ms / 180 ms audio
 //     envelope follower, the 80 ms parameter easing and the wheelOffset drift
 //     (BASE_DRIFT 220, AUDIO_GAIN 1700).
 // The upstream VJ-9000 repository carries no LICENSE file; it is used here as
 // the author's own work. The yotta preset inside it is credited upstream to
-// Matthias Hurrle (@atzedent) under MIT — that attribution is retained verbatim
+// Matthias Hurrle (@atzedent) under MIT, that attribution is retained verbatim
 // in the shader body below.
 //
 // CHANGES MADE IN THIS PORT (full list; see the report notes inline):
@@ -25,11 +25,11 @@
 //     down to GLSL1 (varyings, gl_FragColor, tanh polyfills, a cpAt(int)
 //     selector); that is undone. The NaN guards, the determinism fixes and
 //     the loop-invariant hoist that pass added are version-independent and
-//     stay — each is listed below with why.
+//     stay, each is listed below with why.
 //   * gl_FragCoord / `resolution` are replaced by the interpolated `vUv` of a
 //     2x2 clip-space quad plus a precomputed `uAspectScale`. This is exactly
-//     equivalent — (FC - 0.5*R)/min(R.x,R.y) == (vUv-0.5) * vec2(max(A,1),
-//     max(1/A,1)) and FC/R == vUv — and it makes the frame independent of the
+//     equivalent, (FC - 0.5*R)/min(R.x,R.y) == (vUv-0.5) * vec2(max(A,1),
+//     max(1/A,1)) and FC/R == vUv, and it makes the frame independent of the
 //     engine's device-pixel-ratio scaling of the render target.
 //   * yotta's `vec3 cp[14]` global array + initCam() are one `const vec3
 //     cp[14] = vec3[14](...)` array constructor. GLSL ES 3.00 has array
@@ -48,8 +48,8 @@
 //     here anyway. Same math.
 //   * tanh() is the native GLSL ES 3.00 builtin again, as upstream. The GLSL1
 //     pass's tanh1()/tanh3() exp() polyfills (argument clamped to +/-10) are
-//     removed: both call sites feed tanh() values inside [0, ~1.1] — ao*ao and
-//     a smoothstep()'d colour cubed — so there is nothing to overflow.
+//     removed: both call sites feed tanh() values inside [0, ~1.1], ao*ao and
+//     a smoothstep()'d colour cubed, so there is nothing to overflow.
 //   * Upstream undefined behaviour made deterministic: yotta's `bool near;`,
 //     `float dd, i, edge;` are now explicitly zero/false-initialised (drivers
 //     zero-init in practice, so this reproduces the observed upstream look),
@@ -75,7 +75,7 @@
 //   * Quality tiers: march limits and fractal iteration counts scale with
 //     ctx.quality.tier (table in createScene). `high` reproduces the upstream
 //     counts verbatim; `med` and `low` are reduced. Measured on the brief's
-//     reference part — Radeon RX Vega M GL, 1920x1080, one full-screen draw,
+//     reference part, Radeon RX Vega M GL, 1920x1080, one full-screen draw,
 //     GPU-synced per frame (a trivial passthrough shader measures 0.45 ms on
 //     the same harness, so these are honest fill costs):
 //
@@ -105,7 +105,7 @@
 //         costs its own time plus the other scene's.
 //     `low` exists for exactly those cases. For scale, the shipped
 //     mandelbulb.js measures 5.6 ms and warp.js 2.5 ms at med on the same
-//     harness — this scene is the most expensive in the registry, because the
+//     harness, this scene is the most expensive in the registry, because the
 //     upstream template marches every pixel to maxd with no bounding volume
 //     and no early-out, and reproducing that was the brief.
 //   * Preset ORDER differs from upstream. SHADER_PRESETS lists yotta first,
@@ -115,22 +115,22 @@
 //     pad 4. Consequence: the scene opens on the Mandelbulb, not on yotta.
 //     Every preset's own parameters are unchanged by the reordering.
 //   * NO AUTONOMOUS ROTATION (project rule: nothing auto-rotates in any
-//     scene). The raymarch template's camera orbit advanced by itself —
+//     scene). The raymarch template's camera orbit advanced by itself,
 //     azimuth T*0.2, elevation sin(T*0.15)*0.4. Both terms are removed; the
 //     orbit angles are now io.xy alone (azimuth uPan.x*3.0, elevation
 //     uPan.y*0.9), so the view holds still until the hand moves it. T still
 //     drives everything non-rotational it drove upstream: the surface colour
 //     cycling, the glow tint cycle, the Julia constant's c.z oscillation and
 //     yotta's forward travel along the Catmull-Rom path (which turns with the
-//     corridor but never rolls — dir() keeps world up). The wheelOffset drift
+//     corridor but never rolls, dir() keeps world up). The wheelOffset drift
 //     that advances T is therefore a scrub of those terms, not a turn.
 //   * SwayCommand additions, all additive on top of untouched upstream math:
 //     u_hue is driven from io.palette[0]'s hue, the glow accumulator is tinted
 //     with a palette colour, io.xy sets the camera orbit angles, press
 //     biases the active preset's primary parameter, SWAY is a preset-space
-//     morph — every structural parameter carries a per-preset morph vector
+//     morph, every structural parameter carries a per-preset morph vector
 //     (swA/swB in the tables below) so the hand glides the solid through
-//     distinct pattern families instead of nudging one slot — STRIKE
+//     distinct pattern families instead of nudging one slot, STRIKE
 //     (io.strike on a pad rising edge) kicks the primary parameter, jumps the
 //     wheel scrub (a seed jump along the flythrough) and flashes, pads 5-7
 //     step to the next preset the way the Quantum Lattice steps geometries,
@@ -139,7 +139,7 @@
 //     white transition flash.
 //     Every one of those inputs contributes ZERO at its documented rest value
 //     (knobs 0.5, io.xy 0.5/0.5, gestures 0, no strikes), so with nothing
-//     connected the scene sits on the upstream parameter defaults exactly —
+//     connected the scene sits on the upstream parameter defaults exactly,
 //     verified: u_power 8.0000, u_glow 1.0000 after 30 s of idle update()
 //     calls. (The camera, per the bullet above, rests at azimuth 0 /
 //     elevation 0 instead of drifting.)
@@ -147,7 +147,7 @@
 //
 // Pads 0-4 pick the preset (Mandelbulb, Julia Bulb, Mandelbox, Kaleido IFS,
 // Yotta); pads 5-7 step to the next preset. Pads 8-15 pick one of the eight
-// materials, which — exactly as upstream — apply to the four fractals only;
+// materials, which (exactly as upstream) apply to the four fractals only;
 // yotta ignores u_material. Every pad rising edge is also a STRIKE that
 // convulses the active preset's own structure (STRIKE_KICK below).
 // One draw call: five ShaderMaterials on one shared 2x2 quad geometry, with
@@ -177,10 +177,10 @@ const FLASH_TAU = 0.22; // preset / material change flash decay, seconds
 const PAD_ARM = 0.25;   // a pad must land at least this hard to register
 const PAD_EDGE = 0.06;  // ...and rise at least this much above the last frame
 
-// STRIKE — a pad rising edge, magnitude io.strike (the engine's max pad
+// STRIKE, a pad rising edge, magnitude io.strike (the engine's max pad
 // energy). A hit must morph the fractal's own structure, never just spin the
 // view: the strike envelope kicks the active preset's PRIMARY parameter, and
-// the wheel scrub jumps forward — for yotta a leap down the Menger corridor,
+// the wheel scrub jumps forward, for yotta a leap down the Menger corridor,
 // for the fractals a scrub of every T-driven term in the distance fields. The
 // 80 ms parameter easing then turns the kick into a fast structural
 // convulsion rather than a snap.
@@ -200,13 +200,13 @@ const A_NONE = 0, A_BASS = 1, A_MID = 2, A_HIGH = 3, A_VOL = 4;
 const MATERIALS = ['Neon', 'Chrome', 'Matte', 'Glass', 'Gold', 'Iridescent', 'Velvet', 'Plasma'];
 
 // --- per-preset parameter tables, verbatim from shaderPresets.ts -------------
-// { id, min, max, def, audio, amt, swA, swB } — `amt` is the audio depth as a
+// { id, min, max, def, audio, amt, swA, swB }, `amt` is the audio depth as a
 // fraction of (max-min); upstream's default when a preset omits audioAmt is
 // 0.3. `primary` indexes the parameter press and strike bias: the one that
 // visibly reshapes the solid. `swA` / `swB` are the preset-space morph vector
 // (fractions of the span): sway travels the parameter along
 //   swA * sin(pi * sway) + swB * sway
-// so the swA lobe peaks mid-travel and the swB ramp owns the far end — the
+// so the swA lobe peaks mid-travel and the swB ramp owns the far end, the
 // sweep visits one pattern family and lands on another, morphing the solid
 // BETWEEN families instead of spinning it. Upstream has no such concept; each
 // vector is chosen so every stop on the sweep stays inside the upstream
@@ -245,7 +245,7 @@ const PRESETS = [
   },
   {
     // the kaleidoscope proper: sway lifts the fold angle to ~0.63 mid-travel,
-    // then flips it through zero to -0.65 while the fold scale tightens —
+    // then flips it through zero to -0.65 while the fold scale tightens,
     // the wedge pattern re-tiles through visibly different symmetry families
     id: 'kifs', name: 'Kaleido IFS', primary: 1,
     params: [
@@ -269,11 +269,11 @@ const PRESETS = [
 
 // =============================== SHARED GLSL ==================================
 
-// Rodrigues hue rotation in RGB — verbatim from HUE_GLSL in shaderPresets.ts.
+// Rodrigues hue rotation in RGB, verbatim from HUE_GLSL in shaderPresets.ts.
 const HUE_GLSL =
   'vec3 hueShift(vec3 c, float h){ const vec3 k=vec3(0.57735); float ca=cos(h*6.2831853), sa=sin(h*6.2831853); return c*ca+cross(k,c)*sa+k*dot(k,c)*(1.0-ca); }';
 
-// Analytic sky the eight materials reflect — verbatim from the raymarch()
+// Analytic sky the eight materials reflect, verbatim from the raymarch()
 // template in shaderPresets.ts.
 const ENV_GLSL =
   'vec3 env(vec3 d){ float t=d.y*0.5+0.5; vec3 c=mix(vec3(0.03,0.04,0.07),vec3(0.45,0.55,0.75),t); c+=vec3(1.0,0.95,0.85)*pow(max(dot(d,normalize(vec3(0.6,0.7,0.4))),0.0),24.0)*2.0; c+=vec3(0.4,0.5,0.7)*pow(max(dot(d,normalize(vec3(-0.5,0.2,-0.6))),0.0),8.0); return c; }';
@@ -292,7 +292,7 @@ const VERT = /* glsl */ `
  * 3.00 as upstream. The camera orbit, march, normal, eight-material shading,
  * glow, hue, gamma and vignette are reproduced expression for expression; only
  * the declarations above main(), the guards marked GUARD and the two
- * orbit-angle lines differ — the orbit's self-advancing T terms are removed
+ * orbit-angle lines differ, the orbit's self-advancing T terms are removed
  * (header CHANGES list), so the view turns only under io.xy.
  */
 function raymarchSource(o) {
@@ -484,9 +484,9 @@ function kifsSource(iters, deIter) {
 }
 
 /**
- * yotta — the recursive Menger "cloud computing" flythrough.
+ * yotta, the recursive Menger "cloud computing" flythrough.
  *
- *   made by Matthias Hurrle (@atzedent) — MIT.
+ *   made by Matthias Hurrle (@atzedent), MIT.
  *
  * Ported from the YOTTA_SOURCE string in shaderPresets.ts. The Catmull-Rom
  * spline through the 14 control points, the 5-iteration Menger fold in map(),
@@ -520,7 +520,7 @@ out vec4 fragColor;   // upstream: out vec4 O
 #define EDGESIZE 42e-4
 #define hue(a) (.5+.5*sin(3.14*(a)+vec3(1,2,3)))
 const vec3 LP = vec3(-2,8,-2);   // upstream #define LP, hoisted to a const
-// GUARD: every upstream normalize() routes through here — normalize(vec3(0))
+// GUARD: every upstream normalize() routes through here, normalize(vec3(0))
 // is NaN and a single NaN fragment blanks the frame.
 vec3 nsafe(vec3 v){ float l=length(v); return l>1e-9 ? v/l : vec3(0.,0.,1.); }
 #define N nsafe
@@ -755,8 +755,8 @@ export function createScene(ctx) {
   //
   //     Measured on the brief's reference part (Radeon RX Vega M GL, 1920x1080,
   //     one full-screen draw): cost is essentially linear in the march limit at
-  //     ~0.46 ms per step, and the eight-material branch — being uniform across
-  //     the frame — costs nothing measurable (36x5 with the whole chain: 15.97
+  //     ~0.46 ms per step, and the eight-material branch, being uniform across
+  //     the frame, costs nothing measurable (36x5 with the whole chain: 15.97
   //     ms; with the chain collapsed to the Neon branch: 16.20 ms). So the
   //     march limit is the only lever, and it is set PER PRESET: upstream uses
   //     one number for all four, but their per-step costs differ by ~2x, and
@@ -776,7 +776,7 @@ export function createScene(ctx) {
   //       Kaleido IFS  140 x 12           44 x 7         32 x 6
   //       yotta        130/300, fold 5    36/56, fold 5  24/40, fold 4
   //
-  //     Fewer DE iterations smooth the finest filigree — the shape is the same,
+  //     Fewer DE iterations smooth the finest filigree, the shape is the same,
   //     the detail floor is coarser. A shorter march dims the glow accumulator
   //     (it integrates one term per step) and lets the silhouette go lacy.
   const tier = quality.tier;
@@ -793,13 +793,13 @@ export function createScene(ctx) {
   // step, and norm() + calcAO() + two getao() calls add eleven more map()
   // evaluations on every hit. Upstream marches up to 130 steps when the camera
   // starts outside the corridor (|p.y| > 1) and up to 800 inside it. Even at
-  // `high` the 800 is cut to 300 — no ray in this flythrough was observed to
+  // `high` the 800 is cut to 300, no ray in this flythrough was observed to
   // need more. The Menger fold count is held at the upstream 5 for `high` and
   // `med`, because it is the one number that changes the geometry rather than
   // how far down the corridor you can see; `low` accepts fold 4 as the price
   // of running at all. Measured against the 300-step fold-5 build over three
   // points on the camera path, the `med` build differs by 0.0 / 5.5 / 8.0 out
-  // of 255 on average — zero on the frames that fit inside 56 steps, and a
+  // of 255 on average, zero on the frames that fit inside 56 steps, and a
   // visible but modest loss of distant corridor detail on the frames that do
   // not. Raising `med` to 110 steps takes that to 0.0 / 0.7 / 1.0 but costs
   // 20.1 ms, which is over the 60 fps budget.
@@ -808,7 +808,7 @@ export function createScene(ctx) {
   // it is the only place a reduced tier changes an expression's RANGE rather
   // than its detail: render() ends with an amber depth bloom weighted by
   // S(-1., 2., clamp(i/300., 0., 1.)) where `i` is the final march step count.
-  // The 300 is upstream's and is kept verbatim — but upstream's `i` runs to 800,
+  // The 300 is upstream's and is kept verbatim, but upstream's `i` runs to 800,
   // so the term saturates for deep rays, while at `med` it can only ever reach
   // 56/300 = 0.19 and at `low` 40/300 = 0.13. The bloom therefore sits close to
   // constant on the reduced tiers instead of brightening down the corridor.
@@ -961,10 +961,10 @@ export function createScene(ctx) {
         prevPads[i] = v;
       }
       if (struck) {
-        // io.strike is the engine's max pad energy this frame — on the edge
+        // io.strike is the engine's max pad energy this frame, on the edge
         // frame, the hit velocity. The envelope kicks the primary parameter
         // (param loop below); the wheel jump scrubs every T-driven term of
-        // the distance fields — for yotta, a leap down the Menger corridor.
+        // the distance fields, for yotta, a leap down the Menger corridor.
         const s = clamp01(io.strike);
         strikeEnv = Math.max(strikeEnv, s);
         wheelOffset += WHEEL_JUMP * s;
@@ -1033,14 +1033,14 @@ export function createScene(ctx) {
         // knobs 3..6 take direct control of parameter slots 0..3
         let base = i < 4 ? knobBase(io.knobs[3 + i], pm.min, pm.max, pm.def) : pm.def;
         // Press and strike bias the primary parameter; sway morphs EVERY
-        // parameter along its swA/swB vector — the preset-space morph, so the
+        // parameter along its swA/swB vector, the preset-space morph, so the
         // hand reshapes the distance field itself (power, Julia constant, box
         // scale, fold angle) and never just spins the view. All three inputs
         // are read unipolar, so all contribute exactly zero bias at rest:
         // `press` and `sway` are documented as 0..1 with an INITIAL VALUE OF 0
         // (docs/MIDI.md, createControlState), not 0.5. Reading sway bipolar as
-        // (sway-0.5)*2 — the convention the orbit-angle scenes use, where a
-        // constant offset only rotates the view — would rest at -1 here and
+        // (sway-0.5)*2, the convention the orbit-angle scenes use, where a
+        // constant offset only rotates the view, would rest at -1 here and
         // park every morphed parameter well off its upstream default whenever
         // no Sway hardware is connected, defeating knobBase()'s whole point of
         // reproducing the upstream value at the knob default.

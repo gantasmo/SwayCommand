@@ -1,13 +1,13 @@
-// Miracle Mile — the atom, and the city it ends. Four acts on one knob, a noir
+// Miracle Mile, the atom, and the city it ends. Four acts on one knob, a noir
 // city under all of them, and a deck of sixteen re-entry vehicles over the top.
 //
 //   COLD OPEN   The scene opens DARK on the collider: a faint detector
 //               breathing with the level, nothing else, until the show starts
-//               — the first beat the analyser hears, the transport playing, or
-//               any pad — and then the first collision fires as the opening
+//              , the first beat the analyser hears, the transport playing, or
+//               any pad, and then the first collision fires as the opening
 //               element. KNOB 6 / 'act' take over the moment they move.
 //   ACT         KNOB 6 (io.knobs[5]) picks it in quarter turns the moment the
-//               knob moves: 0–¼ COLLIDER, ¼–½ FISSION, ½–¾ DETONATION, ¾–1
+//               knob moves: 0-¼ COLLIDER, ¼-½ FISSION, ½-¾ DETONATION, ¾-1
 //               SHOCKWAVE. The 'act' parameter drives the same choice from any
 //               assigned control.
 //   YIELD       KNOB 5 (io.knobs[4]), or the 'yield' parameter: collision
@@ -16,7 +16,7 @@
 //   PADS        In the COLLIDER and FISSION acts a strike fires that act's
 //               event, as it always did. In the two CITY acts every pad is its
 //               own re-entry vehicle (below). A strike thrown with the hand
-//               CLENCHED (press ≥ 0.8) fires ground zero instead — that is how
+//               CLENCHED (press ≥ 0.8) fires ground zero instead, that is how
 //               the classic single-cloud detonation stays on an unassigned
 //               deck; 'detonate' is the assignable form of the same event.
 //
@@ -24,7 +24,7 @@
 //               layers (thin rings and axial lines, one instanced mesh of
 //               capsules), the beam pipe on the axis, two bunches racing in
 //               from either end and crossing at the interaction point. A
-//               strike is the collision: 40–120 charged tracks spray from the
+//               strike is the collision: 40 to 120 charged tracks spray from the
 //               vertex as helices in the solenoid field (rebuilt every frame
 //               from each track's pT, φ, η and charge, so the field is live),
 //               propagate outward in 0.4 s, leave hits on every layer they
@@ -32,8 +32,8 @@
 //               then fade over ~3 s. Most tracks cluster about three jet axes.
 //               SWAY is the field strength; PRESS dives the eye toward the
 //               vertex; the hand orbits.
-//   FISSION     Thirteen nuclei in the dark — one at the centre, twelve around
-//               it on an icosahedron — each a packed cluster of nucleons that
+//   FISSION     Thirteen nuclei in the dark, one at the centre, twelve around
+//               it on an icosahedron, each a packed cluster of nucleons that
 //               jitters in place. A strike fires a neutron at the nearest idle
 //               nucleus: the drop swells, oscillates, elongates, necks and
 //               splits; two hot fragments fly apart while two to four prompt
@@ -43,16 +43,16 @@
 //               one goes, and the lattice re-forms. SWAY morphs clean
 //               symmetric scission into a wobbling asymmetric one; PRESS
 //               compresses the nuclei; the hand orbits.
-//   THE CUT     FISSION → DETONATION is not a dissolve. The lattice hangs
+//   THE CUT     FISSION -> DETONATION is not a dissolve. The lattice hangs
 //               forty-six metres up in the middle of a boulevard, and the act
 //               change is one continuous pull-back along a single straight
-//               line — no turn, no cross-fade, no flare. The eye recedes from
+//               line, no turn, no cross-fade, no flare. The eye recedes from
 //               eleven metres to five hundred and twenty on a LOG schedule, so
 //               the field of view opens at a constant rate and the picture
 //               never lurches. As it opens, every nucleon leaves its shell and
 //               travels to a REAL LIT WINDOW: the block grid is keyed by an
 //               integer hash that JS and GLSL evaluate bit for bit alike, and
-//               the JS runs the shader's window rule verbatim — the same
+//               the JS runs the shader's window rule verbatim, the same
 //               pitch, the same lit fraction, the same pane inside its cell,
 //               the same on/off hash and colour temperature, and the SAME
 //               MASSES: a lot stands as up to three stacked boxes, and a JS
@@ -63,9 +63,9 @@
 //               points wink out instead of becoming windows. Only panes bright
 //               enough to read at that distance are candidates; a nucleon that
 //               lands on a desk lamp has landed on nothing. Each nucleon is
-//               then matched to a window by WHERE IT SITS IN THE FRAME — its
+//               then matched to a window by WHERE IT SITS IN THE FRAME, its
 //               place seen from the near station against the window's place
-//               seen from the far one — so the point crosses the move without
+//               seen from the far one, so the point crosses the move without
 //               crossing the screen, and it ARRIVES HOLDING THAT PANE'S OWN
 //               COLOUR, computed from the shader's own window expression and
 //               carried on a per-instance colour rather than a palette ramp
@@ -85,10 +85,10 @@
 //               stand again as it lands, ageing all the way through; ground
 //               zero, five hundred metres beyond where the move ends, stays.
 //   CITY        One city serves both city acts; the act weight only moves the
-//               eye. A raymarched block grid — a DDA across thirty-metre lots,
+//               eye. A raymarched block grid, a DDA across thirty-metre lots,
 //               avenues every fourth lot and cross streets every fifth, the
 //               boulevard on the centre line, a river three lots wide bridged
-//               by the boulevard, a rail yard — of SIX families drawn from the
+//               by the boulevard, a rail yard, of SIX families drawn from the
 //               lot's hash, a sea of four-to-twenty-five-storey blocks with a
 //               few towers: a DECO SETBACK TOWER (three stacked masses, the
 //               tall ones), a BRICK PAIR (two walk-ups side by side, a water
@@ -102,10 +102,10 @@
 //               grime running down from the sills, a wet sheen of the dome;
 //               brick courses and panel joints resolve at the pavement's range.
 //               Every lit pane is a ROOM: the view ray is carried into a box a
-//               cell wide, a floor high, five metres deep — lit ceiling with a
+//               cell wide, a floor high, five metres deep, lit ceiling with a
 //               fixture, dark floor, furniture silhouetted against the back
 //               wall, a screen on some, a figure at the glass in one in seven,
-//               blinds, the odd flicker — so the interiors slide against the
+//               blinds, the odd flicker, so the interiors slide against the
 //               facade as the eye moves. Panes and curtain walls reflect the
 //               dome (the sun as one hard glint where a wall catches it) and
 //               rain runs down the glass. Light is the sunset: one hard low
@@ -123,13 +123,13 @@
 //               distance; low fog banks, rain, steam off the gratings, lamp
 //               streaks in the wet asphalt (the dome and the sun in it where
 //               the trace misses), window grids folding to their average under
-//               a pixel — as before.
+//               a pixel, as before.
 //   SKY         A pretty sunset, interrupted. The sun low on the left of the
 //               look axis (28°, 3.5° up), a warm gradient, a cirrus veil lit
 //               from beneath, a cumulus deck on the horizon, a storm cell on
 //               the right, the first stars as the dusk deepens. The bursts
 //               interrupt it: each adds to a WRECK level that decays over
-//               minutes — the ash overcast creeps in, the sun reddens and dims
+//               minutes, the ash overcast creeps in, the sun reddens and dims
 //               through the dust, the haze goes grey and thickens, the lamps
 //               come up. LIGHTNING: the storm cell throws a forked bolt every
 //               so often (a ten-segment random walk in azimuth/elevation with a
@@ -139,45 +139,45 @@
 //   THE WRECK   The fronts leave damage. Every burst is a CRATER the scene
 //               remembers (up to MAX_DMG, merged when close; the damage at a
 //               point is the max over them of a falloff from each ground zero,
-//               plus a low plateau out to four and a half radii — the front's
+//               plus a low plateau out to four and a half radii, the front's
 //               wake) until 'rebuild'. The JS lot mirror runs the same rule,
 //               so the window gather matches against the wrecked city. Inside
 //               the heavy radius the blocks are knocked down to STUMPS (heights
 //               scaled, exposed floor slabs across the ragged top, rubble at
-//               the foot); a pane past its own threshold is BLOWN OUT — a dark
+//               the foot); a pane past its own threshold is BLOWN OUT, a dark
 //               hole, lit no more; one in five of those BURNS (an orange
 //               flicker from the room); FIRE SITES (lots inside the crater and
 //               round a point ahead of the eye, one in five by hash, the few
 //               nearest kept) catch as the front reaches them and stand SMOKE
-//               COLUMNS — leaning noise columns rising nine metres a second
+//               COLUMNS, leaning noise columns rising nine metres a second
 //               from the roof, dust-grey as the front passes, black as the
 //               fire takes, lit from the fire at the foot, burning out over
-//               minutes — the big readable cue behind the front; signage
+//               minutes, the big readable cue behind the front; signage
 //               dims; the lamp posts are knocked over by the front and stay
-//               down; a DEBRIS SHOWER rides every front — dark chunks waiting
+//               down; a DEBRIS SHOWER rides every front, dark chunks waiting
 //               on the front at radii round the eye's distance, thrown out
 //               along it with gravity and drag as it reaches them.
 //   DETONATION  The eye is eighty-odd metres up on the boulevard's axis, the
 //               city running away under it to ground zero at the far end,
 //               above most of the skyline so the bursts tower over it. At rest
-//               the cloud there stands mature and churns — the cap's roll and
+//               the cloud there stands mature and churns, the cap's roll and
 //               the stem's updraft are flows of the noise domain, not rotation
 //               of anything (the roll fades out on the axis, where its mapping
 //               flips). Ground zero detonates on 'detonate' (or a clenched
 //               strike): flash, fireball, stem, cap broadening and cooling
 //               through orange to ash, the front out across the city, the
-//               wreck behind it. SWAY morphs the build (squat and broad ↔ tall
+//               wreck behind it. SWAY morphs the build (squat and broad <-> tall
 //               and turbulent); PRESS flattens the cap; the hand dollies and
 //               lifts the eye.
 //   SHOCKWAVE   The same city from the pavement, looking down the boulevard.
-//               When ground zero goes, the front comes down the road — a shell
+//               When ground zero goes, the front comes down the road, a shell
 //               that refracts what lies behind it, a condensation band just
 //               inside it, a dust wall where it meets the ground, lamps
-//               flaring and dying as it passes — then arrival: the eye shakes,
+//               flaring and dying as it passes, then arrival: the eye shakes,
 //               dust sweeps the view, debris and embers fly, the posts go
 //               over, the blocks ahead catch and their smoke climbs, and the
 //               boulevard relights from the outside in. SWAY morphs hemisphere
-//               ↔ Mach stem; PRESS ducks; the hand sets the position across the
+//               <-> Mach stem; PRESS ducks; the hand sets the position across the
 //               road and the eye's height.
 //
 //   MIRV        In the two city acts every pad is an independent re-entry
@@ -188,29 +188,29 @@
 //               thins over its last three and a half seconds, whether its life
 //               ran out or the deck did. When the deck IS full the slot that
 //               goes is the one furthest through its own life, not the one
-//               launched first — the deck runs clouds whose lifetimes differ
+//               launched first, the deck runs clouds whose lifetimes differ
 //               by a factor of three side by side, and evicting by launch
 //               order deleted a one-second-old fireball at its brightest while
 //               a minute-old ash column stood next to it. The 'full salvo'
 //               action fires exactly as many vehicles as the deck is deep,
 //               spread across the pad map, for the same reason.
-//               PLACE — the Sway's deck is physically two rows of eight, and
-//               the rows are two RINGS round the eye: the TOP row (pads 0–7)
-//               the far ring, 600–950 m out across ±48° of the look axis, the
-//               BOTTOM row (pads 8–15) the near ring, 180–380 m out across
+//               PLACE, the Sway's deck is physically two rows of eight, and
+//               the rows are two RINGS round the eye: the TOP row (pads 0 to 7)
+//               the far ring, 600 to 950 m out across ±48° of the look axis, the
+//               BOTTOM row (pads 8 to 15) the near ring, 180 to 380 m out across
 //               ±70° (the eye sees ±40°: the far ring lands across the whole
-//               frame, the near ring wraps past its edges) — the column the
+//               frame, the near ring wraps past its edges), the column the
 //               bearing from left to right. So a chord lands all around the
 //               viewer and the near bursts tower over the frame. Each
 //               cell carries a fixed jitter of its own so the pattern never
 //               reads as a grid, and the map is deterministic, so it can be
 //               learned.
-//               YIELD — the pads are chromatic, 0 the lowest note and 15 the
+//               YIELD, the pads are chromatic, 0 the lowest note and 15 the
 //               highest, and the yield falls with pitch on 0.30 + 0.70·(1 −
 //               i/15)^1.35. Pad 0 is a city-killer: a cap five hundred metres
 //               up, ten seconds to full height, a minute standing, a front
 //               that crosses the whole city. Pad 15 is a tactical burst that
-//               tops out around a hundred and fifty — three and a third times
+//               tops out around a hundred and fifty, three and a third times
 //               smaller in every dimension, up in four seconds, gone in
 //               twenty-five. The curve's floor is set by the skyline and not by
 //               the arithmetic: a cap that tops out under the rooftops is a
@@ -218,13 +218,13 @@
 //               of this scene delivered on the high notes. Cap height and
 //               width, stem width, rise, lifetime, front radius, dust, flash
 //               and flight time all ride the same curve; velocity trims it.
-//               RE-ENTRY — the burst lands ON the hit. The strike begins six
+//               RE-ENTRY, the burst lands ON the hit. The strike begins six
 //               hundred metres up and fourteen hundred out to the SIDE of its
 //               target (alternating by pad, a little from beyond), and crosses
 //               the sky diagonally on a shallow twenty-five-degree line in
-//               0.14–0.24 s — a
+//               0.14 to 0.24 s, a
 //               STREAK, the way a meteor crosses a sky, two kilometres of
-//               track in a fifth of a second — barely an arc, at constant
+//               track in a fifth of a second, barely an arc, at constant
 //               speed (nothing this fast slows visibly in a quarter of a
 //               second), and the burst is on the ground before the ear has
 //               finished the note. Shallow because that is what the frame can
@@ -233,8 +233,8 @@
 //               keeps is the LIGHT: a hard white head with a tight violet-white
 //               halo and, behind it, a thin streak of ionised air covering the
 //               last two thirds of the track, white-hot at the head and
-//               thinning to nothing along its length — no puffs, no smoke, no
-//               contrail, which is the signature of a slow object — gone as an
+//               thinning to nothing along its length, no puffs, no smoke, no
+//               contrail, which is the signature of a slow object, gone as an
 //               afterimage in under half a second. Head and streak are sized
 //               in ANGLE, not in metres: the thing itself is never resolved at
 //               this speed, only its light. Several notes at once arrive as a
@@ -243,12 +243,12 @@
 //               on its own, and a vehicle diving at a target twenty-eight
 //               blocks away was painted flat across the face of the tower in
 //               front of it. The CPU asks the question the depth buffer cannot
-//               — the DDA's own lot grid and the same masses, run from the eye
+//              , the DDA's own lot grid and the same masses, run from the eye
 //               to four stations along the track, then the cap and stem bounds
-//               of every standing cloud — and eases the answer into the body's
+//               of every standing cloud, and eases the answer into the body's
 //               and the trail's alpha, so a vehicle passing behind a cornice
 //               dims through it instead of blinking.
-//               THEN — the flash, the fireball, the cap rising with its
+//               THEN, the flash, the fireball, the cap rising with its
 //               toroidal roll, the stem drawing dust off the ground, the
 //               condensation cap, and the front crossing the city: every
 //               facade turned toward a fireball burns, windows and lamps flare
@@ -275,15 +275,15 @@
 // cheap by construction rather than by luck.
 //
 // TWO clouds are marched per ray on med and high and ONE on low. Every extra
-// inlined copy of the density map costs the WHOLE shader its occupancy — a
+// inlined copy of the density map costs the WHOLE shader its occupancy, a
 // second march measured 2.4 ms a frame at 1080p even on frames where no ray
-// took it — so a deck of six or eight will never fit in marches. The two the
+// took it, so a deck of six or eight will never fit in marches. The two the
 // ray gets are ranked by where it ENTERS their bounds, nearest first, with a
 // grazing guard that demotes a cloud the ray only clips behind every cloud it
 // goes squarely through: without it a near cloud's grazed limb claims the ray,
 // contributes almost nothing, and the cloud behind it is the one that suffers.
-// Every cloud past the second is composited COARSELY — the same solid, sampled
-// once across the ray's span, with the noise left off — and not dropped: a
+// Every cloud past the second is composited COARSELY, the same solid, sampled
+// once across the ray's span, with the noise left off, and not dropped: a
 // dropped third cloud leaves the silhouette of the second one's BOUND cut out
 // of the deck in straight black edges, which is a worse artefact than an
 // under-detailed mass at the back. The bound itself is a cap ellipsoid unioned
@@ -298,8 +298,8 @@
 // vec4 arrays with a uniform count, so an idle slot costs nothing (a uniform
 // loop bound is coherent across the draw where a per-slot skip is not, and five
 // idle slots measured a third of a millisecond each), and everything past the
-// first array — cap height and radius, stem, carve depth, fire, embers, the
-// flow of the noise domain, the fireball's light — is worked out once a frame
+// first array, cap height and radius, stem, carve depth, fire, embers, the
+// flow of the noise domain, the fireball's light, is worked out once a frame
 // on the CPU, because none of it depends on the pixel and every one of them was
 // being recomputed once per cloud per pixel. The DDA skips any mass whose
 // height band the ray cannot reach inside that cell; the dust veil's noise runs
@@ -309,7 +309,7 @@
 //
 // Colour comes from the palette: 0 the hot core, 1 fire and tungsten, 2 the
 // detector, cool matter and cold window light, 3 the secondary tracks, gamma
-// and signage, 4 ash, asphalt and dust — everything structural pulled most of
+// and signage, 4 ash, asphalt and dust, everything structural pulled most of
 // the way to its own luminance, because noir keeps its saturation for the
 // windows and the signs. Nothing lifts a wall that is turned away from the
 // light: the fireballs' term on a facade is purely directional and the air
@@ -392,8 +392,8 @@ const CLOUD_H = 600;  // the height of the deck the projected light comes throug
 // over it) and the rail yard, both in lot rows (cz)
 const RIVER_C0 = -15, RIVER_C1 = -17;
 const YARD_C0 = -27, YARD_C1 = -28;
-// the sun, low on the left of the look axis — 28° off it, three and a half
-// degrees up — and the storm cell on the right horizon; the wind the smoke leans in
+// the sun, low on the left of the look axis, 28° off it, three and a half
+// degrees up, and the storm cell on the right horizon; the wind the smoke leans in
 const SUN_AZ = -0.49, SUN_EL = 0.061;
 const STORM_AZ = 0.62;
 const WIND_X = 0.20, WIND_Z = 0.09;
@@ -413,10 +413,10 @@ const GZ_SCALE = 0.95; // ground zero stays the act's hero cloud at the deck's l
 // re-entry vehicles and their clouds
 const MAX_RV = 16;
 const TRAIL_SEGS = 22;
-const CLOUD_U = 40;      // metres of cloud scale at full yield — the bursts are the show
+const CLOUD_U = 40;      // metres of cloud scale at full yield, the bursts are the show
 // The pad map is two rings AROUND THE EYE, not two rows in front of it: the far
-// ring (pads 0–7) at 600–950 m across ±48° of the look axis, the near ring
-// (pads 8–15) at 180–380 m across ±70° — the eye sees ±40°, so the far ring
+// ring (pads 0 to 7) at 600 to 950 m across ±48° of the look axis, the near ring
+// (pads 8 to 15) at 180 to 380 m across ±70°, the eye sees ±40°, so the far ring
 // lands across the whole frame and the near ring wraps past its edges, the
 // nearest bursts towering over the top of it. A wider spread was tried first
 // (±75° / ±115°): most of the deck then burst out of frame and the performer
@@ -425,14 +425,14 @@ const CLOUD_U = 40;      // metres of cloud scale at full yield — the bursts a
 const EYE_X = 0, EYE_Z = 160;
 const RING_R = [[600, 950], [180, 380]];
 const RING_SPAN = [0.84, 1.22];
-// The streak comes in SHALLOW — six hundred metres up, fourteen hundred out
-// beyond the target, a descent of about twenty degrees — because that is what
+// The streak comes in SHALLOW, six hundred metres up, fourteen hundred out
+// beyond the target, a descent of about twenty degrees, because that is what
 // the eye can see: from sixty metres up looking down the canyon the frame
 // reaches twenty-five degrees of elevation, and a steep track from high
 // altitude (tried first: 1.5 km up over 600 m) stayed above the frame until its
 // last four frames, so the burst arrived without the light that caused it.
 // Shallow, the whole streak crosses the upper frame, and the track is still two
-// kilometres in a fifth of a second — eleven kilometres a second.
+// kilometres in a fifth of a second, eleven kilometres a second.
 const RV_ALT = 600;
 const RV_OUT = 1400;
 const STREAK_SPAN = 0.62; // the fraction of the track the light streak covers behind the head
@@ -444,7 +444,7 @@ const GLSL_COMMON = /* glsl */ `
   // Hashes without a transcendental in them. The cloud march evaluates three
   // octaves of 3-D value noise three times a step, which is eight corner
   // hashes an octave: a sine in the hash would put thousands of them in every
-  // pixel, and it did — this is the difference between 25 ms and 8 ms a frame.
+  // pixel, and it did, this is the difference between 25 ms and 8 ms a frame.
   float h11(float n) { n = fract(n * 0.1031); n *= n + 33.33; n *= n + n; return fract(n); }
   float h21(vec2 p) { vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
   float h31(vec3 p) { p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
@@ -543,7 +543,7 @@ const WORLD_FRAG = /* glsl */ `
   uniform int uNFire;
   uniform vec4 uFire[MAX_FIRE];
   // The clouds. The standing ones are packed at the front of these arrays and
-  // uNCloud says how many there are, so an idle slot costs the frame nothing —
+  // uNCloud says how many there are, so an idle slot costs the frame nothing,
   // a uniform loop bound is coherent across the whole draw where a per-slot
   // skip is not, and five idle slots measured a third of a millisecond each.
   // Everything past A is worked out ONCE A FRAME on the CPU, because none
@@ -612,7 +612,7 @@ const WORLD_FRAG = /* glsl */ `
   bool lotYard(ivec2 c) { return c.y <= (${YARD_C0}) && c.y >= (${YARD_C1}); }
   bool lotStreet(ivec2 c) {
     // the offsets are multiples of both spacings, so the fraction of the scaled
-    // index is the modulo — and no integer division reaches the DDA's inner loop
+    // index is the modulo, and no integer division reaches the DDA's inner loop
     return fract((float(c.x) + 4100.0) * ${(1 / AV).toFixed(6)}) < 0.05
         || fract((float(c.y) + 4100.0) * ${(1 / ST).toFixed(6)}) < 0.05
         || lotRiver(c) || lotYard(c);
@@ -637,7 +637,7 @@ const WORLD_FRAG = /* glsl */ `
   // the crater term alone, for the geometry, over the STUMPS biggest craters
   // (the list is kept sorted): the wake's plateau never reaches the height a
   // block starts to fall at, and a lot outside the box round the heavy radii
-  // never enters the loop — which is what keeps the DDA cheap
+  // never enters the loop, which is what keeps the DDA cheap
   float craterAt(vec2 q) {
     if (uNDmg == 0 || q.x < uDmgBox.x || q.y < uDmgBox.y || q.x > uDmgBox.z || q.y > uDmgBox.w) return 0.0;
     float d = 0.0;
@@ -653,7 +653,7 @@ const WORLD_FRAG = /* glsl */ `
   // one lot: family, plan centre, the up-to-three masses it stands as, its
   // random words. b* = (half x, half z, y base, y top); off = (mass 1 offset,
   // mass 2 offset) off the centre; rnd = plan bits, rnd2 = colour / material /
-  // furniture / signage bits. Six families: DECO TOWER (three setback masses —
+  // furniture / signage bits. Six families: DECO TOWER (three setback masses,
   // the few towers), BRICK PAIR (two walk-ups side by side, a water tank on the
   // taller), GLASS SLAB (plant room, mast), SHED (a billboard on the roof),
   // CONCRETE MID-RISE (balconies, a plant box), PODIUM + SLAB (a two-storey
@@ -722,7 +722,7 @@ const WORLD_FRAG = /* glsl */ `
     top = max(max(b0.w, b1.w), b2.w);
   }
 
-  // the ceiling of a lot, undamaged — a bound for the DDA's reach test, so it
+  // the ceiling of a lot, undamaged, a bound for the DDA's reach test, so it
   // stays conservative (a stump is never taller than its block was)
   float lotTop(uint k, out int fam, out float g) {
     uint b = hu(k ^ 0x9e3779b9u);
@@ -740,18 +740,18 @@ const WORLD_FRAG = /* glsl */ `
 
   // ================================================================ the shadows
   // the sun's bearing on the ground, its rise per metre along it, and the
-  // inverse — set once a pixel (prepColours)
+  // inverse, set once a pixel (prepColours)
   vec2 gSunDir; float gRise, gInvRise;
   // Does lot c block a ray leaving p along dir (unit, on the ground) and
   // rising rise per metre? The lot's footprint (the same plan bits lotOf
-  // reads — two hashes, no family branches) is slab-tested along the ray, and
+  // reads, two hashes, no family branches) is slab-tested along the ray, and
   // the ray's height where it ENTERS the footprint is held against the lot's
   // top: a real trace, not a height lookup at a guessed distance. The penumbra
   // widens with that entry distance (the sun is half a degree wide; the flash
   // is a fireball), so the shadow is knife-sharp at the foot of the block that
-  // throws it and soft at the far end of its run — the contact hardening of a
+  // throws it and soft at the far end of its run, the contact hardening of a
   // soft shadow map. fallen takes the crater into account (a stump throws a
-  // stump's shadow); the etched shadows pass 0 — they were thrown by the
+  // stump's shadow); the etched shadows pass 0, they were thrown by the
   // blocks as they STOOD at the instant of the flash.
   float lotBlock(ivec2 c, vec3 p, vec2 dir, float rise, float soft, float fallen) {
     uint k = lotKey(c);
@@ -774,12 +774,12 @@ const WORLD_FRAG = /* glsl */ `
     return smoothstep(-w, w, p.y + rise * tIn - top);
   }
   // The sun's shadow at p: a march along the bearing, the first lots one by
-  // one and then at a widening stride out to a few hundred metres — the sun
+  // one and then at a widening stride out to a few hundred metres, the sun
   // stands three and a half degrees up, so a tower throws its shadow hundreds
   // of metres down the boulevard and what decides the light at a point is
   // whether ANY block along that run clears the ray. own is the cell p
   // stands in (a block does not shadow its own lit face); steps is a uniform
-  // — the wet road's trace takes the short form. The result is squared by the
+  //, the wet road's trace takes the short form. The result is squared by the
   // callers: the shadow side goes to black.
   float sunShadow(vec3 p, ivec2 own, int steps) {
     float lit = 1.0;
@@ -796,7 +796,7 @@ const WORLD_FRAG = /* glsl */ `
     return lit;
   }
   // The flash: a burst is a point light for the instant of its flash, and
-  // every block throws a HARD shadow away from it — a march from p toward the
+  // every block throws a HARD shadow away from it, a march from p toward the
   // burst, the ray climbing to the fireball. fallen as in lotBlock.
   float flashShadow(vec3 p, vec3 B, int steps, float fallen) {
     vec2 dv = B.xz - p.xz;
@@ -819,9 +819,9 @@ const WORLD_FRAG = /* glsl */ `
   }
   // THE PROJECTED LIGHT. The sunlight reaching the city comes through the
   // storm's broken deck and the smoke between the sun and the city, so it is
-  // gated by a PROJECTED mask — the pen's projection map: a domain-warped fbm,
+  // gated by a PROJECTED mask, the pen's projection map: a domain-warped fbm,
   // a ridge, the pen's own mask weights and a luma threshold with a 0.1
-  // smoothstep — evaluated where the sun ray from p crosses the cloud plane
+  // smoothstep, evaluated where the sun ray from p crosses the cloud plane
   // (CLOUD_H), so the pattern is carried along the sun onto whatever it hits;
   // it FLOWS (translation, never rotation) and the wreck thickens it as the
   // ash comes in (the caller raises uGateT). Bands of hard light and cloud
@@ -839,7 +839,7 @@ const WORLD_FRAG = /* glsl */ `
   }
   // THE ETCHED SHADOWS. Inside a crater the flash bleached whatever it
   // reached and left the ground and the walls dark wherever a block stood
-  // between them and the burst — the silhouette persists in the wreck. Traced
+  // between them and the burst, the silhouette persists in the wreck. Traced
   // toward each crater's burst (the STUMPS biggest) at a reduced step count
   // against the city as it STOOD; 'rebuild' clears the craters and the etch
   // with them. Returns how bleached p is (0 in the silhouette or outside).
@@ -953,7 +953,7 @@ const WORLD_FRAG = /* glsl */ `
       float sc = A.w;
       vec2 dv = q - A.xy;
       float d2 = dot(dv, dv);
-      // Every fireball lights the whole quarter it stands in — while there is a
+      // Every fireball lights the whole quarter it stands in, while there is a
       // fireball. A cloud a minute old contributes a number with twenty zeroes
       // after the point, and this loop runs once per pixel per cloud, so it
       // leaves before the divide rather than after it.
@@ -1034,8 +1034,8 @@ const WORLD_FRAG = /* glsl */ `
   // A sunset, interrupted. The sun is low on the left; the dome is a warm
   // gradient; a cirrus veil lit from beneath; a cumulus deck on the horizon; a
   // storm cell stands on the right and throws the lightning. uWreck is the ash
-  // dusk the bursts leave — the overcast creeps in, the sun reddens and dims
-  // through the dust, the haze goes grey — and it decays over minutes.
+  // dusk the bursts leave, the overcast creeps in, the sun reddens and dims
+  // through the dust, the haze goes grey, and it decays over minutes.
   // the sun's tint, the haze and the dome's ambient: the same three colours in
   // every function below, so they are worked out once a pixel (prepColours)
   vec3 gSunT, gHaze, gAmb;
@@ -1055,7 +1055,7 @@ const WORLD_FRAG = /* glsl */ `
     vec3 col = mix(hor, zen, pow(h, 0.42));
     float sd = max(dot(rd, uSun), 0.0);
     float sd2 = sd * sd, sd4 = sd2 * sd2, sd8 = sd4 * sd4, sd16 = sd8 * sd8, sd32 = sd16 * sd16;
-    // the warm band round the sun, its glare, and the disc (HDR — the
+    // the warm band round the sun, its glare, and the disc (HDR, the
     // compositor's limiter takes it)
     col += mix(uPal0, uPal3, 0.4) * sd8 * 0.55 * (1.0 - h * 0.5);
     col += mix(uPal0, vec3(1.0), 0.4) * sd32 * sd16 * 0.9;
@@ -1088,11 +1088,11 @@ const WORLD_FRAG = /* glsl */ `
   // ---- facades
   // window emission at a facade point; aa folds the grid into its average once
   // a pane falls under a pixel, so the city never crawls. rd is the view ray:
-  // behind a lit pane stands a ROOM — a box the cell wide, a floor high, five
+  // behind a lit pane stands a ROOM, a box the cell wide, a floor high, five
   // metres deep, its ceiling lit, its furniture a silhouette against the back
-  // wall — and the ray is carried into it, so the interiors slide against the
+  // wall, and the ray is carried into it, so the interiors slide against the
   // facade as the eye moves. dmg is the wreck here: a pane past its own
-  // threshold is BLOWN OUT — a dark hole, lit no more — and one in five of
+  // threshold is BLOWN OUT (a dark hole, lit no more) and one in five of
   // those burns. hole and fire come back for the caller (the wall darkens in
   // the hole; the fire is emission the caller also uses as light).
   vec3 windows(float u, float v, vec3 rd, vec3 n, uint k, int fam, vec4 rnd, vec4 bx, float aa, float blown, float dmg, float rooms, out float lum, out float hole, out float fire, out float paneM) {
@@ -1231,7 +1231,7 @@ const WORLD_FRAG = /* glsl */ `
 
     // ---- light: the sun (hard, low, long shadows), the dome, the occlusion of
     // the canyon floor and the setbacks, the lightning
-    // the traced shadow, squared to black, under the projected gate — the
+    // the traced shadow, squared to black, under the projected gate, the
     // face is lit only where every block along the sun's run clears the ray
     // AND the deck is open over that run
     float sunD = max(dot(n, uSun), 0.0);
@@ -1386,7 +1386,7 @@ const WORLD_FRAG = /* glsl */ `
         col += base * paint * light * 0.22;
       }
       // ---- signage: the few saturated things in the frame. The palette keeps
-      // its colour here — neon tubes on the podium fronts and the walk-ups, LED
+      // its colour here, neon tubes on the podium fronts and the walk-ups, LED
       // boards up the mid-rises and the slabs, the billboard on the shed's roof.
       if (neonHere) {
         float sy = bx.z + (fam == 5 ? 5.0 : 3.4 + rnd2.w * 5.0);
@@ -1433,7 +1433,7 @@ const WORLD_FRAG = /* glsl */ `
     // the street lamps reach the lower floors
     if (p.y < 46.0) col += lampLight(p, clamp(blown + flare * 0.5, 0.0, 2.0)) * mix(uPal1, uPal0, 0.3) * 0.22 * uLamps * max(1.0 - n.y, 0.15) * expo;
     // Every fireball is a light: the facades turned toward it burn. The term is
-    // PURELY directional and carries no ambient share at all — the smallest
+    // PURELY directional and carries no ambient share at all, the smallest
     // floor here is a floor under every wall in frame, and with a deck standing
     // it lifted the whole city to a flat mid grey and took the blacks with it.
     // A wall turned away from every fireball stays unlit however many stand.
@@ -1461,7 +1461,7 @@ const WORLD_FRAG = /* glsl */ `
     float wet = uRain * smoothstep(0.34, 0.66, fbm2b(p.xz * 0.035 + 3.1));
     float dmg = damageAt(p.xz);
     // light: the dome into the canyon, the sun where the blocks let it through
-    // — the traced shadow squared to black, the projected gate over it; the
+    //, the traced shadow squared to black, the projected gate over it; the
     // long dark lanes the towers throw down the grid are this number
     float shadowG = sunShadow(p, ivec2(100000), uShadowSteps);
     shadowG *= shadowG;
@@ -1509,7 +1509,7 @@ const WORLD_FRAG = /* glsl */ `
     // fading with distance, thicker where two wakes overlap), clumps and
     // clear patches by a noise, the boulevard's centre line scoured thin by
     // the blast wind and the rubble piled at the kerbs and corners, glass
-    // glitter on the asphalt where the panes blew out — and the etched shadow
+    // glitter on the asphalt where the panes blew out, and the etched shadow
     // on the bare ground between.
     float wreckG = smoothstep(0.12, 0.5, dmg);
     if (wreckG > 0.01) {
@@ -1567,7 +1567,7 @@ const WORLD_FRAG = /* glsl */ `
     col += mix(uPal1, uPal0, 0.45) * fireLit * 0.055 * gn;
     // wet asphalt: a second, shorter trace of the reflected ray, torn up
     // vertically so it smears the way a wet road smears; where the trace
-    // misses, the dome itself lies in the film — the sunset in the street
+    // misses, the dome itself lies in the film, the sunset in the street
     #if REF_STEPS > 0
     float fr = 1.0 - max(-rd.y, 0.0);
     float fr2 = fr * fr;
@@ -1730,7 +1730,7 @@ const WORLD_FRAG = /* glsl */ `
   }
 
   // the megalopolis past the DDA's reach: two bands of skyline on the horizon
-  // — blocky cells, a tower now and then, a scatter of lights — each fading
+  // (blocky cells, a tower now and then, a scatter of lights) each fading
   // into the haze, the farther the fainter
   vec3 farCity(vec3 rd, float az, vec3 sky) {
     vec3 haze = gHaze;
@@ -1762,7 +1762,7 @@ const WORLD_FRAG = /* glsl */ `
 
   // Smoke columns off the fires the fronts leave: each a leaning column of
   // noise rising off its roof, growing from the moment the fire catches (nine
-  // metres a second — nothing stands at its height), sampled twice across the
+  // metres a second, nothing stands at its height), sampled twice across the
   // ray's span (one noise sample). Dust-grey off the roofs as the front passes, black smoke as the
   // fire takes, thinning to haze as it burns out. F = (x, z, y, age).
   void smokeColumns(vec3 ro, vec3 rd, float tOpaque, inout vec3 col) {
@@ -1816,7 +1816,7 @@ const WORLD_FRAG = /* glsl */ `
 
   // Everything about a cloud that does not depend on the point being sampled,
   // worked out ONCE per cloud per pixel. It used to be worked out again on
-  // every step of every march — three exponentials and a page of arithmetic,
+  // every step of every march, three exponentials and a page of arithmetic,
   // fifteen steps deep, for each of the three map calls a step can make, which
   // is a couple of hundred transcendentals a pixel spent on constants.
   struct Cloud {
@@ -1858,7 +1858,7 @@ const WORLD_FRAG = /* glsl */ `
     float d = cloudSolid(p, c);
     sd = d;
     // The noise can only carve so far off the solid, so a step this far outside
-    // it is empty whatever the noise says — and it can leave before paying for
+    // it is empty whatever the noise says, and it can leave before paying for
     // the roll and the two octaves. Most of a bound is empty space: this is
     // what makes the march affordable, and the distance it hands back is what
     // lets the next step jump the whole of it.
@@ -1888,7 +1888,7 @@ const WORLD_FRAG = /* glsl */ `
   // SHAPE and not a ball or a box around it: a sphere round a column three
   // hundred metres tall is mostly empty sky, and whichever bound the ray enters
   // first is the cloud it marches, so slack in the bound erases whatever stands
-  // behind it — as a ball in soft patches, as a box in hard rectangles. So the
+  // behind it, as a ball in soft patches, as a box in hard rectangles. So the
   // bound is a sphere on the cap unioned with a capped cylinder on the stem,
   // each carrying the margin the noise can carve past the solid.
   bool cloudSpan(vec3 ro, vec3 rd, Cloud c, float tMax, out float t0, out float t1, out float ang, out float depth) {
@@ -1987,8 +1987,8 @@ const WORLD_FRAG = /* glsl */ `
   // A cloud the ray could afford to bound but not to march still has to stand
   // where it stands. This is the same body with the noise left off: the solid
   // sampled once across the ray's span, shaded with the cloud's own average
-  // light. It reads as an under-detailed mass at the back of a deck — which is
-  // what it is — instead of the straight-edged hole a dropped cloud leaves. The
+  // light. It reads as an under-detailed mass at the back of a deck, which is
+  // what it is, instead of the straight-edged hole a dropped cloud leaves. The
   // coarse clouds composite behind the marched ones; they ranked worse because
   // the ray entered them later or only clipped them, so behind is where they
   // almost always are.
@@ -2054,7 +2054,7 @@ const WORLD_FRAG = /* glsl */ `
     else if (groundHit) col = shadeGround(ro, rd, ro + rd * tg, tg, blown, flare, glint, scorch, fireLit);
     else { col = skyCol(rd, az); if (rd.y < 0.1) col = farCity(rd, az, col); }
     // aerial perspective: the haze takes the distance, and the dust thickens
-    // it — and the flash takes the haze's exposure as it takes the city's
+    // it, and the flash takes the haze's exposure as it takes the city's
     float expoH = 1.0 / (1.0 + uFlashExpo * 0.7);
     if (tOpaque < CFAR) col = mix(col, gHaze * expoH, (1.0 - exp(-tOpaque * uHaze)) * 0.92);
 
@@ -2069,7 +2069,7 @@ const WORLD_FRAG = /* glsl */ `
     vec3 fogCol = gHaze * 0.55 * expoH;
     col = mix(col, fogCol, clamp(fog, 0.0, 0.96));
     // crepuscular shafts: the sun's forward scatter in the haze, gated by the
-    // projected mask where the ray crosses it — bright rays where the deck
+    // projected mask where the ray crosses it, bright rays where the deck
     // stands open, nothing where it is closed
     float sdv = dot(rd, uSun);
     if (sdv > 0.25) {
@@ -2084,7 +2084,7 @@ const WORLD_FRAG = /* glsl */ `
 
     // The clouds this ray marches, ranked by where it enters their bounds. Two
     // are marched on med and high and one on low: every extra call to cloudMap
-    // that the compiler inlines costs the WHOLE shader its occupancy — a second
+    // that the compiler inlines costs the WHOLE shader its occupancy, a second
     // march measured 2.4 ms a frame at 1080p even on frames where no ray took
     // it. A deck of six or eight will not fit in two marches, so every cloud
     // past the second is composited coarsely instead of dropped.
@@ -2102,7 +2102,7 @@ const WORLD_FRAG = /* glsl */ `
       // A cloud the ray only clips is ranked behind every cloud it goes
       // squarely through. Without that a near cloud's grazed limb claims the
       // ray, contributes almost nothing, and the cloud standing behind it is
-      // shaded coarsely — which reads as a notch bitten out of it.
+      // shaded coarsely, which reads as a notch bitten out of it.
       float key = s0 + (depth < 0.22 ? 1e6 : 0.0);
       if (key < k0) {
         #if MARCH2
@@ -2141,7 +2141,7 @@ const WORLD_FRAG = /* glsl */ `
     #endif
     col = (col * cT + cAcc) * T + acc;
 
-    // Every fireball throws its own glow into the air — and it is the AIR it
+    // Every fireball throws its own glow into the air, and it is the AIR it
     // lifts. A flat add put a share of every fireball on every facade in frame,
     // and a salvo handed back a grey city instead of a noir one lit from four
     // directions at once, so the term rides the ray's own fog integral: a wall
@@ -2374,17 +2374,17 @@ const SPH_FRAG_GLOW = /* glsl */ `
 
 // ------------------------------------------------------------ oriented boxes
 // The cars, the flying chunks and the resting rubble: one instanced box mesh,
-// each instance an oriented box — position, half extents, a quaternion — lit
+// each instance an oriented box (position, half extents, a quaternion) lit
 // per face in the vertex shader by the same light the city takes: the dome,
 // the sun with the CPU mirror's traced shadow (aLit.x), the lamps (aLit.y),
 // the strongest flash with its traced shadow (aLit.z), a fire of its own
 // (aLit.w). The flash's exposure drop (uExpo) rides it like the city. A
 // negative aLit.w marks a SHADOW STREAK: a flat black box laid down-sun from
-// the thing that throws it, hardest at the foot and fading along its run —
+// the thing that throws it, hardest at the foot and fading along its run,
 // the cars' own shadows on the road. Depth-written, normal-blended.
 const BOX_VERT = /* glsl */ `
   uniform vec3 uSun, uSunCol, uAmb, uDome, uLampCol, uFlashCol, uFireCol;
-  uniform vec4 uFlash;       // x, y, z, amplitude — the strongest flash
+  uniform vec4 uFlash;       // x, y, z, amplitude, the strongest flash
   uniform float uFlashR2, uExpo;
   in vec3 aPos;
   in vec3 aExt;
@@ -2409,7 +2409,7 @@ const BOX_VERT = /* glsl */ `
     } else {
       vec3 n = normalize(rot(aRot, normal));
       float ndS = max(dot(n, uSun), 0.0);
-      // the dome's sheen on the upward faces — paintwork and wet slab carry the sky
+      // the dome's sheen on the upward faces, paintwork and wet slab carry the sky
       vec3 L = (uAmb * (0.55 + 0.45 * (n.y * 0.5 + 0.5)) + uDome * (0.12 + 0.55 * max(n.y, 0.0)) + uSunCol * ndS * aLit.x * 1.5) / (1.0 + uExpo);
       L += uLampCol * aLit.y * max(n.y * 0.5 + 0.5, 0.25) / (1.0 + uExpo);
       if (uFlash.w > 0.0) {
@@ -2481,9 +2481,9 @@ const smoothstepJS = (a, b, x) => { const u = Math.min(1, Math.max(0, (x - a) / 
 
 // `lotOf` in full, not just its base height: a lot stands as up to three
 // masses, each with its own plan, its own offset off the lot centre and its
-// own height band — the deco tower's mass 0 tops out at 0.42 of its height
+// own height band, the deco tower's mass 0 tops out at 0.42 of its height
 // with the two above it recessed, the brick pair stands side by side, the
-// podium carries its slab — and the wreck knocks the blocks inside a burst's
+// podium carries its slab, and the wreck knocks the blocks inside a burst's
 // heavy radius down to stumps. A JS copy that knew only the total height sent
 // the cluster to panes that hang in the air in front of the setbacks, so it
 // mirrors every number. out.b holds four floats per mass (half x, half z, y
@@ -2564,7 +2564,7 @@ function lotOfJS(cx, cz, seed, out, dmg) {
 // ---------------------------------------------------- the shadow traces on JS
 // The shader's lotTop, lotBlock, sunShadow and flashShadow, number for number,
 // so a car in a tower's shadow is dark and a chunk in a flash's shadow is
-// black — the impostors take the same light as the city they stand in.
+// black, the impostors take the same light as the city they stand in.
 const SUN_DX = Math.sin(SUN_AZ), SUN_DZ = -Math.cos(SUN_AZ);   // the bearing on the ground
 const SUN_RISE = Math.tan(SUN_EL);
 function lotTopJS(k) {
@@ -2631,7 +2631,7 @@ function flashShadowJS(px, py, pz, bx, by, bz, seed, steps, dmg) {
   return lit;
 }
 // the shader's projected gate (skyGate), number for number: h21, vnoise2,
-// fbm2b and the mask — so a car or a chunk standing under a closed patch of
+// fbm2b and the mask, so a car or a chunk standing under a closed patch of
 // the deck takes the cloud's shadow like the road it stands on
 const fractJ = (x) => x - Math.floor(x);
 function h21J(px, py) {
@@ -2697,8 +2697,8 @@ export function createScene(ctx) {
   const CITY_STEPS = tier === 'low' ? 24 : tier === 'high' ? 72 : 28; // the lower city walks farther a ray; the impostor stands past the reach
   const REF_STEPS = tier === 'low' ? 0 : tier === 'high' ? 22 : 4;
   const MAX_CLOUDS = tier === 'low' ? 4 : tier === 'high' ? 8 : 5; // the bigger bursts cost a slot on med
-  // A second inlined march costs the whole shader its occupancy — 2.5 ms a
-  // frame at 1080p — but without it a cloud in front bites a crescent out of
+  // A second inlined march costs the whole shader its occupancy, 2.5 ms a
+  // frame at 1080p, but without it a cloud in front bites a crescent out of
   // the cloud behind, and clouds standing together is the point of the deck.
   // Med and high pay for it; low marches one and takes the coarse composite
   // for everything else.
@@ -2956,7 +2956,7 @@ export function createScene(ctx) {
   // the shadow streak a thing throws down-sun: a flat black box from its foot,
   // as long as its height lets it be (capped), fading along its run
   // the box's local x runs along the streak, from the foot (x = -1) away from
-  // the sun: a yaw about y sends +x onto (-SUN_DX, -SUN_DZ) — a rotation by θ
+  // the sun: a yaw about y sends +x onto (-SUN_DX, -SUN_DZ), a rotation by θ
   // maps (1, 0, 0) to (cos θ, 0, -sin θ)
   const shadowQ = new Float32Array(4);
   quatSetAxisAngle(shadowQ, 0, 0, 1, 0, Math.atan2(SUN_DZ, -SUN_DX));
@@ -3088,7 +3088,7 @@ export function createScene(ctx) {
     // one mass of one lot, one wall of it.
     //   axis 0: the plane is x = ccx + sign*halfX, u runs along z
     //   axis 1: the plane is z = ccz + sign*halfZ, u runs along x
-    // Every number below is the shader's `windows()` verbatim — the pitch, the
+    // Every number below is the shader's `windows()` verbatim, the pitch, the
     // lit fraction, the pane's place inside its cell, the height band it is
     // allowed to stand in, the on/off hash and the colour temperature. They
     // have to be, or the cluster lands on panes the city leaves dark and the
@@ -3133,7 +3133,7 @@ export function createScene(ctx) {
           // The glass slabs carry the densest grid and the highest lit
           // fraction, so left alone they are two thirds of everything the
           // cluster can land on and it resolves entirely in their cool light.
-          // Thinning their share of the CANDIDATES (not of the city — every
+          // Thinning their share of the CANDIDATES (not of the city, every
           // pane skipped here still burns on the wall) hands the constellation
           // the skyline's own mix of warm and cool.
           if (L.fam === 2 && (w1 >>> 24) > 150) continue;
@@ -3142,7 +3142,7 @@ export function createScene(ctx) {
           if (dmgHere >= ((w2 >>> 24) & 255) / 255 * 0.9 + 0.05) continue;
           // At the distance the cluster resolves at, a pane is under a pixel and
           // the shader has already folded the grid into its average, which uses
-          // the building's own colour temperature and not the per-pane jitter —
+          // the building's own colour temperature and not the per-pane jitter,
           // so that is the number the point has to arrive holding.
           if (axis === 0) push(plane + sign * 0.3, v, u, ct);
           else push(u, v, plane + sign * 0.3, ct);
@@ -3172,7 +3172,7 @@ export function createScene(ctx) {
     // directly comparable: match them and the point crosses the move without
     // crossing the screen. The window field is scaled to BLOOM times the
     // cluster's own reach, so the shell opens outward a little as it resolves
-    // while the pull-back pulls it back in — the two nearly cancel.
+    // while the pull-back pulls it back in, the two nearly cancel.
     const MATCH_A = 24, MATCH_B = 118, BLOOM = 1.7;
     const e2y = TDZ, e2z = -TDY;                  // the frame's up, perpendicular to the axis
     const c1 = [ATOM_X + TDX * MATCH_A, ATOM_Y + TDY * MATCH_A, ATOM_Z + TDZ * MATCH_A];
@@ -3243,7 +3243,7 @@ export function createScene(ctx) {
   const cYc = new Float32Array(MAX_CLOUDS);      // cap height, this frame
   const cFade = new Float32Array(MAX_CLOUDS);    // density, thinning at end of life
   const cAge = new Float32Array(MAX_CLOUDS).fill(-1);
-  // Ground zero always stands: the resting subject of the act. It rests OLD —
+  // Ground zero always stands: the resting subject of the act. It rests OLD,
   // the cloud is mature either way, but an old one has let the grid come back
   // on, so the city is lit at rest instead of blacked out by its own front.
   cAge[0] = 90;
@@ -3279,7 +3279,7 @@ export function createScene(ctx) {
     padAz[i] = az;
     padX[i] = EYE_X + Math.sin(az) * r;
     padZ[i] = EYE_Z - Math.cos(az) * r;
-    // Low note big, high note small — but the floor is set by the skyline, not
+    // Low note big, high note small, but the floor is set by the skyline, not
     // by the curve: a burst whose cap tops out under the rooftops is a flash on
     // a wall and nothing else. At 0.30 the highest note still stands a cloud
     // about a hundred and fifty metres up, and pad 0 is three and a third times
@@ -3306,7 +3306,7 @@ export function createScene(ctx) {
   const winWarm = new Float32Array(3), winCool = new Float32Array(3);
   const nucPh = new Float32Array(NUCLEONS * 3);
   for (let i = 0; i < NUCLEONS * 3; i++) nucPh[i] = Math.random() * 6.2831853;
-  // The scene OPENS on the collider — act 0, the detector held dark until the
+  // The scene OPENS on the collider, act 0, the detector held dark until the
   // show starts (the first beat, the transport playing, or any pad), and the
   // first collision fires as the opening element. KNOB 6 / 'act' take over the
   // moment they move, as before.
@@ -3341,8 +3341,8 @@ export function createScene(ctx) {
   // lightning: the storm cell throws a bolt every so often; 'lightning' fires one
   let ltnT = 9, ltnClock = 0, ltnNext = 26 + Math.random() * 30;
   // ---- THE DEBRIS: pieces of buildings flying. Chunks waiting on a front,
-  // then thrown along it — slabs, beams, panels, window frames, signage, car
-  // bodies — as oriented boxes tumbling about their own axis as a function of
+  // then thrown along it, slabs, beams, panels, window frames, signage, car
+  // bodies, as oriented boxes tumbling about their own axis as a function of
   // their flight (the spin rate rides the speed, so a chunk at rest does not
   // spin), ballistic: radial from the burst, gravity, a little drag, NO
   // wander. A chunk that lands stays where it fell (state 3) until a new
@@ -3359,8 +3359,8 @@ export function createScene(ctx) {
   const dbRestT = new Float32Array(DEBRIS);
   for (let i = 0; i < DEBRIS; i++) dbQ[i * 4 + 3] = 1;
   let debrisLive = 0;
-  // ---- THE RESTING POOL: the bigger chunks a burst leaves round its crater —
-  // slab corners, beams, a water tank, a cornice piece — settled on the
+  // ---- THE RESTING POOL: the bigger chunks a burst leaves round its crater,
+  // slab corners, beams, a water tank, a cornice piece, settled on the
   // rubble, at the feet of the stumps and down the streets, sized by the
   // crater; each grows from nothing as the fireball hides it. Cleared by
   // 'rebuild'; the oldest recycled by the next burst.
@@ -3373,7 +3373,7 @@ export function createScene(ctx) {
   let rsNext = 0;
   // ---- THE CARS: parked along both kerbs of the boulevard, the avenues and
   // the cross streets; in the wreck shoved, flipped, stacked against the bases
-  // of the blocks, burning — and lifted and tumbled along the blast wind when
+  // of the blocks, burning, and lifted and tumbled along the blast wind when
   // a front takes them.
   const carState = new Uint8Array(CARS);                 // 0 empty slot, 1 parked, 2 flying, 3 wrecked at rest
   const carX = new Float32Array(CARS), carY = new Float32Array(CARS), carZ = new Float32Array(CARS);
@@ -3384,7 +3384,7 @@ export function createScene(ctx) {
   for (let i = 0; i < CARS; i++) carQ[i * 4 + 3] = 1;
   const CAR_EX = 2.2, CAR_EY = 0.36, CAR_EZ = 0.95;       // the body's half extents; the cabin sits on it
   // the blast wind: radial from the most recent burst at the eye, relaxing
-  // back to the storm's wind over a minute — the smoke leans with it, the
+  // back to the storm's wind over a minute, the smoke leans with it, the
   // embers stream along it, debris far from any burst rides it
   let bwX = 0.91, bwZ = 0.41, bwGust = 0.35;
   const WBX = WIND_X / Math.sqrt(WIND_X * WIND_X + WIND_Z * WIND_Z), WBZ = WIND_Z / Math.sqrt(WIND_X * WIND_X + WIND_Z * WIND_Z);
@@ -3488,7 +3488,7 @@ export function createScene(ctx) {
   }
   // The fires a burst leaves: a scan of the lots inside its crater for blocks
   // still standing but hit hard, and a second of the blocks round the eye for
-  // the ones the front's wake sets alight — so the smoke columns stand where
+  // the ones the front's wake sets alight, so the smoke columns stand where
   // the eye is, in the front's wake, not only at ground zero
   function igniteFrom(x, z, sc) {
     const R = Math.min(sc * 10 * 0.85, 330);
@@ -3500,7 +3500,7 @@ export function createScene(ctx) {
     const E = 170;
     scanFires(x, z, sc, Math.floor((fx - E) / CELL), Math.ceil((fx + E) / CELL), Math.floor((fz - E) / CELL), Math.ceil((fz + E) / CELL), 0.18, 2, fx, fz);
   }
-  // a chunk's shape: slab, beam, panel, window frame, signage, a car body —
+  // a chunk's shape: slab, beam, panel, window frame, signage, a car body,
   // the box's x is its long axis and y its thin one, so a chunk lies flat
   // when its quaternion is a yaw
   function rollChunk(i, scale) {
@@ -3522,7 +3522,7 @@ export function createScene(ctx) {
   // the debris a front throws: a share of the pool (the idle first, then the
   // longest-resting) waits on this burst's front at radii round the eye's
   // distance, bearing toward the eye, so the shower crosses the eye as the
-  // front does — launched upwind of it, the chunks stream PAST it
+  // front does, launched upwind of it, the chunks stream PAST it
   function seedDebris(src, x, z, sc, share) {
     const dx = camPos.x - x, dz = camPos.z - z;
     const dCam = Math.sqrt(dx * dx + dz * dz);
@@ -3561,7 +3561,7 @@ export function createScene(ctx) {
           const ca = Math.cos(dbAz[i]), sa = Math.sin(dbAz[i]);
           dbX[i] = ox + ca * rs; dbZ[i] = oz + sa * rs; dbY[i] = 1 + Math.random() * 6;
           // THROWN: radial from the burst at the front's speed, a narrow spread
-          // across it, a kick upward — and nothing else. No wander.
+          // across it, a kick upward, and nothing else. No wander.
           const v = 48 + Math.random() * 44;
           const sp = (Math.random() - 0.5) * 0.24 * v;
           dbVX[i] = ca * v - sa * sp; dbVZ[i] = sa * v + ca * sp; dbVY[i] = 6 + Math.random() * 18;
@@ -4156,9 +4156,9 @@ export function createScene(ctx) {
           r = rad + (0.9 - rad) * mu;
         }
         // The colour the point arrives holding is the shader's own window
-        // expression at that pane's colour temperature — warm is palette 1
+        // expression at that pane's colour temperature, warm is palette 1
         // pulled 30 % to palette 0, cool is palette 2 lifted 30 % toward white
-        // — and not a ramp coordinate walking 0 -> 1 -> 2. The two only agree at
+        //, and not a ramp coordinate walking 0 -> 1 -> 2. The two only agree at
         // the warm end; at the cool end the ramp handed back raw palette 2 where
         // the city lifts it, and the constellation resolved in a colour family
         // the windows under it do not use. That is the whole of the hand-off
@@ -4183,7 +4183,7 @@ export function createScene(ctx) {
   const capHeightJS = (a, m, q, sc, tau) => sc * (1.5 + 9 * (1 - Math.exp(-a / tau))) * (1 + 0.35 * m) * (1 - 0.25 * q);
   const CLOUD_TAIL = 3.5; // seconds a cloud takes to thin out of the deck
   // Which slot a new burst takes. An empty one first; failing that the slot
-  // furthest through its own life, NOT the one launched first — the deck runs
+  // furthest through its own life, NOT the one launched first, the deck runs
   // clouds of wildly different lifetimes side by side, and evicting by launch
   // order deletes a one-second-old fireball at its brightest while a minute-old
   // ash column stands next to it.
@@ -4236,7 +4236,7 @@ export function createScene(ctx) {
   // the depth buffer cannot: it runs the DDA's own lot grid from the eye to the
   // point and tests the same masses `lotOf` builds, then the same cap and stem
   // bounds the cloud march uses. One query per vehicle body and four along each
-  // trail is nothing — sixteen vehicles at twenty lots apiece — and the answer
+  // trail is nothing (sixteen vehicles at twenty lots apiece) and the answer
   // drives alpha, so a body passing behind a cornice fades instead of popping.
   const visRec = { fam: 0, k: 0, cx: 0, cz: 0, top: 0, b: new Float64Array(12), off: new Float64Array(6), r: [0, 0, 0, 0], r2: [0, 0, 0, 0] };
   function visibleFrom(px, py, pz) {
@@ -4308,9 +4308,9 @@ export function createScene(ctx) {
     const yf = padYf[idx];
     rvAlive[slot] = 1;
     rvT[slot] = 0;
-    // The flight is a STREAK, not a glide: 0.14–0.24 s from the top of the sky
+    // The flight is a STREAK, not a glide: 0.14 to 0.24 s from the top of the sky
     // to the ground, so the burst lands on the hit that launched it. A body
-    // coming in at re-entry speed — eight or nine kilometres a second — crosses
+    // coming in at re-entry speed (eight or nine kilometres a second) crosses
     // this whole sky in under a second; what the eye keeps is the light.
     rvDur[slot] = 0.14 + 0.10 * yf;
     rvFade[slot] = 0;
@@ -4319,13 +4319,13 @@ export function createScene(ctx) {
     for (let k = 0; k < RV_VIS; k++) rvVis[slot * RV_VIS + k] = 1; // released above the skyline
     const tx = padX[idx], tz = padZ[idx];
     rvTG[slot * 3] = tx; rvTG[slot * 3 + 1] = 0; rvTG[slot * 3 + 2] = tz;
-    // The track comes down STEEPLY from high altitude, the way a meteor does —
+    // The track comes down STEEPLY from high altitude, the way a meteor does,
     // from far out beyond the target on the side away from the eye, so the
     // streak crosses the sky toward the viewer and lands in front of, beside
     // or behind them. Barely an arc: the control point lifts the midpoint a
     // little so the line reads as ballistic and not ruled. Each cell carries a
     // fixed lateral fan of its own, so a chord arrives as a spread.
-    // The approach is LATERAL to the line of sight — the streak comes in from
+    // The approach is LATERAL to the line of sight, the streak comes in from
     // the side (alternating by pad), a little from beyond, and crosses the sky
     // diagonally to its target. A track laid along the bearing from the eye
     // was tried first and read as a dot with a tail: seen end-on, a kilometre
@@ -4351,7 +4351,7 @@ export function createScene(ctx) {
       if (rvT[i] < rvDur[i]) {
         rvT[i] += dt;
         const s = clamp(rvT[i] / rvDur[i], 0, 1);
-        u = s; // constant speed — nothing this fast slows visibly in a quarter of a second
+        u = s; // constant speed, nothing this fast slows visibly in a quarter of a second
         if (rvT[i] >= rvDur[i]) {
           const slot = allocCloud();
           burst(slot, rvTG[i * 3], rvTG[i * 3 + 2], rvYf[i], rvSc[i]);
@@ -4383,20 +4383,20 @@ export function createScene(ctx) {
       }
       const body = (live ? 1 : 0) * rvVis[i * RV_VIS];
       // The body inside its plasma sheath. A vehicle released fifteen hundred
-      // metres downrange is a two-metre object two kilometres off — under a
+      // metres downrange is a two-metre object two kilometres off, under a
       // pixel, which is to say invisible for the first half of the flight. It
       // is an unresolved point source, so it is sized in ANGLE and not in
       // metres: a hard bright point from release that swells and brightens as
       // the air thickens, and the sheath around it likewise.
       const dcx = pv[0] - camPos.x, dcy = pv[1] - camPos.y, dcz = pv[2] - camPos.z;
       const dCam = Math.sqrt(dcx * dcx + dcy * dcy + dcz * dcz);
-      // The head: a hard white point and a tight violet-white halo — the thing
+      // The head: a hard white point and a tight violet-white halo, the thing
       // itself is never resolved at this speed, only its light.
       sph(glows, g0, pv[0], pv[1], pv[2], dCam * (0.0022 + 0.0012 * heat), body * (1.8 + heat * 1.8), 4.97, 1);
       sph(glows, g0 + 1, pv[0], pv[1], pv[2], dCam * (0.0050 + 0.0040 * heat), body * (0.12 + heat * 0.22), 0.12, 1);
       // The streak behind it covers a fixed fraction of the track, whatever the
       // flight time: a meteor's trail is the ionised air it has just crossed,
-      // bright and thin at the head, thinning to nothing along its length — no
+      // bright and thin at the head, thinning to nothing along its length, no
       // puffs, no smoke, no contrail, which is the signature of a slow object.
       const step = STREAK_SPAN / TRAIL_SEGS;
       for (let k = 0; k < TRAIL_SEGS; k++) {
@@ -4415,7 +4415,7 @@ export function createScene(ctx) {
         const mx = (pv[0] + pv2[0]) * 0.5 - camPos.x, my = (pv[1] + pv2[1]) * 0.5 - camPos.y, mz = (pv[2] + pv2[2]) * 0.5 - camPos.z;
         const dSeg = Math.sqrt(mx * mx + my * my + mz * mz);
         // the capsule radius is in PIXELS (the mesh is screen-space): a few at
-        // the head tapering to a hairline, and bright — the streak is the event
+        // the head tapering to a hairline, and bright, the streak is the event
         const a = Math.pow(1 - f, 1.25) * (1.6 + heat * 1.4) * (0.85 + nz * 0.3) * dies * vis;
         cap(c0 + k, pv[0], pv[1], pv[2], pv2[0], pv2[1], pv2[2],
           1.0 + 4.5 * (1 - f) * (0.7 + heat * 0.5), a, 0.02 + f * 0.30, 1);
@@ -4437,22 +4437,22 @@ export function createScene(ctx) {
     cTau[0] = 10.5;
     cFireS[0] = 1.6;
     // Everything the fragment shader needs about a cloud that does not depend
-    // on the pixel — the front's radius, the fireball's brightness and its
+    // on the pixel, the front's radius, the fireball's brightness and its
     // light, the cap's height and radius, the stem, the carve depth, the flow
-    // of the noise domain — computed here once, and packed so the shader's
+    // of the noise domain, computed here once, and packed so the shader's
     // loops run over the standing clouds and no further.
     const m = swayS, q = pressS;
     // THE DECK STANDS DOWN FOR THE PULL-BACK. The atom -> city move is the only
-    // time the eye flies THROUGH the block the near row of the deck lands on —
+    // time the eye flies THROUGH the block the near row of the deck lands on,
     // it starts three hundred and forty-nine metres out from the atom and ends
-    // five hundred and twenty back, and the near row stands between the two — so
+    // five hundred and twenty back, and the near row stands between the two, so
     // for a second in the middle of it every pixel in the lower half of the
     // frame is inside a cloud, three hundred metres of bound deep. A column the
     // eye is standing inside is not readable at any step count and costs eleven
     // milliseconds a frame to say so. The move already carries the fission
     // lattice and the city at once; it does not also carry the deck. So the
     // MIRV clouds thin out the moment the move starts, stay out for as long as
-    // it is running — a scrub parked mid-move is still mid-move — and stand
+    // it is running (a scrub parked mid-move is still mid-move) and stand
     // again over the second after it lands, ageing all the way through. Ground
     // zero, five hundred metres beyond where the move ends, never leaves.
     const deckW = deckStand;
@@ -4549,8 +4549,8 @@ export function createScene(ctx) {
       for (let s = 0; s < 2; s++) {
         const lx = s ? LAMP_X : -LAMP_X;
         const i = k * 2 + s;
-        // the front knocks the posts over — ground zero's own as it passes
-        // (most of them), or any burst's heavy radius — and they stay down
+        // the front knocks the posts over, ground zero's own as it passes
+        // (most of them), or any burst's heavy radius, and they stay down
         const dgx = lx - GZ_X, dgz = lz - GZ_Z;
         const hit = (blastAge >= 0 && gzRs * gzRs >= dgx * dgx + dgz * dgz && hf(i * 977 + 13) < 0.75) || damageAtJS(dmg, lx, lz) > 0.35;
         if (hit && lampFall[i] < 1) lampFall[i] = Math.min(1, lampFall[i] + dt * 2.2);
@@ -4562,8 +4562,8 @@ export function createScene(ctx) {
         cap(CAP_LAMP0 + i, lx, 0, lz, lx + (st * LAMP_H * dirx) / dl, LAMP_H * ct, lz + (st * LAMP_H) / dl, 1.6, w * 0.34 * (0.45 + 0.55 * lampSun[i]), 4.0, 0);
       }
     }
-    // the embers stream along the blast wind — carried horizontally with the
-    // front, faster than they fall; none of them floats — and are re-seeded
+    // the embers stream along the blast wind, carried horizontally with the
+    // front, faster than they fall; none of them floats, and are re-seeded
     // upwind of the eye so the stream keeps crossing it
     const wsp = (0.5 + bwGust) * dt;
     for (let i = 0; i < EMBERS; i++) {
@@ -4615,7 +4615,7 @@ export function createScene(ctx) {
       else if (key === 'strike') launchRV(clamp(Math.round(placeP), 0, 15), 1);
       // A salvo fills the deck and no more. Firing eight into five slots evicted
       // three of its own bursts at their brightest, half a second after they
-      // landed — so the salvo is exactly as long as the deck is deep, spread
+      // landed, so the salvo is exactly as long as the deck is deep, spread
       // across the pad map so it reads as a bus's payload and not a cluster.
       else if (key === 'salvo') { salvoLeft = MAX_CLOUDS - 1; salvoT = 0; salvoIdx = 0; }
       else if (key === 'lightning') fireLightning();
@@ -4692,7 +4692,7 @@ export function createScene(ctx) {
       // second after it lands (updateClouds says why)
       deckStand = approach(deckStand, transiting ? 0 : 1, transiting ? 0.09 : 0.30, dt);
       // a pull-back starting over a wrecked city matches the nucleons against
-      // the panes the wreck left lit — gathered again only when the wreck changed
+      // the panes the wreck left lit, gathered again only when the wreck changed
       if (transiting && !wasTransiting && winDirty) { gatherWindows(citySeed); winDirty = false; }
       wasTransiting = transiting;
 

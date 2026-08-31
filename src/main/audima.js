@@ -1,6 +1,6 @@
 // Audima CDN client. Two rules, both verified against Audima's site behavior
 // and terms (docs/RESEARCH.md):
-//   1. Never bundle Audima binaries — always fetch them onto the user's
+//   1. Never bundle Audima binaries, always fetch them onto the user's
 //      machine from Audima's official CDN, with an honest custom User-Agent
 //      (the CDN 403s curl/python-style UAs).
 //   2. Verify everything we can: Audima signs release artifacts with minisign
@@ -148,7 +148,7 @@ async function downloadCompanion(progress) {
     url = entry.url;
     signature = entry.signature || null;
   } catch (err) {
-    // CDN manifest unreachable/odd — fall back to the pinned known-good URL.
+    // CDN manifest unreachable/odd, fall back to the pinned known-good URL.
     url =
       process.platform === 'win32'
         ? AUDIMA.FALLBACK_APP_WIN
@@ -167,12 +167,12 @@ async function downloadCompanion(progress) {
       minisignVerify(dest, signature, AUDIMA.MINISIGN_PUBKEY);
     } catch (err) {
       fs.rmSync(dest, { force: true });
-      return { ok: false, detail: `Deleted download — ${err.message}. Get it manually from audima.com.au/downloads.` };
+      return { ok: false, detail: `Deleted download, ${err.message}. Get it manually from audima.com.au/downloads.` };
     }
   }
 
   await shell.openPath(dest);
-  const verifiedNote = signature ? 'signature verified ✓' : 'no signature available for this fallback URL — installer opened, proceed at your discretion';
+  const verifiedNote = signature ? 'signature verified ✓' : 'no signature available for this fallback URL, installer opened, proceed at your discretion';
   return { ok: true, detail: `Downloaded ${fileName} (${verifiedNote}). Complete the install in the window that just opened, then re-run checks.` };
 }
 

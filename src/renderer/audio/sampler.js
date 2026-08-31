@@ -1,9 +1,9 @@
-// Sample/stem playback — the Sway's 16 pads as a WebAudio kit.
+// Sample/stem playback, the Sway's 16 pads as a WebAudio kit.
 //
 // The caller owns the AudioContext (engine/audio.js builds it) and passes the
 // nodes the master bus feeds: ctx.destination for the speakers AND the engine
 // analyser, so every stem the DJ fires is heard and drives the visuals at the
-// same time. Pure module: no DOM, no fetch, no filesystem — the caller hands
+// same time. Pure module: no DOM, no fetch, no filesystem, the caller hands
 // us ArrayBuffers and we decode them.
 //
 // Knob idiom follows engine.js: the 0.5 detent is "untouched" and every mapped
@@ -49,7 +49,7 @@ export function createSampler(ctx, destinationNodes) {
 
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.Q.value = 0.7; // flat — this is a sweep, not a resonator
+  filter.Q.value = 0.7; // flat, this is a sweep, not a resonator
   filter.frequency.value = cutMax; // open until knob 5 is moved
   filter.connect(masterGain);
 
@@ -75,7 +75,7 @@ export function createSampler(ctx, destinationNodes) {
       masterGain.connect(node);
       outs.push(node);
     } catch {
-      // incompatible target — skip it rather than kill the whole kit
+      // incompatible target, skip it rather than kill the whole kit
     }
   }
 
@@ -95,7 +95,7 @@ export function createSampler(ctx, destinationNodes) {
 
   const pool = [];
   const free = [];
-  const active = []; // oldest first — steal order
+  const active = []; // oldest first, steal order
 
   for (let i = 0; i < POOL_SIZE; i++) {
     const g = ctx.createGain();
@@ -112,7 +112,7 @@ export function createSampler(ctx, destinationNodes) {
       ending: false,
       onEnded: null,
     };
-    // one closure per slot, made once — never per trigger
+    // one closure per slot, made once, never per trigger
     slot.onEnded = (ev) => endVoice(slot, ev && ev.target);
     pool.push(slot);
     free.push(slot);
@@ -171,7 +171,7 @@ export function createSampler(ctx, destinationNodes) {
     try {
       slot.source.stop(now + releaseTime + 0.005);
     } catch {
-      endVoice(slot, slot.source); // never started — reclaim it now
+      endVoice(slot, slot.source); // never started, reclaim it now
     }
   }
 
@@ -217,7 +217,7 @@ export function createSampler(ctx, destinationNodes) {
     }
     let slot = free.pop();
     if (!slot && active.length) {
-      // pool exhausted by release tails — reclaim the oldest outright
+      // pool exhausted by release tails, reclaim the oldest outright
       endVoice(active[0], active[0].source);
       slot = free.pop();
     }
@@ -299,7 +299,7 @@ export function createSampler(ctx, destinationNodes) {
       });
     } catch (err) {
       const why = err && err.message ? err.message : 'unsupported or corrupt audio';
-      throw new Error(`sampler: could not decode "${key}" — ${why}`);
+      throw new Error(`sampler: could not decode "${key}", ${why}`);
     }
     if (!buffer || !buffer.length) throw new Error(`sampler: "${key}" decoded to an empty buffer`);
 
@@ -383,7 +383,7 @@ export function createSampler(ctx, destinationNodes) {
   }
 
   // Restores assignments over already-loaded samples. Anything it cannot place
-  // comes back in the result — a kit referencing a missing stem never throws.
+  // comes back in the result, a kit referencing a missing stem never throws.
   function setKit(kit) {
     const result = { ok: false, version: 0, restored: 0, missing: [], rejected: [] };
     if (disposed) return result;
@@ -444,7 +444,7 @@ export function createSampler(ctx, destinationNodes) {
     if (slot && pad.mode !== 'oneshot') latch.set(i, slot);
   }
 
-  // Note-off. Only gate pads respond — loop pads latch until the next strike.
+  // Note-off. Only gate pads respond, loop pads latch until the next strike.
   function release(padIndex) {
     if (disposed) return;
     const i = padIndexOf(padIndex);
@@ -518,7 +518,7 @@ export function createSampler(ctx, destinationNodes) {
       } catch {}
     }
     pool.length = 0;
-    // let go of the caller's nodes first — the analyser and speakers outlive us
+    // let go of the caller's nodes first, the analyser and speakers outlive us
     for (const node of outs) {
       try {
         masterGain.disconnect(node);

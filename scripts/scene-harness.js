@@ -1,5 +1,5 @@
 // Offscreen scene harness: compiles and renders registry scenes in a hidden
-// Electron window — not the app — so shader errors, per-frame cost and stills
+// Electron window (not the app) so shader errors, per-frame cost and stills
 // can be checked without a headless app launch (HANDOFF.md asks for those to
 // stay rare). Bundles scene-harness.entry.js with esbuild, writes the page
 // next to the output, then runs itself under Electron as the main script.
@@ -27,7 +27,7 @@
 // ms/frame of a timed burst closed by a pipeline-draining readPixels, the
 // GPU's own per-frame time from the disjoint timer query where the driver
 // exposes it (`gpuMs`, the number to trust), and the hooked console errors
-// and warnings — a shader that fails to compile shows there. `actions` and
+// and warnings, a shader that fails to compile shows there. `actions` and
 // `params` reach a scene's control surface (action() / setParam()) exactly as
 // the router would.
 
@@ -104,7 +104,7 @@ if (process.versions.electron && !process.env.ELECTRON_RUN_AS_NODE) {
   const electron = require('electron');
   // "freshCache": true runs Electron on an empty user-data dir, so the GPU
   // shader cache is cold and every shot's `warm.firstDrawMs` is the real
-  // first-use compile — the number a user meets on the first launch after an
+  // first-use compile, the number a user meets on the first launch after an
   // install. "userDataDir": "<path>" pins a specific profile instead.
   const args = [__filename, resolved];
   if (plan.freshCache) {

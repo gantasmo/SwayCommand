@@ -1,4 +1,4 @@
-// .gan web-plugins — GANTASMO's portable plugin format from theDAW: a ZIP
+// .gan web-plugins, GANTASMO's portable plugin format from theDAW: a ZIP
 // holding manifest.json, an index.html entry and its assets (zip comment
 // "GANv1"). A .gan is a CONTROL SURFACE: its page posts
 // { type: 'updateValue', id, value | valueX/valueY/valueZ } to its parent, and

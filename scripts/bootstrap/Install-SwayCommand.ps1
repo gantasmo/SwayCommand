@@ -1,5 +1,5 @@
 ﻿<#
-  Install-SwayCommand.ps1 — one double-click to set up and start SwayCommand.
+  Install-SwayCommand.ps1, one double-click to set up and start SwayCommand.
 
   Resolves the dependency graph in scripts/bootstrap/Steps.ps1, installs only
   what is actually missing, and launches the app. The graph runs on a worker
@@ -43,7 +43,7 @@ function Invoke-ConsoleBootstrap {
 
     $ctx = New-BootstrapContext -RepoRoot $RepoRoot -InstallRoot $InstallRoot
     Write-Host ''
-    Write-Host '  SwayCommand — Install & Launch' -ForegroundColor White
+    Write-Host '  SwayCommand, Install & Launch' -ForegroundColor White
     Write-Host "  $RepoRoot" -ForegroundColor DarkGray
     Write-Host ''
 
@@ -162,7 +162,7 @@ $workerScript = {
         while ($true) {
             $ctx = New-BootstrapContext -RepoRoot $Sync.RepoRoot -InstallRoot $Sync.InstallRoot
             $Sync.LogFile = $ctx.LogFile
-            Write-BootstrapLog -Context $ctx -Message "bootstrap start — repo=$($ctx.RepoRoot) installRoot=$($ctx.InstallRoot)"
+            Write-BootstrapLog -Context $ctx -Message "bootstrap start, repo=$($ctx.RepoRoot) installRoot=$($ctx.InstallRoot)"
 
             $steps = New-SwayBootstrapGraph -Context $ctx
             Import-StepEstimates -Context $ctx -Steps $steps
@@ -236,7 +236,7 @@ $workerScript = {
                 if ($action -eq 'quit') { $Sync.RequestClose = $true; return }
                 if ($action -eq 'skip') {
                     $step.State = 'skipped'
-                    $step.Detail = 'Skipped — you can install this later'
+                    $step.Detail = 'Skipped, you can install this later'
                     break
                 }
                 # retry: fall through and go round again
@@ -419,7 +419,7 @@ $timer.Add_Tick({
             $ui.ListScroller.Visibility = 'Collapsed'
             $ui.FailureCard.Visibility = 'Visible'
             $ui.Headline.Text = 'That step did not finish'
-            $ui.Subhead.Text = 'Nothing is broken — you can try again or carry on without it.'
+            $ui.Subhead.Text = 'Nothing is broken, you can try again or carry on without it.'
             if ($null -ne $step) {
                 $ui.FailureTitle.Text = $step.Name
                 $ui.FailureBody.Text = [string]$step.Error

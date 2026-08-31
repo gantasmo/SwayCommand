@@ -1,4 +1,4 @@
-// Preload — the entire IPC surface the renderer sees, behind contextBridge.
+// Preload, the entire IPC surface the renderer sees, behind contextBridge.
 
 'use strict';
 

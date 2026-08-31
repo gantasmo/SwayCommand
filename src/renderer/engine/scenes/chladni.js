@@ -1,4 +1,4 @@
-// Cymatic Plate — the real cymatics "cymatics" mode from GANTASMO's theDAW:
+// Cymatic Plate, the real cymatics "cymatics" mode from GANTASMO's theDAW:
 // a Chladni/Faraday standing-wave liquid plate.
 //
 // Ported from theDAW frontend/src/components/audio/cymatics/cymatics-shader.ts,
@@ -27,12 +27,12 @@
 //     compiles and versions that program itself.
 //   * No autonomous rotation (project rule): the Faraday spoke term
 //     cos(n * theta - t * 0.4), which slowly turned the polar nodal spokes by
-//     themselves, is cos(n * theta) here — the spokes hold still while the
+//     themselves, is cos(n * theta) here, the spokes hold still while the
 //     rings keep propagating and the quadrature Chladni waves keep migrating.
 //     The camera was already hand-only (io.xy inside the DRIFT margin).
 //   * Upstream reads a real 16-band FFT. SwayCommand scenes receive three bands
 //     plus a level, so the 16 audioLevels are synthesized (bins 0-3 bass,
-//     4-10 mid, 11-15 high — upstream's own split — shaped into a curve with a
+//     4-10 mid, 11-15 high (upstream's own split) shaped into a curve with a
 //     small deterministic ripple). The spectral-centroid mode picker and both
 //     asymmetric smoothings (mode 0.04 down / 0.08 up, amplitude 0.28 up /
 //     0.07 down) then run on that spectrum unchanged, as does the
@@ -43,13 +43,13 @@
 //   * The rim and fill lights are tinted from io.palette each frame; the key
 //     light stays near its warm white with a whisper of the palette.
 //   * A floor under the drive amplitude keeps the plate rippling without
-//     audio — upstream lets it rest perfectly flat on silence.
+//     audio, upstream lets it rest perfectly flat on silence.
 //   * Control morphs drive the plate's own physics, not object motion:
 //     STRIKE jumps activeModeIndex to a new discrete mode (+3..5, wrapping)
-//     with a decaying amplitude hit — a mallet on the plate re-sorting the
+//     with a decaying amplitude hit, a mallet on the plate re-sorting the
 //     sand; SWAY bows it, biasing the target the centroid eases toward across
 //     the whole mode table; PRESS is a finger damping the plate (amplitude
-//     toward 0.15, time ×0.4); PULSE drives it (cymaticAmplitude 1 → 2 and a
+//     toward 0.15, time ×0.4); PULSE drives it (cymaticAmplitude 1 -> 2 and a
 //     bloom surge). XY drifts the cover-framed camera over the surface.
 //   * Plane segments 160 as upstream at the med tier, 110 low / 200 high.
 
@@ -65,7 +65,7 @@ const PADS = 16;
 
 // Upstream's camera framing: FOV 65, and the camera pulled in so the larger
 // viewport axis stays inside the active plate region (~1.45 of the 1.75 half,
-// never showing the damped flat rim) — cover, not contain. DRIFT is carved
+// never showing the damped flat rim), cover, not contain. DRIFT is carved
 // out of that 1.45 so the io.xy camera drift can never expose the rim.
 const FOV = 65;
 const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
@@ -303,7 +303,7 @@ export function createScene(ctx) {
       const f60 = dt * 60; // upstream's dt is measured in 60ths of a second
 
       // ADAPTATION: synthesize upstream's 16 analyser bands from three. Bins
-      // 0-3 bass, 4-10 mid, 11-15 high — upstream's own split — leaned toward
+      // 0-3 bass, 4-10 mid, 11-15 high (upstream's own split) leaned toward
       // the next band so the spectrum reads as a curve, with a small
       // deterministic ripple so the centroid is never perfectly static.
       let avgVolume = 0;
@@ -323,7 +323,7 @@ export function createScene(ctx) {
       }
       avgVolume /= 16;
 
-      // STRIKE — a mallet on the plate: jump to a new discrete mode (+3..5,
+      // STRIKE, a mallet on the plate: jump to a new discrete mode (+3..5,
       // wrapping over the 16-entry table) and kick the amplitude. Both the
       // engine's strike dimension and per-pad rising edges arm it.
       let struck = io.strike > 0.25 && io.strike > prevStrike + 0.05;
@@ -353,13 +353,13 @@ export function createScene(ctx) {
       const ampSmoothFactor = avgVolume > smoothedAmp ? 0.28 : 0.07;
       smoothedAmp += (avgVolume - smoothedAmp) * Math.min(1, ampSmoothFactor * f60);
 
-      // PRESS — a finger on the plate: drive scales toward 0.15 and the clock
+      // PRESS, a finger on the plate: drive scales toward 0.15 and the clock
       // slows to ×0.4. The 0.3 floor keeps the mercury alive without audio.
       const damp = 1 - io.gestures.press * 0.85;
       const drive = Math.max(0.3, smoothedAmp + io.level * 0.25);
       plateUniforms.smoothedAmplitude.value = Math.min(1.0, drive + ampHit) * damp;
 
-      // PULSE — drive: global cymatic amplitude 1 → 2 plus a bloom surge.
+      // PULSE, drive: global cymatic amplitude 1 -> 2 plus a bloom surge.
       plateUniforms.cymaticAmplitude.value = 1 + io.gestures.pulse;
       bloom.strength = 1.65 + io.gestures.pulse * 1.1 + ampHit * 0.5;
 
@@ -367,8 +367,8 @@ export function createScene(ctx) {
       tAccum += f60 * 0.04 * (1 - io.gestures.press * 0.6);
       plateUniforms.time.value = tAccum;
 
-      // Camera: upstream's cover framing — the larger viewport axis stays
-      // inside the active plate region — with io.xy drifting the eye over the
+      // Camera: upstream's cover framing, the larger viewport axis stays
+      // inside the active plate region, with io.xy drifting the eye over the
       // surface inside the DRIFT margin.
       dx += ((io.xy.x - 0.5) * 0.24 - dx) * (1 - Math.exp(-dt / 0.4));
       dy += ((io.xy.y - 0.5) * 0.24 - dy) * (1 - Math.exp(-dt / 0.4));

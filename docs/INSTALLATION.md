@@ -46,7 +46,7 @@ Settings are written to `~/.config/SwayCommand` on first run.
 
 | Platform | Removal | Data left behind |
 |---|---|---|
-| Windows | "SwayCommand" entry in Settings → Apps → Installed apps | `%APPDATA%\SwayCommand` |
+| Windows | "SwayCommand" entry in Settings -> Apps -> Installed apps | `%APPDATA%\SwayCommand` |
 | macOS | deletion of `SwayCommand.app` | `~/Library/Application Support/SwayCommand` |
 | Linux | deletion of the AppImage file | `~/.config/SwayCommand` |
 
@@ -56,8 +56,8 @@ The Windows uninstaller does not delete application data (`deleteAppDataOnUninst
 
 The distributed binaries are not Authenticode-signed, and the macOS build is neither signed nor notarized. Consequences:
 
-- Windows SmartScreen shows an unknown-publisher warning the first time the installer runs; installation proceeds through "More info" → "Run anyway".
-- macOS Gatekeeper refuses to open the application until an exception is granted in System Settings → Privacy & Security.
+- Windows SmartScreen shows an unknown-publisher warning the first time the installer runs; installation proceeds through "More info" -> "Run anyway".
+- macOS Gatekeeper refuses to open the application until an exception is granted in System Settings -> Privacy & Security.
 
 The signing hooks of electron-builder are the place to configure a certificate: the `win` and `mac` sections of [electron-builder.yml](../electron-builder.yml) currently contain no signing options.
 
@@ -77,8 +77,8 @@ Setup is a dependency graph rather than a fixed sequence. Each node owns one pre
 
 | Node | Satisfied when | Installed by |
 |---|---|---|
-| `system` | Windows build, architecture and ≥ 2 GB free on the install volume | — (a gate) |
-| `repo` | `package.json`, `src/main/main.js` and `scripts/build-renderer.js` all present | — (a gate) |
+| `system` | Windows build, architecture and ≥ 2 GB free on the install volume |, (a gate) |
+| `repo` | `package.json`, `src/main/main.js` and `scripts/build-renderer.js` all present |, (a gate) |
 | `node` | A Node.js ≥ 18 at a known absolute path | Portable `node-v*-win-*.zip` from nodejs.org unpacked into the private toolchain folder |
 | `npm-deps` | `node_modules/.package-lock.json` exists and the recorded SHA-256 of `package-lock.json` matches | `npm install --no-audit --no-fund` |
 | `electron-runtime` | `node_modules/electron/dist/electron.exe` exists | Release zip verified against the SHA-256 in the electron package's own `checksums.json`, falling back to `node install.js` |
@@ -89,7 +89,7 @@ No node requires administrator rights except `dfu-driver`, which is opt-in. Node
 
 State lives in `%LOCALAPPDATA%\SwayCommand`: `cache/` for verified downloads, `toolchain/` for the private Node.js, `logs/` for a per-run transcript, and `bootstrap-state.json` for the lockfile hash, package count and measured per-step durations. Because every test is content-addressed rather than timestamp-based, a fresh `git clone` is judged on its contents; because downloads are cached and checksummed, wiping `node_modules` costs an unpack rather than a download.
 
-Time remaining is computed from measured per-step durations recorded on that machine, scaled live by how far the run has drifted from its own estimate, with downloads reporting true bytes and rate. Durations are recorded per variant — restoring Electron from cache and downloading it are timed separately — so a warm run never distorts the estimate for a cold one.
+Time remaining is computed from measured per-step durations recorded on that machine, scaled live by how far the run has drifted from its own estimate, with downloads reporting true bytes and rate. Durations are recorded per variant (restoring Electron from cache and downloading it are timed separately) so a warm run never distorts the estimate for a cold one.
 
 #### Inherited Electron environment variables
 
@@ -97,7 +97,7 @@ Every Electron-hosted terminal, VS Code's integrated terminal included, exports 
 
 ### macOS and Linux bootstrap
 
-`SwayCommand.command` changes to its own directory and executes `SwayCommand.sh`. When macOS refuses to run the file — for example after the repository arrives as a zip download — executable permission is restored from Terminal:
+`SwayCommand.command` changes to its own directory and executes `SwayCommand.sh`. When macOS refuses to run the file (for example after the repository arrives as a zip download) executable permission is restored from Terminal:
 
 ```sh
 chmod +x SwayCommand.command SwayCommand.sh
@@ -112,7 +112,7 @@ chmod +x SwayCommand.command SwayCommand.sh
 | `/etc/os-release` `ID`/`ID_LIKE` matches `fedora`/`rhel`/`centos` | `sudo dnf install -y nodejs npm` |
 | other | both hints above in abbreviated form (the `apt-get` line without the preceding `apt-get update`), plus the download page |
 
-With Node.js present it installs dependencies when `node_modules/.package-lock.json` is missing or older than `package-lock.json`, then checks for the Electron runtime named by `node_modules/electron/path.txt` and runs `node node_modules/electron/install.js` if it is absent — electron ≥ 43 publishes no postinstall hook, so `npm install` exits 0 without ever downloading it. `ELECTRON_CACHE` defaults to `~/.cache/electron` so the download survives a `node_modules` wipe. Finally it launches with `npm run start`.
+With Node.js present it installs dependencies when `node_modules/.package-lock.json` is missing or older than `package-lock.json`, then checks for the Electron runtime named by `node_modules/electron/path.txt` and runs `node node_modules/electron/install.js` if it is absent, electron ≥ 43 publishes no postinstall hook, so `npm install` exits 0 without ever downloading it. `ELECTRON_CACHE` defaults to `~/.cache/electron` so the download survives a `node_modules` wipe. Finally it launches with `npm run start`.
 
 ### Manual installation
 
@@ -124,6 +124,6 @@ The bootstrap scripts are a convenience; the equivalent manual procedure is:
 
 ## First run
 
-From source, `npm run start` first builds the renderer bundle (`scripts/build-renderer.js`), then launches Electron; packaged builds contain a prebuilt bundle and start directly. In both cases the application opens on the cockpit with the stage behind a closed blast door, and the SYSTEM modal runs the Doctor, the startup system check. Each check reports its result with a remediation action where one exists; when every check passes, the door opens on its own after 1.4 seconds — ENTER opens it manually regardless of results. The individual checks, their detection methods, and the fix actions are documented in [DOCTOR.md](DOCTOR.md).
+From source, `npm run start` first builds the renderer bundle (`scripts/build-renderer.js`), then launches Electron; packaged builds contain a prebuilt bundle and start directly. In both cases the application opens on the cockpit with the stage behind a closed blast door, and the SYSTEM modal runs the Doctor, the startup system check. Each check reports its result with a remediation action where one exists; when every check passes, the door opens on its own after 1.4 seconds, ENTER opens it manually regardless of results. The individual checks, their detection methods, and the fix actions are documented in [DOCTOR.md](DOCTOR.md).
 
 A Sway, other MIDI hardware, and an audio input are optional at first run: the application substitutes mouse and keyboard control and an internal analysis signal when they are absent, so every scene renders output on a machine with no peripherals.

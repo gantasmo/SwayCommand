@@ -1,10 +1,10 @@
 // Prune approved work out of HANDOFF.md. Delivered tasks wait for the user's
-// approval inside `<!-- prune:<id> -->` … `<!-- /prune:<id> -->` blocks; once a
-// task is approved, removing its block keeps the note short — git history keeps
+// approval inside `<!-- prune:<id> -->` ... `<!-- /prune:<id> -->` blocks; once a
+// task is approved, removing its block keeps the note short, git history keeps
 // the detail. The ids go onto the one-line ledger at the end of the note.
 //
 //   node scripts/handoff-prune.js --list        print the prunable ids
-//   node scripts/handoff-prune.js <id> [<id>…]  remove those blocks
+//   node scripts/handoff-prune.js <id> [<id>...]  remove those blocks
 //   node scripts/handoff-prune.js --all         remove every block
 
 'use strict';

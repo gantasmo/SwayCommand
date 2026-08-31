@@ -13,7 +13,7 @@ const outDir = path.join(legacyDir, 'templates');
 
 const legacyIndex = path.join(legacyDir, 'index.json');
 if (!fs.existsSync(legacyIndex)) {
-  console.log('[convert] no legacy projects/index.json — the conversion already ran; templates/ is the output.');
+  console.log('[convert] no legacy projects/index.json, the conversion already ran; templates/ is the output.');
   process.exit(0);
 }
 const index = JSON.parse(fs.readFileSync(legacyIndex, 'utf8'));

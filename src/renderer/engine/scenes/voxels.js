@@ -1,4 +1,4 @@
-// Voxels — an N x N slab of boxes whose heights form a living heightfield.
+// Voxels, an N x N slab of boxes whose heights form a living heightfield.
 // Bass pumps radial waves out from the center, each pad hit drops a stone
 // into its own patch of the grid (expanding ripple), and the hand drags a
 // gaussian hill across the field. Press crushes everything flat; beat pops
@@ -18,7 +18,7 @@ export function createScene(ctx) {
   const camera = new THREE.PerspectiveCamera(55, ctx.width / ctx.height, 0.1, 400);
   camera.position.set(0, 20, 44);
 
-  // grid resolution by tier — instance count stays comfortably under ~1k
+  // grid resolution by tier, instance count stays comfortably under ~1k
   const N = quality.tier === 'high' ? 32 : quality.tier === 'low' ? 20 : 26;
   const COUNT = N * N;
   const cell = SIZE / N;
@@ -170,7 +170,7 @@ export function createScene(ctx) {
       voxels.instanceMatrix.needsUpdate = true;
       voxels.instanceColor.needsUpdate = true;
 
-      // fixed viewpoint — nothing auto-rotates (user rule); sway leans it,
+      // fixed viewpoint, nothing auto-rotates (user rule); sway leans it,
       // hand height sets elevation
       const orbit = (io.gestures.sway - 0.5) * 1.0;
       camera.position.x = Math.sin(orbit) * 44;

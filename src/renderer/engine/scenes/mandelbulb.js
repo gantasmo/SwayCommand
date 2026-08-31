@@ -1,11 +1,11 @@
-// Mandelbulb — a raymarched multi-formula fractal solid on one fullscreen quad.
+// Mandelbulb, a raymarched multi-formula fractal solid on one fullscreen quad.
 //
 // Two instruments, two time scales:
 //
 //   STRIKES JUMP THE FORMULA. A pad rising edge picks one of six distance
 //   estimators (pad index modulo six) AND hops the iteration-constant seed
 //   by the golden angle, so even a strike that lands on the same formula
-//   lands in a new basin — a visibly different fractal — under a detonation
+//   lands in a new basin (a visibly different fractal) under a detonation
 //   flash. Both event scalars are CPU-side with exponential decay, so the
 //   solid changes shape ON the hit instead of popping silently.
 //
@@ -13,8 +13,8 @@
 //   exponential smoothing with long time constants (0.09 s for the treble
 //   shimmer up to 3.0 s for the hand-height offset), so the gestures drift
 //   the formula's own parameters rather than snapping them. Sway owns the
-//   primary parameter — for the bulb that is the power itself, glid across
-//   6..12, the canonical mandelbulb morph — press squeezes the secondary
+//   primary parameter, for the bulb that is the power itself, glid across
+//   6..12, the canonical mandelbulb morph, press squeezes the secondary
 //   fold while diving the camera, and bass breathes the primary parameter
 //   AROUND whatever the hand set, so the solid pumps on the beat without
 //   ever fighting the player.
@@ -22,7 +22,7 @@
 // Rays that miss still paint neon haze, striped by the active formula's
 // rotational symmetry order, so the frame keeps depth instead of falling to
 // flat black. Nothing turns on its own: the solid holds its orientation and
-// the haze stripes hold their angle — only the hand orbits the camera. One
+// the haze stripes hold their angle, only the hand orbits the camera. One
 // draw call, all GLSL3 (GLSL ES 3.00). Follows docs/SCENE_CONTRACT.md;
 // reference style: beams.js.
 
@@ -48,8 +48,8 @@ const FORMULA_NAMES = [
 const F_SCALE = [1.00, 5.20, 1.00, 1.45, 1.60, 1.15];
 
 // Camera standoff multiplier per formula. F_SCALE fits each solid inside the
-// marching bound, but the solids do not fill that bound equally — the box and
-// the sponge occupy a much smaller fraction of it than the bulb — so without
+// marching bound, but the solids do not fill that bound equally, the box and
+// the sponge occupy a much smaller fraction of it than the bulb, so without
 // this the frame goes from full to postage-stamp when a pad switches formula.
 const F_DIST = [1.00, 0.62, 1.00, 0.74, 0.78, 0.86];
 
@@ -103,7 +103,7 @@ export function createScene(ctx) {
   //     accept a uniform bound; the literal is kept for the unroll). Worst
   //     case per marched pixel is
   //     MB_STEPS * (iterations of the active formula), and the engine renders
-  //     at canvas * devicePixelRatio (capped 1.75) — 6.3 Mpx at 1080p, doubled
+  //     at canvas * devicePixelRatio (capped 1.75), 6.3 Mpx at 1080p, doubled
   //     during a crossfade. med holds the bulb at 44 * 6 = 264 iterations, the
   //     same budget as before. The fold formulas get more iterations only
   //     because they cost far less each: a bulb iteration is a pow + acos +
@@ -405,7 +405,7 @@ export function createScene(ctx) {
         // the solid sits fixed in world space: no spin of its own, the only
         // turning is the hand's camera orbit above
 
-        // closest approach of the ray to the origin — cheap outer-haze basis
+        // closest approach of the ray to the origin, cheap outer-haze basis
         float tc = max(-dot(ro, rd), 0.0);
         vec3 cp = ro + rd * tc;
         float perp = length(cp);
@@ -477,7 +477,7 @@ export function createScene(ctx) {
           vec3 irid = pal(fract(hue + 0.36) * 5.0);
           col = mix(base, irid, fres * 0.85); // iridescent, never lambert
 
-          // high-frequency filigree across the trap — detail that rewards staring
+          // high-frequency filigree across the trap, detail that rewards staring
           float bands = 0.5 + 0.5 * sin(trapHit * 44.0 - uTime * 1.1 + iterHit * 11.0);
           // Floors are generous: interpolating between complementary palette
           // entries already darkens the midpoints, so stacking two low-floor
@@ -618,8 +618,8 @@ export function createScene(ctx) {
       // Normalised shape controls, mapped into each formula's own range below.
       // Smoothing happens here, in normalised space, so a formula switch
       // remaps the range instantly without a jump in the underlying gesture.
-      // SWAY owns the primary parameter — the formula's own shape glides
-      // across its whole travel, nothing so cheap as a lean — and press owns
+      // SWAY owns the primary parameter, the formula's own shape glides
+      // across its whole travel, nothing so cheap as a lean, and press owns
       // the secondary fold: the squeeze tightens the formula while the
       // camera dives (below). Bass rides ON TOP of the sway value: it
       // breathes the solid around wherever the hand put it instead of
@@ -648,7 +648,7 @@ export function createScene(ctx) {
         pB = -0.22 + b01 * 0.44;             // cell offset
       } else {
         // the canonical mandelbulb morph: sway glides the power itself, and
-        // the whole solid re-forms — lobe count, pinch, filigree — as the
+        // the whole solid re-forms (lobe count, pinch, filigree) as the
         // exponent travels. Iteration cost is exponent-independent, so the
         // wider range is free.
         pA = 6.0 + a01 * 6.0;                // bulb / julia exponent, 6..12
@@ -668,14 +668,14 @@ export function createScene(ctx) {
       u.uRelax.value = F_RELAX[formula];
       // World -> formula space, widened by the transition swell: the new solid
       // arrives collapsed to two thirds and springs back out over ~0.4 s. The
-      // pulse deliberately shrinks rather than grows — growing past F_SCALE
+      // pulse deliberately shrinks rather than grows, growing past F_SCALE
       // would push the solid through the fixed BOUND sphere and shear its
       // silhouette flat against it.
       u.uSolidScale.value = F_SCALE[formula] * (1 + swell * 0.45);
 
       // the julia constant walks a lissajous at the press-set radius; the
       // basin phase shears all three component phases, so a strike relocates
-      // c to a different arc of the orbit — a different julia set
+      // c to a different arc of the orbit, a different julia set
       u.uJuliaC.value.set(
         Math.sin(t * 0.17 + basin) * juliaR,
         Math.sin(t * 0.23 + 1.7 + basin * 1.7) * juliaR * 0.92,
@@ -705,7 +705,7 @@ export function createScene(ctx) {
       el += (Math.max(-1.25, Math.min(1.25, (io.xy.y - 0.5) * 2.3)) - el) * kOrbit;
 
       // knob 3 sets the standoff distance, and press dives the camera toward
-      // the surface — the squeeze is also a dive. The 1.55 floor stays clear
+      // the surface, the squeeze is also a dive. The 1.55 floor stays clear
       // of the 1.40 marching bound for every formula's F_DIST, so the camera
       // can never end up inside the bounding sphere.
       const rad = Math.max(1.55,
@@ -739,7 +739,7 @@ export function createScene(ctx) {
       u.uGlow.value = Math.min(1.8, io.beat * 0.7 + deton * 1.1 + trans * 0.8);
       u.uIntensity.value = io.intensity;
 
-      // palette animates upstream — copy all five every frame, never mutate
+      // palette animates upstream, copy all five every frame, never mutate
       for (let i = 0; i < 5; i++) palette[i].copy(io.palette[i]);
       u.uHitColor.value.copy(io.palette[hitIdx]);
     },

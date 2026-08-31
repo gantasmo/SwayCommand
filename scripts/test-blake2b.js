@@ -1,6 +1,6 @@
 // Checks src/main/blake2b.js against Node's native blake2b512 and RFC 7693.
 //
-// Run under plain Node (which has BLAKE2b via OpenSSL) — that is the whole
+// Run under plain Node (which has BLAKE2b via OpenSSL), that is the whole
 // point: the reference we are testing against is exactly the implementation
 // Electron cannot give us. Run under Electron it will skip the differential
 // half and only assert the fixed vectors.
@@ -117,7 +117,7 @@ if (hasNative) {
     fs.rmSync(tmp, { force: true });
   }
 } else {
-  console.log('skipping differential checks — no native blake2b512 here');
+  console.log('skipping differential checks, no native blake2b512 here');
 }
 
 console.log(`${checks - failures}/${checks} checks passed`);

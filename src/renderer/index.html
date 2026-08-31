@@ -41,7 +41,7 @@
       <div class="rail-label">AUTO</div>
       <div id="auto-box">
         <button id="auto-toggle" class="cham">RUN</button>
-        <label>HOLD <input type="number" id="auto-min" min="1" max="600" step="1"> – <input type="number" id="auto-max" min="1" max="1200" step="1"></label>
+        <label>HOLD <input type="number" id="auto-min" min="1" max="600" step="1">, <input type="number" id="auto-max" min="1" max="1200" step="1"></label>
         <label>FADE <input type="number" id="auto-fade" min="0" max="60" step="0.5"></label>
       </div>
     </aside>
@@ -82,9 +82,9 @@
 
     <section id="timeline">
       <div id="tl-bar">
-        <button class="chip" id="tl-import" title="Import audio — each file becomes a stem on its own track (I)">IMPORT</button>
+        <button class="chip" id="tl-import" title="Import audio, each file becomes a stem on its own track (I)">IMPORT</button>
         <button class="chip" id="tl-addtrack" title="Add an empty track">+ TRACK</button>
-        <label class="tl-field">BPM <input type="number" id="tl-bpm" min="0" max="400" step="0.1" placeholder="—"></label>
+        <label class="tl-field">BPM <input type="number" id="tl-bpm" min="0" max="400" step="0.1" placeholder="-"></label>
         <button class="chip" id="tl-tap" title="Tap the tempo">TAP</button>
         <label class="tl-field">SNAP <select id="tl-snap">
           <option value="bar">bar</option>
@@ -153,10 +153,10 @@
           <iframe id="gan-frame" title="plugin surface" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"></iframe>
         </div>
         <p class="panel-note">A .gan is a control surface from theDAW’s Foundry. Open one and its knobs, pads and XY fields become route sources: click a control in the list (or move it on the surface) and add routes in the panel on the right.</p>
-        <div class="kit-label" style="margin-top:14px">VST3 <span class="pill pill-dim" id="vst-pill">—</span></div>
+        <div class="kit-label" style="margin-top:14px">VST3 <span class="pill pill-dim" id="vst-pill">-</span></div>
         <div class="deck-controls">
           <button class="btn btn-ghost btn-small" id="btn-vst-rescan">RESCAN</button>
-          <button class="btn btn-ghost btn-small" id="btn-vst-python">PYTHON…</button>
+          <button class="btn btn-ghost btn-small" id="btn-vst-python">PYTHON...</button>
           <span class="panel-note" id="vst-note"></span>
         </div>
         <ul class="sample-list" id="vst-list"></ul>
@@ -187,9 +187,9 @@
         <h2>CONTROLS</h2>
         <table>
           <tr><td>Hand over Sway</td><td>steers every scene; pulse surges brightness, press squeezes, sway leans the camera</td></tr>
-          <tr><td>Pads · knobs · buttons</td><td>fire whatever the deck shows — click any control on the deck, or touch it on the hardware, to change its assignment</td></tr>
+          <tr><td>Pads · knobs · buttons</td><td>fire whatever the deck shows, click any control on the deck, or touch it on the hardware, to change its assignment</td></tr>
           <tr><td>No Sway</td><td>mouse = hand · click = press · wheel = pulse · <b>Z X C V B N M ,</b> = pads</td></tr>
-          <tr><td><b>1–9</b> · <b>Space</b> · <b>A</b></td><td>pool scene · next scene · auto rotation</td></tr>
+          <tr><td><b>1 to 9</b> · <b>Space</b> · <b>A</b></td><td>pool scene · next scene · auto rotation</td></tr>
           <tr><td><b>P</b> · <b>L</b> · <b>I</b></td><td>play/pause · loop · import stems</td></tr>
           <tr><td><b>S</b> · <b>R</b> · <b>E</b> · <b>G</b></td><td>synth · rack · kit · plugins</td></tr>
           <tr><td>Timeline</td><td>drop audio files onto it (one track per stem) · click a track head to edit its effects and bind them · Shift+drag on a track marks a section for an effect</td></tr>
@@ -209,7 +209,7 @@
           <div class="logo">Sway<span>Command</span></div>
           <div class="version" id="boot-version"></div>
         </header>
-        <div class="boot-status" id="boot-status">Checking your system…</div>
+        <div class="boot-status" id="boot-status">Checking your system...</div>
         <div class="boot-warm" id="boot-warm"></div>
         <ul id="check-list" class="check-list"></ul>
         <footer class="boot-actions">

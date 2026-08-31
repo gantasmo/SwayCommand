@@ -1,4 +1,4 @@
-// Shared constants for SwayCommand — main process and build scripts.
+// Shared constants for SwayCommand, main process and build scripts.
 // All Audima facts below were verified against official Audima artifacts
 // (firmware USB descriptors, companion app binaries, Cubase/Ableton scripts)
 // on 2026-08-19. See docs/RESEARCH.md for sources.
@@ -6,7 +6,7 @@
 'use strict';
 
 const SWAY = {
-  // USB identity (from official firmware CM7.bin device descriptor; stable v1.0.0–v1.3.0)
+  // USB identity (from official firmware CM7.bin device descriptor; stable v1.0.0 to v1.3.0)
   VID: 0x0483,
   PID_NORMAL: 0x52a4, // composite CDC-ACM + class-compliant USB-MIDI
   PID_DFU: 0xdf11, // STM32 ROM bootloader (firmware-update mode)
@@ -29,7 +29,7 @@ const AUDIMA = {
   FALLBACK_APP_WIN: 'https://cdn.audima.com.au/software/v1.2.1/The.Sway_1.2.1_x64_en-US.msi',
   FALLBACK_APP_MAC_ARM: 'https://cdn.audima.com.au/software/v1.2.0/The.Sway_1.2.0_aarch64.dmg',
   FALLBACK_APP_MAC_X64: 'https://cdn.audima.com.au/software/v1.2.0/The.Sway_1.2.0_x64.dmg',
-  // Windows DFU driver (WinUSB for VID_0483&PID_DF11) — only needed for firmware updates
+  // Windows DFU driver (WinUSB for VID_0483&PID_DF11), only needed for firmware updates
   DFU_DRIVER_ZIP: 'https://cdn.audima.com.au/software/Windows%20DFU%20Driver.zip',
   USER_MANUAL: 'https://cdn.audima.com.au/docs/Audima%20Labs%20The%20Sway%20User%20Manual.pdf',
   FIRMWARE_GUIDE: 'https://cdn.audima.com.au/docs/Audima%20Labs%20The%20Sway%20Firmware%20Update%20Guide.pdf',

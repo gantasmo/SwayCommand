@@ -10,7 +10,7 @@ Implementation: [`src/renderer/audio/synth.js`](../src/renderer/audio/synth.js) 
 |---|---|---|
 | 3 wavetable oscillators | Yes | 7 generated tables, continuous morph |
 | Wavetable position morph | Yes | Crossfade between adjacent spectral frames |
-| Unison with detune and stereo spread | Yes | 1–8 voices per oscillator |
+| Unison with detune and stereo spread | Yes | 1 to 8 voices per oscillator |
 | Sub oscillator | Yes | sine/triangle/saw/square, −3 to 0 octaves |
 | Noise oscillator | Yes | white or pink |
 | 2 filters | Yes | lowpass, highpass, bandpass, notch, with drive and key tracking |
@@ -28,7 +28,7 @@ The gaps are the parts of Vital that need a custom DSP path. `createPeriodicWave
 
 ## Wavetables
 
-A Vital table is a series of frames the oscillator morphs between. Web Audio has no wavetable oscillator, but `createPeriodicWave` takes harmonic amplitudes, which is a frame expressed spectrally. Each table is therefore 8 `PeriodicWave` frames of up to 64 harmonics, and the morph is a crossfade between the two frames the position falls between — two oscillators per unison voice, gain-blended.
+A Vital table is a series of frames the oscillator morphs between. Web Audio has no wavetable oscillator, but `createPeriodicWave` takes harmonic amplitudes, which is a frame expressed spectrally. Each table is therefore 8 `PeriodicWave` frames of up to 64 harmonics, and the morph is a crossfade between the two frames the position falls between, two oscillators per unison voice, gain-blended.
 
 Frames are generated rather than sampled, so the bank costs kilobytes and every frame is band-limited by construction.
 
@@ -63,7 +63,7 @@ Envelopes are per-voice, scheduled as `AudioParam` automation at note-on. LFOs a
 | Source | Kind |
 |---|---|
 | `env2`, `env3` | Per-voice, scheduled at note-on |
-| `lfo1`–`lfo4` | Global, live node connection |
+| `lfo1`-`lfo4` | Global, live node connection |
 | `velocity`, `keytrack`, `modwheel` | Static, evaluated at note-on |
 
 Destinations: oscillator position, level and tune; both filters' cutoff and resonance; amplitude; pan.
@@ -78,7 +78,7 @@ Destinations: oscillator position, level and tune; both filters' cutoff and reso
 | On-screen keyboard | Seventeen keys from C3 in the SYNTH drawer |
 | Computer keyboard | `A W S E D F T G Y H U J K O L P ;` while the SYNTH drawer is open; the keys are not captured elsewhere, so the cockpit shortcuts are unaffected |
 
-Whether a pad strike also plays the synth is decided by the project's note-routing mode: by default, pads that carry an assignment no longer double-fire the synth, while free pitches — Theory Engine notes outside the pad range — always reach it ([STUDIO.md](STUDIO.md#note-routing)).
+Whether a pad strike also plays the synth is decided by the project's note-routing mode: by default, pads that carry an assignment no longer double-fire the synth, while free pitches (Theory Engine notes outside the pad range) always reach it ([STUDIO.md](STUDIO.md#note-routing)).
 
 ## theDAW alignment
 
@@ -86,8 +86,8 @@ The module is shaped to lift into theDAW rather than to be rewritten for it.
 
 | theDAW interface | Here |
 |---|---|
-| `VoiceTrigger` — `(ctx, dest, midi, velocity, when, duration, master)` | `synth.voiceTrigger()` returns a function with that exact signature, so a patch drops into piano-roll preview, offline bounce, init render, and the timeline |
-| `VisualControl` — `{ key, label, kind, group, min, max, step }` | `synth.controlManifest()` returns that shape; theDAW's control-sync bus and MIDI mapper consume it without an adapter |
+| `VoiceTrigger`, `(ctx, dest, midi, velocity, when, duration, master)` | `synth.voiceTrigger()` returns a function with that exact signature, so a patch drops into piano-roll preview, offline bounce, init render, and the timeline |
+| `VisualControl`, `{ key, label, kind, group, min, max, step }` | `synth.controlManifest()` returns that shape; theDAW's control-sync bus and MIDI mapper consume it without an adapter |
 | Factory-function modules taking `ctx` and a destination list | `createSynth(ctx, destinationNodes)`, matching `sampler.js` and `audio.js` |
 | `synthVoiceKit` helpers (`mtof`, `distCurve`) | Reproduced locally with the same semantics |
 

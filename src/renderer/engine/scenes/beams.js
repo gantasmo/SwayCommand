@@ -1,7 +1,7 @@
-// Beam Sixteen — sixteen light beams, one per Sway IR sensor. Each beam is
+// Beam Sixteen, sixteen light beams, one per Sway IR sensor. Each beam is
 // a tall camera-facing quad (an axial billboard: the quad turns about the
 // beam's own axis to face the eye), so the fragment shader works in a clean
-// 2-D beam coordinate — u across the beam, v up its height — and paints one
+// 2-D beam coordinate (u across the beam, v up its height) and paints one
 // of three beam styles, crossfading between them per pixel:
 //
 //   HOLOGRAM     (style 0)  a translucent volumetric column: the body is
@@ -9,30 +9,30 @@
 //                fresnel-like rim, with horizontal scanlines scrolling UPWARD,
 //                slow interference bands, a slight chromatic split (the two
 //                rims carry two palette tints) and a gentle flicker. Low
-//                contrast and airy — projected light, not a solid.
+//                contrast and airy, projected light, not a solid.
 //   LASER        (style 1)  the rest look: a razor-thin white-hot core (a
 //                gaussian ~2 device pixels wide at 1080 p, constant brilliance
 //                along the height), a wide palette-coloured halo with an
 //                exponential falloff, a bright impact bloom where the beam
 //                meets the floor and a faint drifting haze glow around the
-//                core — a physical laser in a hazy room.
+//                core, a physical laser in a hazy room.
 //   ELECTRICITY  (style 2)  the core becomes an arc: its path is displaced
-//                across the beam by 2–3 octaves of value noise whose domain
+//                across the beam by 2 to 3 octaves of value noise whose domain
 //                translates along the height axis (nothing rotates), a thin
 //                white core inside a blue-white halo tinted by the palette's
 //                coolest entry, bright nodes travelling up the arc, hard
 //                48 Hz random gating and an intermittent fainter secondary
-//                branch — a Tesla beam.
+//                branch, a Tesla beam.
 //
 // KNOB 4 (io.knobs[3]) is the style: s = knob × 2, so 0 = hologram, 1 = laser
 // (the 0.5 default, pure laser at rest), 2 = electricity, blended
 // continuously (0..1 hologram->laser, 1..2 laser->electricity). The value is
 // smoothed with a 0.15 s time constant, so the transition runs exactly as
-// fast as the knob is turned — a flick snaps, a slow sweep dissolves.
+// fast as the knob is turned, a flick snaps, a slow sweep dissolves.
 //
-// Morph responses (docs/SCENE_CONTRACT.md): sway morphs the beam FIELD — a
+// Morph responses (docs/SCENE_CONTRACT.md): sway morphs the beam FIELD, a
 // tight parallel array spreads, fans outward and cross-tilts odd/even
-// columns into a crossing lattice — and a strike re-seeds the formation
+// columns into a crossing lattice, and a strike re-seeds the formation
 // (idle phases, palette slots, depth stagger, noise seeds) so the array
 // visibly re-patterns while the struck column still flashes. The hand
 // sweeps a highlight across the row (x) and lifts the eye and beam energy
@@ -215,7 +215,7 @@ export function createScene(ctx) {
              + mix(vColA, vec3(1.0), 0.55) * impact * 1.3;
       }
 
-      // ELECTRICITY: the arc path — octave 0 glides, higher octaves re-route
+      // ELECTRICITY: the arc path, octave 0 glides, higher octaves re-route
       // in 48 Hz steps; the noise domain translates along the height (y)
       float arcPath(float y, float seed, float t, float tq) {
         float d = 0.0, a = 0.85, f = 0.33;
@@ -286,7 +286,7 @@ export function createScene(ctx) {
 
   // --- floor: a faint grid plus, per beam, an impact pool (tight for laser,
   // wide and soft for hologram, flickering for electricity) and a reflection
-  // streak smeared toward the camera. Static plane — no motion of its own.
+  // streak smeared toward the camera. Static plane, no motion of its own.
   const floorGeo = new THREE.PlaneGeometry(240, 160);
   const floorMat = new THREE.ShaderMaterial({
     glslVersion: THREE.GLSL3,

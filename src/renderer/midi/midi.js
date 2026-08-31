@@ -1,4 +1,4 @@
-// MIDI layer — WebMIDI with Sway-first behavior:
+// MIDI layer, WebMIDI with Sway-first behavior:
 //   * prefers the port named exactly "Audima Labs The Sway" (substring match
 //     covers Linux/ALSA's " MIDI 1" suffix), hot-attaches on plug-in;
 //   * applies the recovered factory map (swaymap.js), tolerant of the known
@@ -113,13 +113,13 @@ export async function createMidi({ onEvent } = {}) {
     control.lastEventAt = performance.now();
 
     if (type === 0xb0) {
-      // CC — feed MIDI-learn first
+      // CC, feed MIDI-learn first
       if (learnTarget) {
         overrides[learnTarget] = { type: 'cc', num: d1 };
         const t = learnTarget;
         learnTarget = null;
         if (learnResolve) learnResolve({ target: t, cc: d1 });
-        pushMonitor(`LEARN ${t} ← CC${d1}`);
+        pushMonitor(`LEARN ${t} <- CC${d1}`);
         return;
       }
       const target = ccTargetFor(d1);
@@ -128,17 +128,17 @@ export async function createMidi({ onEvent } = {}) {
       // mod-matrix source.
       if (d1 === 1 && onEvent) onEvent({ kind: 'mod', value: d2 / 127 });
       // Every CC also goes out as an event: the router matches button
-      // bindings and touch-to-select on it — continuous state alone lands
+      // bindings and touch-to-select on it, continuous state alone lands
       // silently in `control`, which the UI cannot observe per-control.
       if (onEvent) onEvent({ kind: 'cc', cc: d1, value: d2 / 127, channel: ch, target });
-      pushMonitor(`CC${d1}=${d2} ch${ch + 1}${target ? ' → ' + target : ''}`);
+      pushMonitor(`CC${d1}=${d2} ch${ch + 1}${target ? ' -> ' + target : ''}`);
     } else if (type === 0x90 && d2 > 0) {
       const idx = padIndexFor(d1);
       if (idx >= 0) {
         control.pads[idx] = d2 / 127;
         control.lastPad = idx;
       }
-      pushMonitor(`NOTE ${d1} vel${d2} ch${ch + 1}${idx >= 0 ? ' → pad' + idx : ''}`);
+      pushMonitor(`NOTE ${d1} vel${d2} ch${ch + 1}${idx >= 0 ? ' -> pad' + idx : ''}`);
       if (onEvent) {
         onEvent({ kind: 'pad', idx, vel: d2 / 127 });
         // The raw note goes out too: pads drive the visuals, but the synth
@@ -148,7 +148,7 @@ export async function createMidi({ onEvent } = {}) {
         onEvent({ kind: 'note', note: d1, vel: d2 / 127, channel: ch, idx });
       }
     } else if (type === 0x80 || (type === 0x90 && d2 === 0)) {
-      // Pads decay in the engine, but a synth voice has to be released —
+      // Pads decay in the engine, but a synth voice has to be released,
       // and a gate-mode pad needs its index to release the sampler.
       pushMonitor(`NOTE OFF ${d1} ch${ch + 1}`);
       if (onEvent) onEvent({ kind: 'noteoff', note: d1, channel: ch, idx: padIndexFor(d1) });
@@ -182,15 +182,15 @@ export async function createMidi({ onEvent } = {}) {
     for (const input of targets) {
       input.onmidimessage = (e) => handleMessage(e, input.name);
       boundInputs.set(input.id, input);
-      // Windows lets ONE process hold a MIDI input. If another app — or a
-      // stale headless instance of this one — already owns the port, the
+      // Windows lets ONE process hold a MIDI input. If another app, or a
+      // stale headless instance of this one, already owns the port, the
       // implicit open behind onmidimessage fails silently and the deck looks
       // dead with the Sway plugged in. Open explicitly so that failure is
       // visible: the link pill reads BUSY and the monitor names the port.
       if (typeof input.open === 'function') {
         input.open().catch((err) => {
           control.busy = true;
-          pushMonitor(`PORT BUSY ${input.name} — held by another process (${err && err.name ? err.name : 'open failed'})`);
+          pushMonitor(`PORT BUSY ${input.name}, held by another process (${err && err.name ? err.name : 'open failed'})`);
         });
       }
     }
@@ -223,8 +223,8 @@ export async function createMidi({ onEvent } = {}) {
     monitor,
     supported,
     get available() {
-      // Embedded (relayed) mode never opens its own MIDIAccess — the host
-      // relays raw bytes — so `access` alone made the splash report "WebMIDI
+      // Embedded (relayed) mode never opens its own MIDIAccess, the host
+      // relays raw bytes, so `access` alone made the splash report "WebMIDI
       // unavailable" while relayed MIDI was audibly playing. The relay IS
       // availability.
       return relayed || !!access;

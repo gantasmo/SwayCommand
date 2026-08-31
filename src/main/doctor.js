@@ -1,4 +1,4 @@
-// The Doctor — first-run system check. Every check is independent, times out
+// The Doctor, first-run system check. Every check is independent, times out
 // on its own, and never throws out of runAll(); the app must always reach the
 // project picker even on a machine with nothing attached.
 //
@@ -74,7 +74,7 @@ async function checkSway() {
         id: 'sway',
         label: 'Audima Sway',
         status: 'ok',
-        detail: 'Connected (normal mode). MIDI is driverless on this OS — nothing to install.',
+        detail: 'Connected (normal mode). MIDI is driverless on this OS, nothing to install.',
       };
     }
     if (usb.dfu) {
@@ -83,7 +83,7 @@ async function checkSway() {
         label: 'Audima Sway',
         status: 'warn',
         detail:
-          'Sway detected in DFU (firmware-update) mode. If a firmware update is stuck for a missing driver, install the official STM32 WinUSB driver — otherwise power-cycle the Sway to return to normal mode.',
+          'Sway detected in DFU (firmware-update) mode. If a firmware update is stuck for a missing driver, install the official STM32 WinUSB driver, otherwise power-cycle the Sway to return to normal mode.',
         fix:
           process.platform === 'win32'
             ? { id: 'install-dfu-driver', label: 'Install DFU driver (official, elevated)' }
@@ -95,7 +95,7 @@ async function checkSway() {
       label: 'Audima Sway',
       status: 'info',
       detail:
-        'Not detected. Plug it in over USB any time — SwayCommand hot-attaches automatically. Until then, mouse, keyboard, and any class-compliant MIDI controller all work.',
+        'Not detected. Plug it in over USB any time, SwayCommand hot-attaches automatically. Until then, mouse, keyboard, and any class-compliant MIDI controller all work.',
     };
   } catch (err) {
     return { id: 'sway', label: 'Audima Sway', status: 'info', detail: `USB scan unavailable (${err.message}); MIDI detection still works once the app is running.` };
@@ -138,7 +138,7 @@ async function checkCompanion() {
         id: 'companion',
         label: 'Audima Sway Software',
         status: 'info',
-        detail: 'Audima ships no Linux build of the companion app. Not required to play — only for editing device presets and firmware updates (use Windows/macOS for those).',
+        detail: 'Audima ships no Linux build of the companion app. Not required to play, only for editing device presets and firmware updates (use Windows/macOS for those).',
       };
     }
 
@@ -150,7 +150,7 @@ async function checkCompanion() {
       label: 'Audima Sway Software',
       status: 'info',
       detail:
-        'Not installed. Optional — SwayCommand plays without it. It is only needed to edit the Sway\u2019s on-device presets or update firmware.',
+        'Not installed. Optional, SwayCommand plays without it. It is only needed to edit the Sway\u2019s on-device presets or update firmware.',
       fix: { id: 'fetch-companion', label: 'Download from Audima (signature-verified)' },
     };
   } catch (err) {
@@ -166,7 +166,7 @@ async function checkDfuDriver() {
       id: 'dfu-driver',
       label: 'Firmware-update driver',
       status: 'ok',
-      detail: 'Not needed on this OS — DFU works with built-in class drivers.',
+      detail: 'Not needed on this OS, DFU works with built-in class drivers.',
     };
   }
   try {
@@ -180,7 +180,7 @@ async function checkDfuDriver() {
       label: 'Firmware-update driver',
       status: 'info',
       detail:
-        'Not installed. Normal play needs no driver; this is only used when updating Sway firmware. Install now or later — SwayCommand fetches Audima\u2019s official package.',
+        'Not installed. Normal play needs no driver; this is only used when updating Sway firmware. Install now or later, SwayCommand fetches Audima\u2019s official package.',
       fix: { id: 'install-dfu-driver', label: 'Install DFU driver (official, elevated)' },
     };
   } catch (err) {
@@ -197,7 +197,7 @@ async function checkNetwork() {
       id: 'network',
       label: 'Audima update channel',
       status: 'ok',
-      detail: `cdn.audima.com.au reachable — latest Sway Software is v${latest.version}.`,
+      detail: `cdn.audima.com.au reachable, latest Sway Software is v${latest.version}.`,
     };
   } catch (err) {
     return {

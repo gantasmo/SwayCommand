@@ -1,11 +1,11 @@
-// Nature's Tomb — OCEAN CURRENTS: a port of Luis Alberto Martinez Riancho's
+// Nature's Tomb, OCEAN CURRENTS: a port of Luis Alberto Martinez Riancho's
 // (lessrain) CodePen "Mediterranean Drift V3 (WebGL)" (MIT, notice below). A
 // scene-private module of Nature's Tomb (never registered, no meta); the
 // factory builds a background quad, one instanced trail mesh and one
 // instanced marker mesh, and returns them with an update the Tomb drives.
 //
 // The pen: 14,000 CPU particles circulating round six drifting low- and
-// high-pressure systems — a flow field (per system a tangential swirl
+// high-pressure systems, a flow field (per system a tangential swirl
 // s·mag·t̂ with mag = strength·(d/r)·exp(−d²/2r²)·gain, an inflow of 0.32·mag
 // toward a low, out of a high, plus a background wind) sampled off a JS grid,
 // integrated at 30 Hz, each step drawn as a speed-coloured line (an eight-
@@ -19,18 +19,18 @@
 //   TRAILS      no accumulation pass (a scene does not render): each particle
 //               keeps its last NINE positions in a ring of instanced
 //               attributes and is drawn as EIGHT capsule segments in one draw
-//               call — alpha fading along the trail, colour by the current
-//               speed — which gives the pen's fading-streak look; the ring
+//               call, alpha fading along the trail, colour by the current
+//               speed, which gives the pen's fading-streak look; the ring
 //               head advances at the pen's 30 Hz and only the slot written
 //               that step is uploaded. The field is evaluated directly per
 //               particle (no grid) on the CPU, allocation-free. A re-spawned
 //               particle's trail grows from its spawn point segment by segment
 //               (nothing appears at its size).
 //   MODE        the Tomb's development level steps through the six regimes
-//               in the pen's order (calm → levante → mistral → tramontana →
-//               sirocco → winter storm) with every table value — the
+//               in the pen's order (calm -> levante -> mistral -> tramontana ->
+//               sirocco -> winter storm) with every table value, the
 //               systems' positions, spins, radii and strengths, the flow
-//               speed, the gain, the background wind, the wander —
+//               speed, the gain, the background wind, the wander,
 //               INTERPOLATED continuously, so the knob morphs the field rather
 //               than cutting (a spin flip passes through zero: the system
 //               weakens and reverses); a pad steps one regime.
@@ -40,14 +40,14 @@
 //   SPECIES     a seeded variation of the system layout, the wobble phases
 //               and the wander scale.
 //   PALETTE     the trails' ramp runs between the palette's entries sorted
-//               cool → warm (the pen's eight-colour ramp by speed bin); the
+//               cool -> warm (the pen's eight-colour ramp by speed bin); the
 //               sea background is the palette's darkest stop; the rings and
 //               the glyphs its lightest, lifted.
 //   MOTION      systems drift by their wobble (translation), particles
 //               circulate (per-particle flow); nothing rotates.
 //
 // Upstream: https://codepen.io/luis-lessrain/pen/emgBwPj
-// The MIT License (MIT) — Copyright (c) 2026 Luis Alberto Martinez Riancho
+// The MIT License (MIT), Copyright (c) 2026 Luis Alberto Martinez Riancho
 // (https://codepen.io/luis-lessrain/pen/emgBwPj). Permission is hereby
 // granted, free of charge, to any person obtaining a copy of this software
 // and associated documentation files (the "Software"), to deal in the
@@ -137,7 +137,7 @@ const TRAIL_VERT = /* glsl */ `
     gl_Position = vec4(ndc * vis, vis > 0.5 ? 0.0 : 2.0, 1.0);
     vQ = vec2(aQuad.x, aQuad.y * (vLenR + 2.0) - 1.0);
     // the colour by speed: the pen's ramp by speed², between the palette's
-    // entries sorted cool → warm
+    // entries sorted cool -> warm
     float sc = clamp(aInfo.x * uSpeedGain, 0.0, 1.0) * 3.999;
     int ci = int(sc);
     float cf = sc - float(ci);
@@ -232,7 +232,7 @@ const BG_FRAG = /* glsl */ `
 
 // S is the Tomb's per-frame plate state: { dt, t, weight, level, sway, press,
 // hx, hy, openS, openDim, speciesHash, warm, bass, pulse }; S.order is the
-// palette sorted cool → warm (indices into io.palette).
+// palette sorted cool -> warm (indices into io.palette).
 export function createCurrents(THREE, ctx) {
   const tier = ctx.quality.tier;
   const N = tier === 'low' ? 5000 : tier === 'high' ? 14000 : 9000;
@@ -489,7 +489,7 @@ export function createCurrents(THREE, ctx) {
         mS[o + 3] = clamp(0.34 + sStr[k] * 0.24, 0.42, 0.64) * Math.min(1, Math.abs(sSpin[k]) * 2 + 0.3);
       }
       mPosA.needsUpdate = true; mSA.needsUpdate = true;
-      // colour: the ramp cool → warm, lifted a little; the sea the darkest stop
+      // colour: the ramp cool -> warm, lifted a little; the sea the darkest stop
       const pl = io.palette, ord = S.order;
       for (let i = 0; i < 5; i++) {
         const c = pl[ord[i]];

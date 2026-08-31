@@ -1,6 +1,6 @@
 appId: app.swaycommand
 productName: SwayCommand
-copyright: MIT — unaffiliated with Audima Labs
+copyright: MIT, unaffiliated with Audima Labs
 
 directories:
   output: release

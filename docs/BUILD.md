@@ -56,7 +56,7 @@ The output is an immediately-invoked function expression compiled against the Ch
 | PNG encoder | hand-rolled: 8-bit RGBA `IHDR`, one `none` filter byte per scanline, `IDAT` compressed with `zlib.deflateSync` at level 9, chunk CRCs from a generated 256-entry CRC32 table |
 | ICO wrapper | a single-entry PNG-in-ICO container (32 bpp, image data at offset 22), a format valid on Windows Vista and later |
 
-The motif is sixteen vertical beam stripes — one per Sway infrared sensor — rising from the base. Each beam has a Gaussian cross-section; beam color interpolates from cyan `#2de1fc` at beam 0 to pink `#ff2d95` at beam 15, and beam heights follow a swell curve peaking between beams 9 and 10. The floor glow uses violet `#7a0bc0`.
+The motif is sixteen vertical beam stripes (one per Sway infrared sensor) rising from the base. Each beam has a Gaussian cross-section; beam color interpolates from cyan `#2de1fc` at beam 0 to pink `#ff2d95` at beam 15, and beam heights follow a swell curve peaking between beams 9 and 10. The floor glow uses violet `#7a0bc0`.
 
 | Output | Content |
 |---|---|
@@ -73,7 +73,7 @@ electron-builder reads both files from `build/` (`directories.buildResources: bu
 |---|---|
 | `appId` | `app.swaycommand` |
 | `productName` | `SwayCommand` |
-| `copyright` | `MIT — unaffiliated with Audima Labs` |
+| `copyright` | `MIT, unaffiliated with Audima Labs` |
 | `directories.output` | `release` |
 | `directories.buildResources` | `build` |
 | `asar` | `true` |
@@ -95,7 +95,7 @@ The whitelisted files are packed into `resources/app.asar` (`asar: true`). `node
 
 | Platform | Target | Icon | Metadata |
 |---|---|---|---|
-| `win` | `nsis` | `build/icon.ico` | — |
+| `win` | `nsis` | `build/icon.ico` | n/a |
 | `mac` | `dmg` | `build/icon.png` | category `public.app-category.music` |
 | `linux` | `AppImage` | `build/icon.png` | category `AudioVideo`; synopsis "Gesture VJ instrument for the Audima Labs Sway" |
 
@@ -156,7 +156,7 @@ and macOS ten times. On a public repository standard runners are free.
 |---|---|
 | `SwayCommand-Setup-<version>.exe` | the NSIS installer; 94 MB at version 0.1.0, dominated by the Electron runtime |
 | `SwayCommand-Setup-<version>.exe.blockmap` | block-checksum map emitted alongside every NSIS artifact for differential updates; SwayCommand configures no auto-updater, so the file is unused |
-| `win-unpacked/` | the unpacked application — `SwayCommand.exe`, the Electron runtime files, and `resources/app.asar`; runs in place without installation, suitable for smoke tests |
+| `win-unpacked/` | the unpacked application, `SwayCommand.exe`, the Electron runtime files, and `resources/app.asar`; runs in place without installation, suitable for smoke tests |
 | `builder-debug.yml` | electron-builder's dump of the effective build configuration |
 
 macOS and Linux builds write their artifacts and unpacked directories to the same `release/` directory. `release/`, `dist/`, and the generated icons are listed in `.gitignore` and are not tracked.

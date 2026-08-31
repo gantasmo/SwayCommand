@@ -1,7 +1,7 @@
 // BLAKE2b-512 (RFC 7693), in JavaScript, because Electron cannot do it.
 //
 // Electron links BoringSSL rather than OpenSSL, and BoringSSL implements no
-// BLAKE2 at all — process.versions.openssl reads '0.0.0' and crypto.getHashes()
+// BLAKE2 at all, process.versions.openssl reads '0.0.0' and crypto.getHashes()
 // returns nothing matching /blake/. So crypto.createHash('blake2b512') throws
 // "Digest method not supported" in the main process, while the same call works
 // in plain Node. minisign's modern signature format ('ED') signs
@@ -12,7 +12,7 @@
 // test vector; see scripts/test-blake2b.js.
 //
 // 64-bit words are held as (low, high) uint32 pairs: word i occupies indices
-// 2i and 2i+1. This is the standard approach for BLAKE2b in JS — BigInt would
+// 2i and 2i+1. This is the standard approach for BLAKE2b in JS, BigInt would
 // be far slower over a file of hundreds of megabytes.
 
 'use strict';

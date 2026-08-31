@@ -1,6 +1,6 @@
-// Nature's Tomb — the weather systems. A scene-private module (never
+// Nature's Tomb, the weather systems. A scene-private module (never
 // registered, no meta): the five systems that were the Weather Systems scene
-// — TORNADO, HURRICANE, LIGHTNING, WILDFIRE, SANDSTORM — ported whole into
+// (TORNADO, HURRICANE, LIGHTNING, WILDFIRE, SANDSTORM) ported whole into
 // Nature's Tomb as its weather plates, with the hurricane and the wildfire
 // raised. The factory builds the world quad and its three impostor meshes
 // and returns them with an update the Tomb drives; the Tomb owns the knob,
@@ -20,30 +20,30 @@
 //               it shares the frame; a change between the weather and another
 //               plate is the Tomb's 0.15 s knob dissolve, both quads drawn
 //               weighted and added.
-//   INTENSITY   The Tomb's development level — how far the funnel hangs, its
+//   INTENSITY   The Tomb's development level, how far the funnel hangs, its
 //               width, spin and rain; how tight the eye is and how fast the
 //               bands run; the bolt rate and the cell's mass; the fire's
 //               spread and flame height; the wall's height and speed.
 //   EVENTS      mainEvent() fires the system on screen's main event (a pad on
 //               a weather plate): TOUCHDOWN, EYEWALL, STRIKE, FLARE UP, GUST.
-//               event(key) takes the declared actions — strike (a bolt in ANY
+//               event(key) takes the declared actions, strike (a bolt in ANY
 //               system), touchdown, gust, flareUp, eyewall, calm (everything
 //               stands down over ten seconds).
-//   GESTURES    SWAY morphs one generative parameter per system — funnel
+//   GESTURES    SWAY morphs one generative parameter per system, funnel
 //               tortuosity, band tightness, bolt branching, the wind that
-//               drives the fire, dust density; PRESS squeezes — the funnel
+//               drives the fire, dust density; PRESS squeezes, the funnel
 //               thins, the eye contracts and its wall steepens, the cloud base
 //               drops, the flames crush low, the wall's face steepens. The
 //               hand is the ONLY camera motion: X pans the eye, Y lifts it.
 //   COLD OPEN   The Tomb's: a weather plate selected while the plate is dark
 //               shows its calm sky faintly (a thin stratus, a haze, a faint
 //               cloud base breathing with the level) and BUILDS when the show
-//               starts — the supercell thickens and the funnel grows down, the
+//               starts, the supercell thickens and the funnel grows down, the
 //               bands wind in round the eye, the cell closes, the fire spreads
-//               from its ignition, the wall rises far out — and the opening
+//               from its ignition, the wall rises far out, and the opening
 //               fires its main event.
 //
-//   TORNADO     As it was: a supercell over farm country at dusk — fields in
+//   TORNADO     As it was: a supercell over farm country at dusk, fields in
 //               strips, a road with power poles and wires, a farm and a
 //               windbreak as silhouettes, the dusk band on the horizon; a
 //               marched deck whose noise domain FLOWS round the mesocyclone
@@ -59,9 +59,9 @@
 //               a heightfield marched from above and refined by bisection,
 //               now with a fine CELLULAR octave in the spiral's own
 //               coordinates (elongated along the arms and drifting along them
-//               — a flow, not a turn) that reads as convective cells and
+//              , a flow, not a turn) that reads as convective cells and
 //               streaks rather than smooth bands, whose peaks stand up as HOT
-//               TOWERS — tallest on the eyewall ring, pulsing with the bass —
+//               TOWERS, tallest on the eyewall ring, pulsing with the bass,
 //               that the two shadow taps see, so the towers shadow the bands
 //               and the wall shadows the eye; the eye's STADIUM in terraces,
 //               the sea glittering in it on a finer facet field; LIGHTNING in
@@ -80,26 +80,26 @@
 //               top-down, then the return stroke and its restrikes) on
 //               screen-space capsules; sheet flashes between strikes.
 //   WILDFIRE    RAISED: the flame tongues carry a third octave and their tops
-//               are RAGGED — a fine fast noise tears the tips into tatters
+//               are RAGGED, a fine fast noise tears the tips into tatters
 //               that lift off as embers; a PYROCUMULUS stands over the front:
 //               the smoke column rising into a cauliflower cap lit orange
 //               underneath by the fire's glow SCATTERED up the column (falling
-//               off with height) and grey-white on top; HEAT SHIMMER — the
+//               off with height) and grey-white on top; HEAT SHIMMER, the
 //               view through the hot air over the front and the burnt ground
 //               is refracted, a screen-space warp of the ray by a flowing
 //               noise, strongest low over the fire; more embers, longer
 //               streaks along the wind, some lofted high in the column; SPOT
-//               FIRES — embers that land ahead of the front start small fires;
-//               FIRE WHIRLS — one or two rotating columns of flame on the
+//               FIRES, embers that land ahead of the front start small fires;
+//               FIRE WHIRLS, one or two rotating columns of flame on the
 //               front, their rotation a FLOW of the noise domain round and up
 //               the column as the funnel does it, no object rotates; CROWN
-//               FIRE on the trees — a flash running up the crown as the front
+//               FIRE on the trees, a flash running up the crown as the front
 //               reaches it, then a standing torch, then the char; litter and
 //               rock in the ground lit by the front, embers in the burnt
 //               ground at two depths; a smoke veil in the sky toward the fire.
 //               The wind (sway), the spread, the burnout / regrowth cycle as
 //               before.
-//   SANDSTORM   As it was: a haboob over a desert city — a marched slab of
+//   SANDSTORM   As it was: a haboob over a desert city, a marched slab of
 //               density ahead of its front, lobes rolling up the face, the
 //               base bulging forward, the rim catching the sun behind it,
 //               per-channel extinction so the sun dims to a red disk and the
@@ -112,7 +112,7 @@
 // mesocyclone's turn, the whirls' turn and the bands' run are flows of the
 // noise domain; debris and embers travel paths; fronts and walls advance.
 // Four draw calls: the world quad (sky, ground, sea, every marched volume and
-// the screen rain and grit — drawn additively, weighted by the Tomb's plate
+// the screen rain and grit, drawn additively, weighted by the Tomb's plate
 // weight), one instanced mesh of solid impostors (debris flecks and trees,
 // normal-blended over the world), one of additive impostors (ember streaks),
 // one of screen-space capsules (bolts). The impostors project through the
@@ -622,8 +622,8 @@ const WORLD_FRAG = /* glsl */ `
     }
     cov = (cov + wall * (0.7 + 0.5 * n)) * eyeIn;
     // convective cells and HOT TOWERS: a fine cellular octave in the spiral's
-    // own coordinates — elongated along the arms and drifting along them (a
-    // flow, not a turn) — whose peaks stand up as towers, tallest on the
+    // own coordinates, elongated along the arms and drifting along them (a
+    // flow, not a turn), whose peaks stand up as towers, tallest on the
     // eyewall ring, pulsing with the bass
     // (sampled on a circle in the spiral phase, so there is no seam where the
     // angle wraps)
@@ -645,7 +645,7 @@ const WORLD_FRAG = /* glsl */ `
     return 0.6 * vnoise3(vec3(cos(s) * 3.0, sin(s) * 3.0, log(r) * 3.0 - uTime * 0.1)) + 0.4 * vnoise2(rel * 0.06 + vec2(uTime * 0.05, 0.0));
   }
   // lightning in the eyewall: the flashes sit under the tops and light them
-  // from within — a local glow through the cloud, on top of the point light
+  // from within, a local glow through the cloud, on top of the point light
   vec3 hurFlashGlow(vec3 p) {
     float s = 0.0;
     for (int i = 0; i < ${FLASHES}; i++) {
@@ -721,7 +721,7 @@ const WORLD_FRAG = /* glsl */ `
         float cx = hurCov(P.xz + vec2(e, 0.0)), cz = hurCov(P.xz + vec2(0.0, e));
         vec3 N = normalize(vec3(h0 - hurH(cx), e, h0 - hurH(cz)));
         float ndl = max(dot(N, H_SUN), 0.0);
-        // self-shadowing: two soft taps toward the sun — the towers shadow the
+        // self-shadowing: two soft taps toward the sun, the towers shadow the
         // bands, the wall shadows the eye
         vec3 q1 = P + H_SUN * 14.0, q2 = P + H_SUN * 38.0;
         float sh = clamp(1.0 - (hurH(hurCov(q1.xz)) - q1.y) / 14.0, 0.45, 1.0) * clamp(1.0 - (hurH(hurCov(q2.xz)) - q2.y) / 20.0, 0.6, 1.0);
@@ -864,7 +864,7 @@ const WORLD_FRAG = /* glsl */ `
     vec3 grass = mix(grey(uPal4, 0.4), uPal2, 0.25) * 0.09 * (0.6 + 0.6 * n) * litter;
     grass = mix(grass, grey(uPal4, 0.6) * 0.14, rock * 0.6);
     vec3 ash = grey(uPal4, 0.85) * 0.035 * (0.7 + 0.5 * rock);
-    // the burnt ground: embers at two depths — a fine crust that fades fast
+    // the burnt ground: embers at two depths, a fine crust that fades fast
     // behind the front, and heavier logs that glow on far back into the burn
     float speck = smoothstep(0.45, 0.85, vnoise2(p.xz * 2.2 + 3.0)) * (0.6 + 0.4 * vnoise2(p.xz * 5.0 + uTime * 0.6));
     float speck2 = smoothstep(0.55, 0.92, vnoise2(p.xz * 0.9 + 17.0)) * (0.5 + 0.5 * vnoise2(p.xz * 3.0 - uTime * 0.4));
@@ -877,7 +877,7 @@ const WORLD_FRAG = /* glsl */ `
     g += mix(uPal1, uPal0, 0.3) * 0.6 * lt * uFireP.x * fl * (0.7 + 0.3 * n) * (0.7 + 0.5 * rock);
     return g;
   }
-  // a FIRE WHIRL: a rotating column of flame on the front — the rotation is a
+  // a FIRE WHIRL: a rotating column of flame on the front, the rotation is a
   // FLOW of the noise domain round and up the column, as the funnel's is; no
   // object rotates
   float whirlDens(vec3 p, vec4 wh, float fh) {
@@ -1005,7 +1005,7 @@ const WORLD_FRAG = /* glsl */ `
   }
   vec3 wildfire(vec3 ro, vec3 rd, vec3 right, vec3 up, vec2 uv, float jit) {
     // HEAT SHIMMER: the view through the hot air over the front and the burnt
-    // ground is refracted — a screen-space warp of the ray by a flowing noise,
+    // ground is refracted, a screen-space warp of the ray by a flowing noise,
     // strongest low over the fire
     if (uFireP.x > 0.01 && rd.y < -1e-4) {
       float tg0 = -ro.y / rd.y;
@@ -1177,7 +1177,7 @@ const QUAD_VERT = /* glsl */ `
 
 // ------------------------------------------------------------------- impostors
 // A camera-facing quad per instance, projected through the module's own
-// perspective camera (uView / uProj — the Tomb's scene camera is
+// perspective camera (uView / uProj, the Tomb's scene camera is
 // orthographic). aS = (radius, alpha, shape, seed), aC = (rgb, canopy) for the
 // solids, (velocity, heat) for the glows. Shapes: 0 a fleck, 1..2 a tree (the
 // fraction is how far the crown fire has run up it), 3 an ember streak.
@@ -1243,8 +1243,8 @@ const SPH_FRAG_SOLID = /* glsl */ `
       hw *= (0.85 + 0.3 * vnoise2(vec2(y * 9.0 + vSeed * 10.0, x * 4.0))) * vC.a;
       float canopy = step(abs(x), hw) * step(0.02, vC.a);
       a = max(trunk, canopy);
-      // CROWN FIRE: as the front arrives a flash runs up the crown — a bright
-      // front climbing the canopy — and then the whole crown stands as a torch
+      // CROWN FIRE: as the front arrives a flash runs up the crown, a bright
+      // front climbing the canopy, and then the whole crown stands as a torch
       float torch = fract(vShape);
       if (torch > 0.01) {
         float yf = 0.3 + 0.75 * torch;
@@ -1491,7 +1491,7 @@ export function createWeather(THREE, ctx) {
   let sysTarget = 0;
   const sysW = new Float32Array(SYSTEMS);
   sysW[0] = 1;
-  const build = new Float32Array(SYSTEMS);    // each system's build, 0 → 1 once it has run
+  const build = new Float32Array(SYSTEMS);    // each system's build, 0 -> 1 once it has run
   let swayS = 0, pressS = 0, hx = 0.5, hy = 0.5;
   let bass = 0, mid = 0, high = 0, pulse = 0;
   let calmS = 0, openS = 0, opened = false;
@@ -1645,7 +1645,7 @@ export function createWeather(THREE, ctx) {
         if (py <= 0) break;
         const fork = lvl === 0 && !forked && k === forkAt;
         if (sp < STACK && lvl < 3 && (fork || Math.random() < pBranch * (lvl === 0 ? 1 : lvl === 1 ? 0.8 : 0.5))) {
-          // a branch: the heading turned 25–55° off the channel, shorter, thinner;
+          // a branch: the heading turned 25 to 55° off the channel, shorter, thinner;
           // the fork turns less and runs most of the way down
           const ang = (fork ? 0.3 + Math.random() * 0.3 : 0.45 + Math.random() * 0.55) * (Math.random() < 0.5 ? 1 : -1);
           const ca = Math.cos(ang), sa = Math.sin(ang);
@@ -1816,7 +1816,7 @@ export function createWeather(THREE, ctx) {
       if (s > whMax) whMax = s;
     }
     WU.uFireW.value.set(whMax, 0, 0, 0);
-    // embers loft from the fronts — most from the flames, some high in the
+    // embers loft from the fronts, most from the flames, some high in the
     // column, a few carried far ahead on the wind to SPOT new fires
     if (show && storm > 0.2 && fireN > 0) {
       emAcc += dt * (70 + 300 * intensity) * storm;
@@ -1870,7 +1870,7 @@ export function createWeather(THREE, ctx) {
       sph(glows, i, emX[i], emY[i], emZ[i], Math.max(0.16 + emSd[i] * 0.2, dist * 0.004), lf * flick * w * 1.1, 3, emSd[i]);
       sphC(glows, i, emVX[i], emVY[i], emVZ[i], lf * lf * (0.3 + 0.7 * flick));
     }
-    // the trees catch — the crown fire runs up them — torch, char and shrink to a stump
+    // the trees catch (the crown fire runs up them) torch, char and shrink to a stump
     const p1 = gp[1].value, p4 = gp[4].value, p2 = gp[2].value, p0 = gp[0].value;
     for (let i = 0; i < TREES; i++) {
       const si = DEBRIS + i;
@@ -2048,7 +2048,7 @@ export function createWeather(THREE, ctx) {
       // WARMEST stop lifted to white, 1 (fire and dusk) the WARMEST, 2 (the
       // cool sky, sea and cloud shade) the COOLEST, 3 (the dusk accent and the
       // flash tint) the second warmest, 4 (dust, ash and ground) the second
-      // warmest greyed — the Tomb hands the palette sorted cool → warm in
+      // warmest greyed, the Tomb hands the palette sorted cool -> warm in
       // S.order
       const pl = io.palette, ord = S.order;
       // the hot core is the fire's colour pushed to white (the lightest stop

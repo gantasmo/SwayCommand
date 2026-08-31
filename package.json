@@ -2,7 +2,7 @@
   "name": "swaycommand",
   "productName": "SwayCommand",
   "version": "0.1.0",
-  "description": "SwayCommand — gesture VJ instrument and performance surface for the Audima Labs Sway.",
+  "description": "SwayCommand, gesture VJ instrument and performance surface for the Audima Labs Sway.",
   "author": "dtrujillostyle@gmail.com",
   "license": "MIT",
   "main": "src/main/main.js",

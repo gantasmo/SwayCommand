@@ -1,23 +1,23 @@
-// Nature's Tomb — fifteen plates on one knob: seven organisms under dark-field
-// light, in the order of life and then its end — a DOUBLE HELIX of B-form
+// Nature's Tomb, fifteen plates on one knob: seven organisms under dark-field
+// light, in the order of life and then its end, a DOUBLE HELIX of B-form
 // DNA, a CELL LINE that cleaves from a zygote to a blastula and then morphs on
 // through the single-celled protists into primitive multicellular colonies, a
-// MYCELIUM growing out from a spore, a SLIME MOLD foraging across its dish —
+// MYCELIUM growing out from a spore, a SLIME MOLD foraging across its dish,
 // and then the TOXIN wrecking the molecule, PHAGOCYTOSIS consuming the cell,
-// DECOMPOSITION taking the body; and then THE WORLD — MICROSCOPY (the slide
+// DECOMPOSITION taking the body; and then THE WORLD, MICROSCOPY (the slide
 // refocused), OCEAN CURRENTS (the flow field of drifting pressure systems),
 // THE DAY (sunrise to storm over the sea), and the five weather systems,
 // LIGHTNING, TORNADO, HURRICANE, WILDFIRE, SANDSTORM. One knob picks the
 // plate, one knob and the strikes drive its development, one knob picks the
 // species, sway morphs whichever generator is on screen. The world plates
-// live in scene-private modules under ./naturestomb/ (weather.js — the five
+// live in scene-private modules under ./naturestomb/ (weather.js, the five
 // systems, ported whole from the Weather Systems scene with the hurricane and
-// the wildfire raised; microscopy.js, sea.js, currents.js — three CodePen
+// the wildfire raised; microscopy.js, sea.js, currents.js, three CodePen
 // ports, MIT, each carrying its notice); each owns its own programs, so the
 // organism quad is not one mega-shader.
 //
-//   COLD OPEN   The plate is DARK until the show starts — the first beat the
-//               analyser hears, the transport playing, or any pad — and then
+//   COLD OPEN   The plate is DARK until the show starts, the first beat the
+//               analyser hears, the transport playing, or any pad, and then
 //               the molecule comes up and begins to replicate: the double
 //               helix at stage 0 stepping to its replication fork. That is
 //               the opening element; from there the performer develops it
@@ -29,8 +29,8 @@
 //   PLATE       KNOB 6 (io.knobs[5]) picks it in FIFTEEN bands with a little
 //               hysteresis at the band edges, in this order: 0 DOUBLE HELIX,
 //               1 CELL LINE, 2 MYCELIUM, 3 SLIME MOLD, 4 TOXIN,
-//               5 PHAGOCYTOSIS, 6 DECOMPOSITION — the order of life and then
-//               its end — then the world: 7 MICROSCOPY, 8 OCEAN CURRENTS,
+//               5 PHAGOCYTOSIS, 6 DECOMPOSITION, the order of life and then
+//               its end, then the world: 7 MICROSCOPY, 8 OCEAN CURRENTS,
 //               9 THE DAY, 10 LIGHTNING, 11 TORNADO, 12 HURRICANE,
 //               13 WILDFIRE, 14 SANDSTORM. The selection is smoothed with a
 //               0.15 s time constant, so the dissolve runs exactly as fast as
@@ -46,21 +46,21 @@
 //               SCREEN, reversing at the top and at the bottom; the level
 //               eases over ~1.3 s so every stage plays out. Driving it DOWN
 //               reverses the development. The stage count is the plate's own
-//               — sixteen for the cell line, three for the helix, six for each
+//              , sixteen for the cell line, three for the helix, six for each
 //               simulation and for each of the three end stages, four for the
 //               microscope's focus, six for the currents' regimes, five for
-//               the day's phases — so one strike always means one step of
+//               the day's phases, so one strike always means one step of
 //               what you are looking at. ON A WEATHER PLATE a pad fires the
 //               system's MAIN EVENT instead (touchdown / eyewall cycle /
-//               strike / flare up / gust — what a performer wants from a pad
+//               strike / flare up / gust, what a performer wants from a pad
 //               on a storm) and the level is the system's intensity; the
 //               develop up / down actions still step it. Per world plate the
-//               level is: MICROSCOPY the focus (out of focus → focused →
+//               level is: MICROSCOPY the focus (out of focus -> focused ->
 //               through focus, the layers taking it with their depth); OCEAN
-//               CURRENTS the regime (calm → levante → mistral → tramontana →
-//               sirocco → winter storm, the tables interpolated so the knob
-//               morphs the field); THE DAY the time of day (DAWN → MIDDAY →
-//               DUSK → NIGHT → STORM).
+//               CURRENTS the regime (calm -> levante -> mistral -> tramontana ->
+//               sirocco -> winter storm, the tables interpolated so the knob
+//               morphs the field); THE DAY the time of day (DAWN -> MIDDAY ->
+//               DUSK -> NIGHT -> STORM).
 //   SPECIES     KNOB 7 (io.knobs[6]) picks one of eight seeded parameter sets
 //               for the organism on screen (quantized with hysteresis, so the
 //               knob is a selector, not a smear). It is the "no two runs look
@@ -68,19 +68,19 @@
 //               sequence and duplex flavour, the cell line's irregularity.
 //   THE CELL LINE   Sixteen stages on one continuous axis, every boundary a
 //               morph and never a cut:
-//                 0..6   CLEAVAGE — 1 → 2 → 4 → 8 → 16 → 32 → 64 blastomeres.
+//                 0..6   CLEAVAGE, 1 -> 2 -> 4 -> 8 -> 16 -> 32 -> 64 blastomeres.
 //                        Radii shrink by 2^-1/3, so CELL VOLUME is conserved
 //                        at every division and the embryo grows no cytoplasm.
-//                        The heap's own envelope does widen — a jammed pack of
+//                        The heap's own envelope does widen, a jammed pack of
 //                        sixty-four spheres at a real packing fraction reaches
-//                        a fifth further out than the zygote's surface — but it
+//                        a fifth further out than the zygote's surface, but it
 //                        is clamped at the zona, which never moves, so what the
 //                        eye sees is crowding and not growth. The seats
 //                        the cells take are PACKED, not laid on a lattice: a
 //                        binary lattice can only ever be 4 × 2 × 2 at sixteen
 //                        cells, which welds them along the twice-divided axis
 //                        and opens gaps across the other two. Each stage's
-//                        seats are relaxed once at scene creation — the two
+//                        seats are relaxed once at scene creation, the two
 //                        children are placed either side of the parent across
 //                        the cleavage plane, then the heap is shrunk pass by
 //                        pass while overlapping pairs are pushed back apart
@@ -94,7 +94,7 @@
 //                        bright junction line), and the aggregate is clamped
 //                        at the zona so the outer cells flatten against it.
 //                        Driving the level down merges the cells back.
-//                 7      BLASTULA — the 64 blastomeres migrate outward onto a
+//                 7      BLASTULA, the 64 blastomeres migrate outward onto a
 //                        shell of 96 smaller cells and a fluid-filled
 //                        blastocoel opens inside them; the cavity is lit
 //                        through the shell by its chord. Each morula cell is
@@ -103,12 +103,12 @@
 //                        migration and not a scramble across the embryo; the
 //                        thirty-two seats left over grow in place from
 //                        nothing. The wall's cells are sized to the SEAT
-//                        SPACING — half the nearest-neighbour distance of 96
-//                        points on that sphere, with a little overlap — so the
+//                        SPACING, half the nearest-neighbour distance of 96
+//                        points on that sphere, with a little overlap, so the
 //                        layer closes and the neighbours press into each
 //                        other, which is what makes the blastocoel a cavity
 //                        instead of a colander.
-//                 8..12  THE PROTISTS — AMOEBA (streaming pseudopods whose
+//                 8..12  THE PROTISTS, AMOEBA (streaming pseudopods whose
 //                        extensions run on a slow noise, granular endoplasm
 //                        crowding the centre, nucleus and contractile
 //                        vacuole), PARAMECIUM (a slipper body, ciliary rows
@@ -125,7 +125,7 @@
 //                        costae and a ring of marginal spines), RADIOLARIAN
 //                        (a central capsule inside a perforated mineral
 //                        lattice with six axial and eight diagonal spicules).
-//                 13..15 PRIMITIVE MULTICELLULAR — VOLVOX (a hollow sphere of
+//                 13..15 PRIMITIVE MULTICELLULAR, VOLVOX (a hollow sphere of
 //                        flagellated cells in a glassy matrix. Its cells are
 //                        SEPARATED, unlike the blastula's: a Volvox colony is
 //                        individuals suspended in gel, not an epithelium, so
@@ -145,9 +145,9 @@
 //               colony unrolling into a chain). Protist to protist the two
 //               distance fields mix, so a euglena's spindle grows a diatom's
 //               pores. Aggregate to protist the cells travel onto the
-//               ORGANISM'S OWN SURFACE — each protist and the sponge carries a
+//               ORGANISM'S OWN SURFACE, each protist and the sponge carries a
 //               layout of ninety-six seats laid on its body, and the crossing
-//               is the same seat-by-seat pour — and only over the back half of
+//               is the same seat-by-seat pour, and only over the back half of
 //               the crossing does the analytic solid come up underneath them.
 //               By then the two surfaces are in the same place, so the
 //               handover reads as ninety-six cells fusing into one body. It is
@@ -163,33 +163,33 @@
 //               and writes them into the uniform array in group order with a
 //               bounding sphere per group; the fragment shader tests those
 //               eight spheres against the ray, then makes two cheap passes
-//               over the surviving cells — the first for the nearest true
+//               over the surviving cells, the first for the nearest true
 //               ray/sphere entry, the second keeping the fourteen cells whose
-//               centres lie near the ray AND near that entry — and marches the
+//               centres lie near the ray AND near that entry, and marches the
 //               smooth union of only those. The march therefore costs a
 //               bounded fourteen spheres a step no matter how many cells are
 //               on the plate. Shading: granular cytoplasm with per-cell tint
 //               and grain from a hash of the cell index, wrap light, a
-//               subsurface glow, a wet specular, and — hit analytically on the
+//               subsurface glow, a wet specular, and, hit analytically on the
 //               cell the ray actually entered, so no neighbour's nucleus can
-//               print through the wall of the cell in front of it — a LIT
+//               print through the wall of the cell in front of it, a LIT
 //               nucleus with a nucleolus, shaded off its own normal under the
 //               same two-light rig, rimmed, and dimmed by the depth of
 //               cytoplasm it is seen through.
 //   SLIME MOLD  A Physarum polycephalum plasmodium, simulated rather than
-//               drawn: Jones's agent model — protoplasm agents on a trail map
+//               drawn: Jones's agent model, protoplasm agents on a trail map
 //               sense at three sensors ahead, turn toward the strongest, step
 //               if the cell is free (one agent per cell, the exclusion that
 //               keeps veins thin instead of collapsing the colony into one
 //               slug), deposit; the map is box-blurred and decays. Every
-//               parameter of that model is species-dependent — sensor angle
+//               parameter of that model is species-dependent, sensor angle
 //               and distance, turn angle, step, deposit, decay, agent density,
 //               a random-turn rate that opens a broad fan front, one to FOUR
-//               inoculation points each with its OWN reach — grown to the
+//               inoculation points each with its OWN reach, grown to the
 //               plate's radius plus its own offset from the centre, so the
 //               discs union to the whole dish at full development however far
 //               off-centre the spores were dropped, and colonies expand and
-//               fuse — and the food layout (ring, scatter, clusters, a
+//               fuse, and the food layout (ring, scatter, clusters, a
 //               row) with its own attractant strength. The species table is
 //               four ARCHETYPES the seed picks between and then jitters, so a
 //               strain is a different network MORPHOLOGY and not merely a
@@ -202,8 +202,8 @@
 //               the colony's reach, and at full development that reach is the
 //               whole dish for every strain. A flake the colony has not
 //               reached is a dull speckled husk the dark field still picks out
-//               — it is already leaking a fifth of its attractant onto the
-//               plate, which is what draws the veins to it — and the moment an
+//              , it is already leaking a fifth of its attractant onto the
+//               plate, which is what draws the veins to it, and the moment an
 //               AGENT STEPS ONTO IT it lights, for good, and the veins wire it
 //               in at full strength.
 //   MYCELIUM    A hyphal growth simulation laid down in time order as one
@@ -230,10 +230,10 @@
 //               centre along its segment, and to the other side on the other
 //               strand, so the beads march 5'->3' one way down the molecule and
 //               3'->5' the other. The development level runs it from
-//               a plain duplex, through a replication fork — the strands
+//               a plain duplex, through a replication fork, the strands
 //               splaying into a Y above the fork, a polymerase bubble at the
 //               junction, a continuous leading strand and Okazaki fragments on
-//               the lagging one — to a nucleosome-wrapped chromatin fibre, the
+//               the lagging one, to a nucleosome-wrapped chromatin fibre, the
 //               duplex making 1.65 turns round each histone core with linker
 //               DNA between. Sway sweeps the torsion: from B-form it unwinds
 //               toward an open ladder, then winds back through B-form into an
@@ -242,18 +242,18 @@
 //               so the apparent rotation is always the performer's.
 //   TOXIN       The same B-form helix, and seven real molecules built from
 //               their own atom positions: four of 2,3,7,8-TCDD (dibenzo-p-
-//               dioxin — three fused rings with two oxygens bridging the
+//               dioxin, three fused rings with two oxygens bridging the
 //               middle one, chlorinated at the four outer positions, planar)
 //               and three of DDT (a tetrahedral carbon carrying a
 //               trichloromethyl group, a hydrogen and two para-chlorophenyl
 //               rings twisted against each other). Bond lengths are the real
-//               ones — aromatic C-C 1.40 Å, C-O 1.38, C-Cl 1.74, sp3 C-C 1.54
-//               — drawn at the MOLECULE'S OWN SCALE against the helix, so a
+//               ones, aromatic C-C 1.40 Å, C-O 1.38, C-Cl 1.74, sp3 C-C 1.54
+//              , drawn at the MOLECULE'S OWN SCALE against the helix, so a
 //               dioxin is the width of a base pair because that is what it is.
 //               Atoms are ball impostors shaded off their own normal, coloured
 //               by element from the palette; bonds are sticks. The molecules
 //               drift in from the dark on a slow wander and TUMBLE ONLY UNDER
-//               THE HAND AND THE SWAY — nothing here turns on a clock. The
+//               THE HAND AND THE SWAY, nothing here turns on a clock. The
 //               development is the attack, and every stage is a real lesion:
 //               ADDUCTS dock onto the bases and the backbone; the two dioxins
 //               INTERCALATE, wedging their step of the base stack open by a
@@ -263,7 +263,7 @@
 //               segment's ends draw into its middle, so the strand frays and
 //               parts instead of vanishing in a frame); then two DOUBLE-STRAND
 //               BREAKS at the intercalation sites, and the three fragments
-//               carry apart — each is displaced and tilted about its own fixed
+//               carry apart, each is displaced and tilted about its own fixed
 //               axis by the development, with a slow wander once loose, and
 //               whatever molecule docked on a fragment rides it. Through all
 //               of it the molecule SICKENS: a per-base damage level, carried in
@@ -274,14 +274,14 @@
 //   PHAGOCYTOSIS  A macrophage consuming a smaller cell. One smooth union
 //               marched on the quad: an amoeboid body under slow streaming
 //               bulges (a translation through the noise domain, not a turn),
-//               up to seven PSEUDOPODS — each a chain of three tapered
+//               up to seven PSEUDOPODS, each a chain of three tapered
 //               capsules, bounded by its own sphere so the march tests it only
-//               where it might matter — and the phagosome. The development
+//               where it might matter, and the phagosome. The development
 //               runs the sequence: the prey drifts in from the dark, the
 //               pseudopods reach out and WRAP round it (their tips travel
-//               along an arc about the prey), the membrane SEALS behind it —
+//               along an arc about the prey), the membrane SEALS behind it,
 //               the phagosome is a sphere grown from nothing and blended into
-//               the body, so the prey is enclosed rather than covered — the
+//               the body, so the prey is enclosed rather than covered, the
 //               pseudopods draw back, the vacuole is pulled INSIDE, the prey
 //               is compressed, and then DIGESTED: it fades inside the vacuole
 //               and the vacuole shrinks. Sway grows the last three pseudopods
@@ -289,14 +289,14 @@
 //               squeezes the whole cell. The macrophage's nucleus is hit
 //               analytically and seen through the cytoplasm, like the cell
 //               line's nuclei.
-//   DECOMPOSITION  A dead tissue mass on the plate — fifty-four cells in two
+//   DECOMPOSITION  A dead tissue mass on the plate, fifty-four cells in two
 //               layers, mounded, marched by the SAME culled cell machinery the
 //               embryo uses. The development takes it apart: the turgor goes
 //               and it SLUMPS (the cells sink and spread, and the smooth-min
 //               neck swells so the junctions blur into one mass), the colour
-//               DRAINS to the palette's ash end — the least saturated stop
+//               DRAINS to the palette's ash end, the least saturated stop
 //               relative to its own brightness, so a dark violet is never
-//               mistaken for ash — the surface PITS on a noise the sway moves
+//               mistaken for ash, the surface PITS on a noise the sway moves
 //               through, BACTERIA colonise it in patches (a coarse noise sets
 //               where a colony has taken, a fine one its cells), the MOULD
 //               germinates on the body itself (the hyphal simulation, run from
@@ -314,8 +314,8 @@
 //               sensing, the mycelium's branching angle and tortuosity, the
 //               helix's torsion. PRESS squeezes: it flattens the embryo,
 //               crowds the colony, squashes the mycelium, compresses the
-//               helix. The hand PANS the plate (X) and DOLLIES the eye (Y) —
-//               translation only — except on the helix, where X is the
+//               helix. The hand PANS the plate (X) and DOLLIES the eye (Y),
+//               translation only, except on the helix, where X is the
 //               molecule's azimuth. Bass swells the cytoplasm and the veins,
 //               the beat pulses them, treble shimmers the granules, the level
 //               lifts the plate's rim glow.
@@ -337,14 +337,14 @@
 //               weather's events (strike in ANY weather plate, touchdown,
 //               gust, flare up, eyewall cycle, calm); params for development,
 //               organism (0..14), species, morph and squeeze. The raw knob
-//               reads above stay as the no-assignment fallback — whichever
-//               moved last wins — and morph/squeeze take the larger of the
+//               reads above stay as the no-assignment fallback, whichever
+//               moved last wins, and morph/squeeze take the larger of the
 //               gesture and the assigned control, so assigning one never kills
 //               the other.
 //
 // Draw calls: the organism quad (the cell-line raymarch, the plasmodium's
 // plate, the mycelium's plate and spore, the helix's dark-field column, the
-// macrophage, the dead mass and its plate — whichever organisms have weight,
+// macrophage, the dead mass and its plate, whichever organisms have weight,
 // blended by it), the hyphae mesh (the fungus, or the mould on the corpse),
 // the helix mesh (the molecule, and the toxin's molecules with it), the
 // weather module's four (its world quad, solid impostors, additive impostors,
@@ -358,7 +358,7 @@
 // hyphae and backbones from palette 2 lifted toward white, the four bases from
 // palette 0/1/3/4, the toxin's atoms by element (carbon off palette 2 darkened,
 // oxygen palette 0, chlorine palette 4, hydrogen near white), the sickening
-// and the ash picked from the palette itself — the coldest stop and the least
+// and the ash picked from the palette itself, the coldest stop and the least
 // saturated one, followed smoothly so a hue rotation never flicks them.
 
 import { createWeather } from './naturestomb/weather.js';
@@ -444,7 +444,7 @@ const FORM_SOFT = [1, 0.85, 0.7, 0.12, 0.15, 0.45];
 const FORM_BOUND = [1.16, 1.08, 1.62, 0.92, 1.08, 1.16];
 const FORM_SCALE = 1.45;
 // N seats spread evenly over a sphere of radius R sit a nearest-neighbour
-// spacing of 2R·√(3.6276/N) apart — each seat owns 4πR²/N of the wall, laid
+// spacing of 2R·√(3.6276/N) apart, each seat owns 4πR²/N of the wall, laid
 // out as a hexagon of side s, area (√3/2)s². Sizing the cells to THAT closes
 // the wall; the hand-picked radius the blastula used before left every pair
 // 0.07 apart with the smooth-min neck far too small to bridge them, so the
@@ -465,16 +465,16 @@ const RND_LEN = 65536; // the growth simulation's random table (power of two)
 const GW = 96; // density / occupancy grid side, over the plate
 
 // --- the double helix ------------------------------------------------------------
-const BP = 42; // base pairs built — about four turns, running off frame at both ends
+const BP = 42; // base pairs built, about four turns, running off frame at both ends
 const SUB = 3; // backbone segments per base pair, so the strands read as curves
 const HELIX_SEGS = 2400; // the helix, and the toxin's molecules with it
 const RISE = 0.163; // world units per base pair
 const HRAD = 0.50; // backbone helix radius: pitch / diameter = 1.71, B-form's own ratio
 const TWIST0 = 0.5984; // 2π / 10.5 base pairs per turn
-const GROOVE = 2.4435; // 140° between the strands — this is what makes the grooves unequal
+const GROOVE = 2.4435; // 140° between the strands, this is what makes the grooves unequal
 const NUC = 3; // histone cores on the chromatin fibre
 const COILR = 0.55; // nucleosome superhelix radius
-const ANG = 0.048; // world units per ångström — the helix's own scale (3.4 Å rise, 20 Å across)
+const ANG = 0.048; // world units per ångström, the helix's own scale (3.4 Å rise, 20 Å across)
 
 // --- the toxin ------------------------------------------------------------------
 const NMOL = 7; // molecules on the plate: four TCDD, three DDT
@@ -533,7 +533,7 @@ const GLSL = /* glsl */ `
 
   // the culled cell list for this pixel's ray (see cullCells), and a
   // conservative lower bound on how far the aggregate is from that ray when
-  // the list comes back empty — a finite number, so a blend against another
+  // the list comes back empty, a finite number, so a blend against another
   // field stays a blend instead of letting the other field through
   int gN;
   int gLoc[LOCAL];
@@ -635,7 +635,7 @@ const GLSL = /* glsl */ `
       }
     }
     // Second sweep, in two passes: the cells that can shape the surface near
-    // the entry first, then — ONLY IF THERE IS ROOM LEFT — the ones further
+    // the entry first, then (ONLY IF THERE IS ROOM LEFT) the ones further
     // down the ray. The window round the entry is what bounds the march's
     // cost, but taking it as an exclusion cost a hard black line round every
     // cell that had another cell behind it: a ray passing just OUTSIDE a cell
@@ -685,7 +685,7 @@ const GLSL = /* glsl */ `
     }
     // the flagella of a Volvox colony: the rows stand FIXED on the sphere and
     // only the beat moves, a metachronal wave running pole to pole down the
-    // axis — a travelling wave, never a turn of the pattern about the axis
+    // axis, a travelling wave, never a turn of the pattern about the axis
     if (uCilia > 0.0) {
       vec3 n = normalize(p);
       float rows = 0.5 + 0.5 * sin(atan(n.z, n.x) * 13.0);
@@ -715,10 +715,10 @@ const GLSL = /* glsl */ `
   // ---- the analytic forms ---------------------------------------------------
   // 0 amoeba, 1 paramecium, 2 euglena, 3 diatom, 4 radiolarian, 5 sponge.
   // Each is a distance field about the origin at roughly unit scale, so any
-  // two of them — and a cell aggregate — blend by a mix of their distances.
+  // two of them (and a cell aggregate) blend by a mix of their distances.
   vec3 diaSpace(vec3 p) {
     // the frustule is held at a fixed tilt so the girdle band shows beside the
-    // valve face; the matrices are constants — nothing here turns with time
+    // valve face; the matrices are constants, nothing here turns with time
     vec3 q = p;
     q.yz = mat2(0.52, -0.854, 0.854, 0.52) * q.yz;
     q.xy = mat2(0.94, -0.342, 0.342, 0.94) * q.xy;
@@ -795,8 +795,8 @@ const GLSL = /* glsl */ `
     float s4 = spike(dg, length(a - 0.57735 * dg), 0.86, 0.013);
     return min(d, min(min(s1, s2), min(s3, s4)));
   }
-  // the sponge is held tipped toward the eye — a constant, like the diatom's
-  // — so the osculum reads as an opening and not as a rim seen edge-on
+  // the sponge is held tipped toward the eye, a constant, like the diatom's
+  //, so the osculum reads as an opening and not as a rim seen edge-on
   vec3 spgSpace(vec3 p) {
     vec3 q = p;
     q.yz = mat2(0.8525, -0.5227, 0.5227, 0.8525) * q.yz;
@@ -871,13 +871,13 @@ const GLSL = /* glsl */ `
       if (uFormF > 0.002) d = mix(d, formD(q, uFormB), uFormF);
       d *= uFormScale;
     }
-    // the jiggle is a membrane, not silica — the analytic forms damp it
+    // the jiggle is a membrane, not silica, the analytic forms damp it
     d += uJig * (mode == 0 ? 1.0 : uSoft) * 0.045 * (noise3(p * 3.0 + vec3(0.0, uTime * 0.35, 0.0)) - 0.5);
     return d;
   }
   // the analytic forms' organelles, seen through the body. A cell's nucleus is
   // NOT marched: it is the owning cell's own sphere, hit analytically in
-  // specimen(), which is both cheaper and correct — the min over every culled
+  // specimen(), which is both cheaper and correct, the min over every culled
   // cell used to draw a neighbour's nucleus through the wall of the cell in
   // front of it, as doubled, offset discs.
   float mapOrgan(vec3 p) {
@@ -993,8 +993,8 @@ const GLSL = /* glsl */ `
 
   // The two marches carry their OWN bounding radii. One number for both made
   // the drawn zona jump 35 % wide in a single frame the instant a protist
-  // stage came into range — while its weight was still zero and nothing of it
-  // was drawn — because the bound was gated on the form being selected rather
+  // stage came into range, while its weight was still zero and nothing of it
+  // was drawn, because the bound was gated on the form being selected rather
   // than on the form being visible.
   uniform float uBound, uBoundF;
 
@@ -1033,7 +1033,7 @@ const GLSL = /* glsl */ `
 
     float eb;
     float tb = iSphere(roL, rd, vec3(0.0), bnd, eb);
-    // the hand can dolly the eye inside a long specimen's bounding sphere —
+    // the hand can dolly the eye inside a long specimen's bounding sphere,
     // then the march simply starts at the eye
     bool inSphere = dot(roL, roL) < bnd * bnd;
     if (tb <= 0.0 && !inSphere) return col;
@@ -1279,7 +1279,7 @@ const GLSL = /* glsl */ `
 
   // ---- phagocytosis: a macrophage throwing pseudopods round a smaller cell,
   // sealing it into a phagosome, drawing it in and digesting it. One smooth
-  // union: the amoeboid body (an ellipsoid under slow streaming bulges — a
+  // union: the amoeboid body (an ellipsoid under slow streaming bulges, a
   // translation through the noise domain, never a turn), up to seven
   // pseudopods as chains of three tapered capsules each, and the phagosome, a
   // sphere round the prey that grows from nothing as the membrane seals. The
@@ -1292,7 +1292,7 @@ const GLSL = /* glsl */ `
     return length(pa - ba * h) - mix(r1, r2, h);
   }
   // The pseudopods, smooth-united into a body already at distance dBody. A
-  // bounding sphere per pseudopod skips the three capsule tests — but ONLY
+  // bounding sphere per pseudopod skips the three capsule tests, but ONLY
   // when the sphere is further from this point than the blend can reach
   // (db > dBody + k), because there smin() is exactly min() and dropping the
   // pod changes nothing. Blending against the BOUNDING SPHERE instead, which
@@ -1320,7 +1320,7 @@ const GLSL = /* glsl */ `
     // at every step of the march that is still crossing empty water
     if (abs(d) < 0.26) {
       // faded out across the window, so the bound and the true field agree at
-      // the seam — switching between them hard left a straight shading band
+      // the seam, switching between them hard left a straight shading band
       // across the cell where the two iso-surfaces met
       float w = 1.0 - smoothstep(0.14, 0.26, abs(d));
       d += 0.07 * w * (noise3(q * 2.4 + vec3(uTime * 0.11, -uTime * 0.06, 0.0)) - 0.5) - 0.035 * (1.0 - w);
@@ -1553,7 +1553,7 @@ const GLSL = /* glsl */ `
     vec3 sss = mix(uPal4, uPal3, 0.5) * (0.3 * rim) * (1.0 - 0.8 * uDec.w);
     float spec = pow(max(dot(reflect(-L, n), -rd), 0.0), 50.0) * 0.4 * gloss;
     vec3 inner = alb * (0.12 + 0.88 * lit) + sss + vec3(spec) + mix(uPal0, ash, uDec.w) * rim * 0.2;
-    // bacteria: fine specks in colonies — a coarse noise sets where a patch has
+    // bacteria: fine specks in colonies, a coarse noise sets where a patch has
     // taken hold, a fine one the individual cells inside it, thickest in the pits
     float colony = smoothstep(0.42, 0.72, noise3(p * 5.5 + 11.0));
     float sp = noise3(p * 120.0 + 7.0);
@@ -1649,7 +1649,7 @@ const MYC_VERT = /* glsl */ `
     float rad = max(radPx, 0.9) * pxH;
     vLenR = len / rad;
     // segments butt flat against each other (no additive doubling at the
-    // joints); only a hypha's last segment — its apex — gets a round cap
+    // joints); only a hypha's last segment (its apex) gets a round cap
     float cap = step(0.5, kind);
     vec2 pos = mix(s0, s1 + dir * rad * cap, aQuad.y) + nrm * aQuad.x * rad;
     vec2 ndc = pos / vec2(aspect, 1.0) * 2.0;
@@ -1704,7 +1704,7 @@ const MYC_FRAG = /* glsl */ `
 
 // ------------------------------------------------------------- the helix
 // The same screen-space capsule projection, plus the hand's azimuth about the
-// molecule's own axis — the ONLY thing that turns it, and never a clock.
+// molecule's own axis, the ONLY thing that turns it, and never a clock.
 // aInfo: x role (0 backbone, 1 base, 2 hydrogen bond, 3 histone core,
 // 4 polymerase, 5 daughter strand), y palette slot, z random, w strand.
 const HX_VERT = /* glsl */ `
@@ -1736,8 +1736,8 @@ const HX_VERT = /* glsl */ `
     vec2 nrm = vec2(-dir.y, dir.x);
     float depth = uDist - 0.5 * (a.z + b.z);
     float pxH = 1.0 / uRes.y;
-    // radii are world units here — a histone core is a real bead, not a
-    // fixed number of pixels — converted through the pinhole at this depth
+    // radii are world units here, a histone core is a real bead, not a
+    // fixed number of pixels, converted through the pinhole at this depth
     float role = aInfo.x;
     float radW = 0.030;
     if (role > 0.5 && role < 1.5) radW = 0.024;
@@ -1760,7 +1760,7 @@ const HX_VERT = /* glsl */ `
     vRnd = aInfo.z;
     vStrand = aInfo.w;
     vDepth = depth;
-    // depth cue: the near strand burns, the far one recedes — the only way an
+    // depth cue: the near strand burns, the far one recedes, the only way an
     // additive molecule reads as a solid
     vA = uWeight * vis * (0.30 + 0.70 * smoothstep(4.4, 2.5, depth));
   }
@@ -1799,7 +1799,7 @@ const HX_FRAG = /* glsl */ `
     if (vRole < 5.5) tint = mix(tint, uCold, sick * 0.85);
     vec3 col;
     if (vRole > 5.5 && vRole < 6.5) {
-      // an atom: a lit ball — the impostor's own normal under one light
+      // an atom: a lit ball, the impostor's own normal under one light
       vec3 nn = normalize(vec3(vQ.x, dx, sqrt(max(1.0 - d2, 0.0))));
       vec3 L = normalize(vec3(-0.45, 0.55, 0.7));
       float nl = max(dot(nn, L), 0.0);
@@ -1810,7 +1810,7 @@ const HX_FRAG = /* glsl */ `
       col = mix(uPalA[2], vec3(1.0), 0.7) * (0.35 * body + 0.5 * core);
     } else if (vRole < 0.5) {
       // The sugar-phosphate backbone, with a phosphate bead at each nucleotide.
-      // The bead sits OFF CENTRE, and to the other side on the other strand —
+      // The bead sits OFF CENTRE, and to the other side on the other strand,
       // the two strands are laid in opposite senses, so the beads march 5'->3'
       // one way down the molecule and 3'->5' the other. That offset is the only
       // thing on the backbone that reads as a direction, and it is what makes
@@ -2094,10 +2094,10 @@ export function createScene(ctx) {
   let cellBound = ZONA;
   let cellGrain = 0;
 
-  // THE PACKED CLEAVAGE SEATS. Volume is conserved — N blastomeres of radius
-  // R0·N^(-1/3) always fill the same space — so the embryo never grows and the
+  // THE PACKED CLEAVAGE SEATS. Volume is conserved, N blastomeres of radius
+  // R0·N^(-1/3) always fill the same space, so the embryo never grows and the
   // cells simply crowd. A binary LATTICE cannot express that: cycling the
-  // cleavage plane x, y, z, x… puts sixteen cells on a 4 × 2 × 2 block, which
+  // cleavage plane x, y, z, x... puts sixteen cells on a 4 × 2 × 2 block, which
   // welds them along the twice-divided axis and opens gaps across the other
   // two, so the sixteen-cell stage read as fewer cells than the eight. The
   // seats are therefore relaxed once, here: the two children are placed either
@@ -2195,7 +2195,7 @@ export function createScene(ctx) {
       z += JIT[i * 3 + 2] * jw;
       // hold the whole embryo at a fixed oblique angle, so the eye never
       // looks straight down a cleavage axis into a flat grid of cells
-      // (a constant, not a clock — nothing here turns)
+      // (a constant, not a clock, nothing here turns)
       const rx = x * 0.8139 + z * 0.5810;
       const rz0 = z * 0.8139 - x * 0.5810;
       out[i * 4] = rx;
@@ -2241,7 +2241,7 @@ export function createScene(ctx) {
   // ---- the protists as CELL CLOUDS -------------------------------------------
   // The brief asks the cells to MORPH into the organism, and a cross-dissolve
   // of two superimposed bodies is not a morph. A cell aggregate and an
-  // analytic solid cannot share one distance field — the aggregate is culled
+  // analytic solid cannot share one distance field, the aggregate is culled
   // per ray, so away from the cells it is a bound and not a distance, and
   // mixing that bound into a solid's field erodes the solid wherever the cull
   // comes back empty. So the morph is done on the CELL side: every protist and
@@ -2281,7 +2281,7 @@ export function createScene(ctx) {
       const dx = FIBD[i * 3], dy = FIBD[i * 3 + 1], dz = FIBD[i * 3 + 2];
       let x = 0, y = 0, z = 0;
       if (f === 0) {
-        // AMOEBA — seventy-two seats over the endoplasm's envelope, the rest
+        // AMOEBA, seventy-two seats over the endoplasm's envelope, the rest
         // four-deep out along each of the six pseudopods, so the cells stream
         // into the lobes as the lobes stream
         if (i < 72) { x = dx * 0.60; y = dy * 0.50; z = dz * 0.52; }
@@ -2291,19 +2291,19 @@ export function createScene(ctx) {
           x = pseudo[k * 4] * v; y = pseudo[k * 4 + 1] * v; z = pseudo[k * 4 + 2] * v;
         }
       } else if (f === 1) {
-        // PARAMECIUM — a slipper: an ellipsoid tapered toward the anterior and
+        // PARAMECIUM, a slipper: an ellipsoid tapered toward the anterior and
         // then bent along its length, the same bend the field applies
         const tp = 1 - 0.30 * smooth01((dx + 0.2) / 1.1);
         const qx = dx * 0.92 - 0.03;
         x = qx; y = dy * 0.355 * tp - 0.15 * qx * qx + 0.05; z = dz * 0.33 * tp;
       } else if (f === 2) {
-        // EUGLENA — a spindle drawn to a posterior point
+        // EUGLENA, a spindle drawn to a posterior point
         const nd = dy < 0 ? -dy : 0;
         const c3 = nd * nd * nd;
         const tp = 1 - 0.70 * c3;
         x = dx * 0.30 * tp; y = dy * 0.70 - 0.30 * c3 * nd; z = dz * 0.28 * tp;
       } else if (f === 3) {
-        // DIATOM — the two valve faces and the girdle band between them
+        // DIATOM, the two valve faces and the girdle band between them
         let qx, qy, qz;
         if (i < 66) {
           const j = i % 33;
@@ -2318,10 +2318,10 @@ export function createScene(ctx) {
         unDia(qx, qy, qz);
         x = cq[0]; y = cq[1]; z = cq[2];
       } else if (f === 4) {
-        // RADIOLARIAN — the mineral shell itself
+        // RADIOLARIAN, the mineral shell itself
         x = dx * 0.70; y = dy * 0.70; z = dz * 0.70;
       } else {
-        // SPONGE — the seats climb the vase's wall in a phyllotactic spiral,
+        // SPONGE, the seats climb the vase's wall in a phyllotactic spiral,
         // on the same radius profile the field uses
         const qy = -0.92 + 1.74 * ((i + 0.5) / N);
         const rad = 0.34 + 0.30 * smooth01((qy + 0.95) / 1.8) + 0.05 * Math.sin(qy * 5);
@@ -2333,8 +2333,8 @@ export function createScene(ctx) {
       out[i * 4 + 1] = y * FORM_SCALE;
       out[i * 4 + 2] = z * FORM_SCALE;
     }
-    // size the seats to the cloud's OWN spacing — half the mean nearest
-    // neighbour with a little overlap — so the skin closes over whatever shape
+    // size the seats to the cloud's OWN spacing, half the mean nearest
+    // neighbour with a little overlap, so the skin closes over whatever shape
     // it was laid on, the same rule the blastula's wall follows. Ninety-six
     // squared distance tests, and only while a crossing is running.
     let sum = 0;
@@ -2473,10 +2473,10 @@ export function createScene(ctx) {
       count = cleavageLayout(clamp(L, 0, 6), raw);
       cellCap = ZONA * 0.955;
     } else {
-      // EVERY other crossing is the same seat-by-seat travel — the morula onto
+      // EVERY other crossing is the same seat-by-seat travel, the morula onto
       // the blastula's wall, the blastula onto the amoeba's surface, the
       // radiolarian's surface onto the Volvox shell, the filament onto the
-      // sponge — so the cells THEMSELVES carry the shape change
+      // sponge, so the cells THEMSELVES carry the shape change
       const nA = layoutFor(s0, layA);
       const nB = layoutFor(s1, layB);
       count = Math.max(nA, nB);
@@ -2499,15 +2499,15 @@ export function createScene(ctx) {
   // --- the slime mold: Physarum agents on a trail map ------------------------------
   // Jones's model: each agent senses the trail at three sensors ahead, turns
   // toward the strongest, steps, deposits; the map is box-blurred and decays.
-  // Everything that shapes the network — sensing geometry, turn rate, deposit,
+  // Everything that shapes the network, sensing geometry, turn rate, deposit,
   // decay, density, the random-turn rate that opens a fan front, how many
-  // inoculation points there are and where, the food layout and its pull — is
+  // inoculation points there are and where, the food layout and its pull, is
   // drawn from the species table, so one strain builds a fine reticulum and
   // the next a sparse mesh of trunk veins between fused colonies.
   const SAGENTS = Math.floor(SCELLS * 0.17); // capacity; the species sets the live count
   const trail = new Float32Array(SCELLS);
   const trail2 = new Float32Array(SCELLS);
-  const occ = new Uint8Array(SCELLS); // one agent per cell — the exclusion that keeps veins thin
+  const occ = new Uint8Array(SCELLS); // one agent per cell, the exclusion that keeps veins thin
   const agX = new Float32Array(SAGENTS);
   const agY = new Float32Array(SAGENTS);
   const agH = new Float32Array(SAGENTS);
@@ -2520,7 +2520,7 @@ export function createScene(ctx) {
   const foodX = new Float32Array(FOOD_N);
   const foodY = new Float32Array(FOOD_N);
   const foodOn = new Uint8Array(FOOD_N);
-  // which flake, if any, a trail cell belongs to — the colony lights a flake by
+  // which flake, if any, a trail cell belongs to, the colony lights a flake by
   // ARRIVING on it, not by being within some radius of a spore
   const foodMap = new Int16Array(SCELLS);
   let agSpawned = 0; // agents that have ever been placed
@@ -2546,7 +2546,7 @@ export function createScene(ctx) {
     [0.60, 11.0, 0.55, 1.0, 5.0, 0.932, 0.088, 0.05, 3, 2, 3.6],
   ];
   // the strain's own draws, hoisted with their seed so picking a species
-  // builds no closure — nothing in the per-frame path allocates
+  // builds no closure, nothing in the per-frame path allocates
   let spSeed = 1;
   const h = (k) => hash1(spSeed * 7.13 + k * 19.77 + 0.11);
   const spj = (k) => 0.8 + 0.4 * h(k);   // the +/-20% jitter on an archetype
@@ -2647,7 +2647,7 @@ export function createScene(ctx) {
     // THE LEVEL IS THE COLONY'S REACH, and at full development the reach is the
     // whole dish. Each inoculum therefore carries its own radius, grown to
     // Rmax + its own offset from the centre, so the discs UNION to the plate
-    // however far off-centre the spores were dropped — a single shared radius
+    // however far off-centre the spores were dropped, a single shared radius
     // measured from each spore left the far side of a two-spore plate
     // unreachable at any development level, and its flakes could never light.
     const growth = clamp((0.14 + 0.86 * devel) * (1 - 0.42 * pressV), 0, 1);
@@ -2659,7 +2659,7 @@ export function createScene(ctx) {
     // stepped has to give its cell back: the exclusion bit is cleared only by
     // that agent's own next move, so a colony driven down used to leave every
     // retired agent's bit set and then grow back into a dish of invisible
-    // obstacles — noticeably noisier and more broken on the way down than up.
+    // obstacles, noticeably noisier and more broken on the way down than up.
     if (nAct < agActive) {
       for (let i = nAct; i < agActive; i++) occ[(agY[i] | 0) * W + (agX[i] | 0)] = 0;
     } else if (nAct > agActive) {
@@ -2739,7 +2739,7 @@ export function createScene(ctx) {
       agX[i] = nx; agY[i] = ny; agH[i] = h;
       trail[to] += DEP;
     }
-    // A flake diffuses attractant whether or not the plasmodium has found it —
+    // A flake diffuses attractant whether or not the plasmodium has found it,
     // faintly while it is only a scent on the plate, at full strength once the
     // veins are on it. It LIGHTS the moment an agent walks onto it (foodMap
     // above) and stays lit: a distance from a spore is not arrival, and with
@@ -2787,7 +2787,7 @@ export function createScene(ctx) {
   // --- the mycelium: hyphal growth in time order ----------------------------------
   // Germ tubes leave the spore; every step each live tip extends by the
   // species' internode with heading persistence, tortuosity, a radial tropism,
-  // gravitropism into the slab and NEGATIVE AUTOTROPISM — it reads the
+  // gravitropism into the slab and NEGATIVE AUTOTROPISM, it reads the
   // gradient of a density grid its own colony has written and steers down it,
   // away from itself. A tip that runs into an older hypha ANASTOMOSES: it lays
   // one last connecting segment, fuses and stops, which is what closes loops in
@@ -2854,7 +2854,7 @@ export function createScene(ctx) {
     myc.info[o4 + 3] = st;
     mSeg++;
   }
-  // the mould on the dead mass: a fixed strain — thin, dense, quick to branch,
+  // the mould on the dead mass: a fixed strain, thin, dense, quick to branch,
   // germinating at several points on the body rather than from one spore
   const MYD = {
     germ: 10, angle: 0.72, prob: 0.22, gap: 2, step: 0.022, tort: 0.55,
@@ -2986,7 +2986,7 @@ export function createScene(ctx) {
   // unequal, antiparallel (the strands are laid in opposite senses), base pairs
   // as rungs with two hydrogen bonds for A-T and three for G-C. The level runs
   // it from a plain duplex through a replication fork to a chromatin fibre;
-  // sway is the torsion. Everything here is static geometry — the hand's
+  // sway is the torsion. Everything here is static geometry, the hand's
   // azimuth in the vertex shader is the only thing that turns it.
   const axP = new Float32Array(BP * 3);
   const frN = new Float32Array(BP * 3);
@@ -3035,7 +3035,7 @@ export function createScene(ctx) {
   let hBrkN = 0;
   // per break: the pivot (the axis at the break), the offset carried across
   // it, and the rotation (Rodrigues, about a fixed per-break axis, by an angle
-  // the development sets — the performer's, not a clock's)
+  // the development sets, the performer's, not a clock's)
   const hBrkPiv = new Float32Array(NBREAK * 3), hBrkOff = new Float32Array(NBREAK * 3), hBrkRot = new Float32Array(NBREAK * 9);
   const hSickK = new Float32Array(NMOL), hSickA = new Float32Array(NMOL);
   let hSickN = 0;
@@ -3187,7 +3187,7 @@ export function createScene(ctx) {
     // the two sugar-phosphate backbones, sub-sampled so the strands read as
     // curves rather than a ten-sided polygon a turn, and laid in opposite
     // senses (5'->3' one way, 3'->5' the other): antiparallel by construction,
-    // and visibly so — the fragment shader keys each segment's phosphate bead
+    // and visibly so, the fragment shader keys each segment's phosphate bead
     // off aInfo.w, the strand, so the beads sit off centre in opposite
     // directions and the two backbones read as running against each other
     const steps = (BP - 1) * SUB;
@@ -3196,7 +3196,7 @@ export function createScene(ctx) {
       const ka = s / SUB, kb = (s + 1) / SUB;
       const sk = damaged ? sickAt(ka) : 0;
       for (let w = 0; w < 2; w++) {
-        // a cut segment's ends retreat to its middle and it is gone — the
+        // a cut segment's ends retreat to its middle and it is gone, the
         // backbone frays into beads and parts, it never vanishes in a frame
         const cut = damaged ? cutAt((ka + kb) * 0.5, w) : 0;
         if (cut > 0.98) continue;
@@ -3284,14 +3284,14 @@ export function createScene(ctx) {
   }
 
   // --- the toxin ---------------------------------------------------------------------
-  // 2,3,7,8-TCDD is dibenzo-p-dioxin — anthracene's three fused rings with the
-  // middle ring's 9 and 10 carbons replaced by oxygen — planar, chlorinated at
+  // 2,3,7,8-TCDD is dibenzo-p-dioxin, anthracene's three fused rings with the
+  // middle ring's 9 and 10 carbons replaced by oxygen, planar, chlorinated at
   // 2,3,7,8, the four outermost positions. DDT is a CH carbon carrying a
   // trichloromethyl group, a hydrogen and two para-chlorophenyl rings,
   // tetrahedral at the centre, the rings twisted against each other.
-  // Coordinates in ångströms from standard bond lengths (aromatic C–C 1.40,
-  // C–O 1.38, C–Cl 1.74, C–H 1.08, single C–C 1.54, C–Cl on sp3 carbon 1.77),
-  // drawn at the helix's own scale, ANG world units per ångström — so a dioxin
+  // Coordinates in ångströms from standard bond lengths (aromatic C-C 1.40,
+  // C-O 1.38, C-Cl 1.74, C-H 1.08, single C-C 1.54, C-Cl on sp3 carbon 1.77),
+  // drawn at the helix's own scale, ANG world units per ångström, so a dioxin
   // is the width of a base pair, as it is. Atoms: x, y, z, element (0 C, 1 O,
   // 2 Cl, 3 H); bonds: pairs of atom indices.
   function molTCDD() {
@@ -3367,8 +3367,8 @@ export function createScene(ctx) {
   // The seven molecules on the plate: kind (0 TCDD, 1 DDT), how it strikes
   // (0 an adduct on a base, 1 intercalation between two), the base index, the
   // strand, where it waits in the dark, and when in the development it sets
-  // off. The two intercalators are the dioxins — it is the planar molecule
-  // that slips between base pairs — and their sites are where the stack
+  // off. The two intercalators are the dioxins, it is the planar molecule
+  // that slips between base pairs, and their sites are where the stack
   // breaks later.
   const MOLDEF = [
     [0, 1, 13, 0, -1.9, 0.9, 0.6, 0.10],
@@ -3644,8 +3644,8 @@ export function createScene(ctx) {
       }
       podB[i * 4] = cx; podB[i * 4 + 1] = cy; podB[i * 4 + 2] = cz; podB[i * 4 + 3] = br;
     }
-    // one bounding sphere over the whole cell — the body, every live
-    // pseudopod, the prey — centred between the macrophage and the prey, so
+    // one bounding sphere over the whole cell, the body, every live
+    // pseudopod, the prey, centred between the macrophage and the prey, so
     // the march's entry is as tight as the scene allows and every ray that
     // misses it costs one sphere test
     const bx = (PH_M[0] + px) * 0.5, by = (PH_M[1] + py) * 0.5, bz = (PH_M[2] + pz) * 0.5;
@@ -3660,7 +3660,7 @@ export function createScene(ctx) {
   }
 
   // --- decomposition ------------------------------------------------------------------------
-  // The dead mass: a mound of tissue on the plate — a lower layer of cells on
+  // The dead mass: a mound of tissue on the plate, a lower layer of cells on
   // a disc and an upper layer riding on it, drawn by the same culled cell
   // march as the embryo. The development runs it down: the turgor goes and it
   // slumps (the cells sink and spread, their junctions blur into one mass),
@@ -3749,8 +3749,8 @@ export function createScene(ctx) {
   let level = 0, target = 0, dir = 1;
   let knobLvlPrev = null, knobOrgPrev = null, knobSpcPrev = null, strikePrev = 0;
   let orgTarget = ORG_HELIX, orgPos = ORG_HELIX;
-  // The cold open: the plate is dark until the show starts — the first beat,
-  // the transport playing, or any pad — and then the molecule comes up and
+  // The cold open: the plate is dark until the show starts, the first beat,
+  // the transport playing, or any pad, and then the molecule comes up and
   // begins to replicate; everything else is the performer's.
   let opened = false, openS = 0, tpPrev = false, openAge = 0;
   // the strain the scene comes up on is the one the params declare, so a
@@ -3787,7 +3787,7 @@ export function createScene(ctx) {
     const q = Math.round(target * n) + s;
     target = clamp(q, 0, n) / n;
   }
-  // the daughter colonies a Volvox sphere carries — fixed positions inside the
+  // the daughter colonies a Volvox sphere carries, fixed positions inside the
   // parent, seen through its glassy wall (they sit still; nothing here turns)
   const DAUGH = [0.40, 0.30, 0.12, 0.26, -0.38, -0.22, 0.24, 0.22, 0.10, -0.46, -0.28, 0.19, -0.20, 0.44, -0.30, 0.16];
   for (let i = 0; i < 16; i++) daugh[i] = DAUGH[i];
@@ -3813,7 +3813,7 @@ export function createScene(ctx) {
           opened = true;
           openNow = true;
           openAge = 0;
-          // the opening element: the molecule replicating — the fork is stage 1 of the helix
+          // the opening element: the molecule replicating, the fork is stage 1 of the helix
           if (orgTarget === ORG_HELIX && target < 0.25) { dir = 1; target = 1 / (ORG_STAGES[ORG_HELIX] - 1); }
         }
         tpPrev = tpNow;
@@ -3924,19 +3924,19 @@ export function createScene(ctx) {
           // cells travelling onto the organism's own surface, so the analytic
           // body only comes up over the back half of the crossing. By then the
           // two surfaces coincide and the handover reads as the cells fusing
-          // into one body — not as two lit specimens double-exposed.
+          // into one body, not as two lit specimens double-exposed.
           fA = fB = FORM[k0 === 0 ? s1 : s0];
           cellW = 1 - smooth01((k0 === 0 ? f - 0.5 : 0.5 - f) * 2);
           protW = 1;
         }
         // the amoeba's pseudopods stream out and draw back on a slow noise.
         // They are set BEFORE the cells are laid out, because the amoeba's cell
-        // cloud runs seats out along them — the lobes and the cells that pour
+        // cloud runs seats out along them, the lobes and the cells that pour
         // into them have to agree within the frame.
         if (protW > 0.002 && (fA === 0 || fB === 0)) {
           for (let i = 0; i < 6; i++) {
             // evenly spread directions, each lobe streaming out and drawing
-            // back on its own slow phase — cytoplasmic streaming, not rotation
+            // back on its own slow phase, cytoplasmic streaming, not rotation
             const yv = 1 - 2 * (i + 0.5) / 6;
             const rr = Math.sqrt(Math.max(0, 1 - yv * yv));
             const th = i * 2.39996 + 0.7;
@@ -3997,8 +3997,8 @@ export function createScene(ctx) {
         U.uTintB.value = SP.tintB;
         U.uFoodN.value = SP.foodN;
       }
-      // The hyphae buffer holds ONE network — the fungus, or the mould on the
-      // corpse — so the heavier weight owns it. The two organisms are four
+      // The hyphae buffer holds ONE network, the fungus, or the mould on the
+      // corpse, so the heavier weight owns it. The two organisms are four
       // bands apart and their weights cannot overlap, but the buffer is shared
       // state and a claim on it belongs to one of them explicitly: two claims
       // in a frame would re-grow the colony twice and flicker between networks.
@@ -4070,7 +4070,7 @@ export function createScene(ctx) {
         const cold = c.b - c.r;
         if (cold > cs) { cs = cold; ci = i; }
         // ash is the LEAST SATURATED stop, measured relative to its own
-        // brightness — an absolute chroma test picks whichever stop is merely
+        // brightness, an absolute chroma test picks whichever stop is merely
         // darkest, and a dark violet is not ash
         const ash = -(mx - mn) / Math.max(mx, 1e-3);
         if (ash > as) { as = ash; ai = i; }
@@ -4134,7 +4134,7 @@ export function createScene(ctx) {
       const warm = warmFrames > 0;
       if (warm) warmFrames--;
       quad.visible = wLife > 0.002 || warm;
-      // the palette sorted cool → warm by (r − b), in place, for the world
+      // the palette sorted cool -> warm by (r − b), in place, for the world
       // plates' tinting (the day's stop tables, the currents' ramp, the
       // microscope's two colours)
       const ord = PS.order;
@@ -4149,7 +4149,7 @@ export function createScene(ctx) {
       PS.level = level; PS.intensity = level;
       PS.sway = jig; PS.press = press; PS.hx = hxS; PS.hy = hyS;
       // the world plates' dark floor sits a little higher than the organisms'
-      // (a calm sky is faint, not black — the same floor Weather Systems had)
+      // (a calm sky is faint, not black, the same floor Weather Systems had)
       PS.opened = opened; PS.openNow = openNow; PS.openS = openS; PS.openDim = Math.max(openS, 0.07 + 0.05 * io.level);
       PS.bass = bass; PS.mid = mid; PS.high = high; PS.pulse = pulse;
       PS.speciesHash = hash1(speciesIdx * 13.37 + reseedN * 3.77 + 2.0);
