@@ -63,39 +63,47 @@ The signing hooks of electron-builder are the place to configure a certificate: 
 
 ## From-source installation
 
-Installation from source requires Node.js 18 or later on `PATH`; npm ships with Node.js. The repository includes three bootstrap scripts that verify this requirement, install npm dependencies when needed, and launch the application:
-
-| Platform | Entry point | Implementation |
-|---|---|---|
-| Windows | `Install & Launch SwayCommand.bat` (double-click) | [`scripts/install-launch.ps1`](../scripts/install-launch.ps1) |
-| macOS | `Install & Launch SwayCommand.command` (double-click) | [`install-launch.sh`](../install-launch.sh) |
-| Linux | `./install-launch.sh` from a terminal | same file |
-
-All three follow the same three steps: (a) verify Node.js ≥ 18, (b) install dependencies when missing or stale, (c) launch with `npm run start`.
-
-The staleness check in step (b) is identical on every platform: `npm install --no-audit --no-fund` runs when `node_modules` is absent, or when `package.json` carries a newer modification time than `node_modules`; otherwise the installed dependencies are reused.
+| Platform | Entry point | Implementation | Needs Node.js first? |
+|---|---|---|---|
+| Windows | `SwayCommand.bat` (double-click) | [`scripts/bootstrap/`](../scripts/bootstrap/) | No |
+| macOS | `SwayCommand.command` (double-click) | [`SwayCommand.sh`](../SwayCommand.sh) | Yes, 18 or later |
+| Linux | `./SwayCommand.sh` from a terminal | same file | Yes, 18 or later |
 
 ### Windows bootstrap
 
-`Install & Launch SwayCommand.bat` switches the console to UTF-8 (code page 65001), changes to the repository root, and runs `scripts/install-launch.ps1` under Windows PowerShell with `-NoProfile -ExecutionPolicy Bypass`. On a non-zero exit code the window pauses so the messages remain readable.
+`SwayCommand.bat` clears the inherited Electron environment variables (see below), then starts [`scripts/bootstrap/Install-SwayCommand.ps1`](../scripts/bootstrap/Install-SwayCommand.ps1) hidden under Windows PowerShell with `-NoProfile -ExecutionPolicy Bypass -STA`. All progress and error reporting happens in the setup window, so the console closes immediately. Setting `SWAYCOMMAND_SETUP_CONSOLE=1` runs it visibly in the console instead.
 
-The PowerShell script itself requires no administrator rights. When Node.js is absent from `PATH` or older than major version 18:
+Setup is a dependency graph rather than a fixed sequence. Each node owns one prerequisite, tests for the artifact it is responsible for, and declares what it requires; the resolver sorts them, the detection pass prunes whatever is already satisfied, and only the remainder is installed:
 
-- With winget available, the script runs `winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements`; the Node.js installer may raise a User Account Control prompt of its own. After installation the script rebuilds the session `PATH` from the Machine and User registry values, so the new `node.exe` is detected without opening a new terminal.
-- When the winget installation succeeded but Node.js is still undetected in the current window, the script prints an instruction to close the window and run the launcher again, then exits with code 1.
-- Without winget, or when the winget installation fails, the script opens `https://nodejs.org/en/download` in the default browser, prints manual instructions, and exits with code 1.
+| Node | Satisfied when | Installed by |
+|---|---|---|
+| `system` | Windows build, architecture and ≥ 2 GB free on the install volume | — (a gate) |
+| `repo` | `package.json`, `src/main/main.js` and `scripts/build-renderer.js` all present | — (a gate) |
+| `node` | A Node.js ≥ 18 at a known absolute path | Portable `node-v*-win-*.zip` from nodejs.org unpacked into the private toolchain folder |
+| `npm-deps` | `node_modules/.package-lock.json` exists and the recorded SHA-256 of `package-lock.json` matches | `npm install --no-audit --no-fund` |
+| `electron-runtime` | `node_modules/electron/dist/electron.exe` exists | Release zip verified against the SHA-256 in the electron package's own `checksums.json`, falling back to `node install.js` |
+| `renderer` | `dist/renderer.bundle.js` is newer than every renderer and shared source | `node scripts/build-renderer.js` |
+| `dfu-driver` | `pnputil /enum-drivers` lists `stm32bootloader.inf` | Audima's official package staged with `pnputil`, under an elevation prompt. Optional, off by default |
 
-The script also verifies that `npm` reached `PATH` and that `package.json` exists in the repository root before installing dependencies.
+No node requires administrator rights except `dfu-driver`, which is opt-in. Node.js is installed as a private copy under `%LOCALAPPDATA%\SwayCommand\toolchain` and is resolved by absolute path for the rest of the run, so nothing depends on `PATH` refreshing and one double-click is always enough. The install location is shown on the plan screen and can be changed there.
+
+State lives in `%LOCALAPPDATA%\SwayCommand`: `cache/` for verified downloads, `toolchain/` for the private Node.js, `logs/` for a per-run transcript, and `bootstrap-state.json` for the lockfile hash, package count and measured per-step durations. Because every test is content-addressed rather than timestamp-based, a fresh `git clone` is judged on its contents; because downloads are cached and checksummed, wiping `node_modules` costs an unpack rather than a download.
+
+Time remaining is computed from measured per-step durations recorded on that machine, scaled live by how far the run has drifted from its own estimate, with downloads reporting true bytes and rate. Durations are recorded per variant — restoring Electron from cache and downloading it are timed separately — so a warm run never distorts the estimate for a cold one.
+
+#### Inherited Electron environment variables
+
+Every Electron-hosted terminal, VS Code's integrated terminal included, exports `ELECTRON_RUN_AS_NODE=1`. Inherited by a child Electron process it makes `require('electron')` return a path string instead of the API object, and `src/main/main.js` fails immediately on `app.commandLine`. The `.bat`, the bootstrapper and `SwayCommand.sh` all clear `ELECTRON_RUN_AS_NODE`, `ELECTRON_NO_ATTACH_CONSOLE`, `ELECTRON_OVERRIDE_DIST_PATH`, `ELECTRON_NO_ASAR` and `NODE_OPTIONS` before spawning anything. Background in [INSTALLER-DIAGNOSIS.md](INSTALLER-DIAGNOSIS.md).
 
 ### macOS and Linux bootstrap
 
-`Install & Launch SwayCommand.command` changes to its own directory and executes `install-launch.sh`. When macOS refuses to run the file — for example after the repository arrives as a zip download — executable permission is restored from Terminal:
+`SwayCommand.command` changes to its own directory and executes `SwayCommand.sh`. When macOS refuses to run the file — for example after the repository arrives as a zip download — executable permission is restored from Terminal:
 
 ```sh
-chmod +x "Install & Launch SwayCommand.command" install-launch.sh
+chmod +x SwayCommand.command SwayCommand.sh
 ```
 
-`install-launch.sh` does not install Node.js itself. When Node.js is absent or older than 18, it prints installation hints matched to the detected system, opens the download page (`open` on macOS, `xdg-open` on Linux), and exits with code 1:
+`SwayCommand.sh` does not install Node.js itself. When Node.js is absent or older than 18, it prints installation hints matched to the detected system, opens the download page (`open` on macOS, `xdg-open` on Linux), and exits with code 1:
 
 | Detected system | Hint printed |
 |---|---|
@@ -103,6 +111,8 @@ chmod +x "Install & Launch SwayCommand.command" install-launch.sh
 | `/etc/os-release` `ID`/`ID_LIKE` matches `debian`/`ubuntu` | `sudo apt-get update && sudo apt-get install -y nodejs npm`; NodeSource for the current LTS |
 | `/etc/os-release` `ID`/`ID_LIKE` matches `fedora`/`rhel`/`centos` | `sudo dnf install -y nodejs npm` |
 | other | both hints above in abbreviated form (the `apt-get` line without the preceding `apt-get update`), plus the download page |
+
+With Node.js present it installs dependencies when `node_modules/.package-lock.json` is missing or older than `package-lock.json`, then checks for the Electron runtime named by `node_modules/electron/path.txt` and runs `node node_modules/electron/install.js` if it is absent — electron ≥ 43 publishes no postinstall hook, so `npm install` exits 0 without ever downloading it. `ELECTRON_CACHE` defaults to `~/.cache/electron` so the download survives a `node_modules` wipe. Finally it launches with `npm run start`.
 
 ### Manual installation
 

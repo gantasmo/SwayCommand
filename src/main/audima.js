@@ -13,6 +13,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { app, shell } = require('electron');
 const { AUDIMA } = require('../shared/constants');
+const blake2b = require('./blake2b');
 
 const ALLOWED_HOSTS = new Set(['cdn.audima.com.au', 'audima.com.au', 'www.audima.com.au']);
 
@@ -99,9 +100,12 @@ function minisignVerify(filePath, signatureB64OrText, pubkeyB64) {
   const parsed = parseSignature(sigText);
   if (!parsed.keyId.equals(pub.keyId)) throw new Error('Signature key id does not match Audima’s public key');
 
-  const fileBytes = fs.readFileSync(filePath);
-  const message =
-    parsed.alg === 'ED' ? crypto.createHash('blake2b512').update(fileBytes).digest() : fileBytes;
+  // 'ED' signs BLAKE2b-512(file), 'Ed' signs the file itself. The prehash comes
+  // from our own BLAKE2b: Electron links BoringSSL, which implements no BLAKE2,
+  // so crypto.createHash('blake2b512') throws "Digest method not supported" here
+  // and every signature check died before it could look at the signature.
+  // It also streams, so a large installer never has to be resident.
+  const message = parsed.alg === 'ED' ? blake2b.blake2b512File(filePath) : fs.readFileSync(filePath);
   const ok = crypto.verify(null, message, ed25519KeyObject(pub.key), parsed.sig);
   if (!ok) throw new Error('minisign signature verification FAILED');
   return true;

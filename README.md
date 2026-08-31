@@ -234,11 +234,20 @@ from the project's pool, with the palette carried across the fade.
 A WebGL2 GPU is required. Packaged builds install per user and need no
 elevation; the Windows installer is one click and launches on completion.
 
-Installing from source needs Node.js 18 or later. The repository carries
-double-click bootstrap scripts that install dependencies and start the
-application: `Install & Launch SwayCommand.bat` on Windows,
-`Install & Launch SwayCommand.command` on macOS, `install-launch.sh` on Linux.
-Silent installation and uninstallation are covered in
+Running from source needs no preparation on Windows: double-click
+`SwayCommand.bat`. It opens a setup window that works out what
+is already on the machine, installs only what is missing — including Node.js, as
+a private copy that needs no administrator and touches no system PATH — and then
+starts the app, with a progress bar and a time estimate measured from the work
+actually in front of it. Everything it downloads is cached and checksummed, so a
+second run installs nothing and launches straight away. The optional Sway
+firmware-update driver can be staged from the same window. `-Console` runs it
+without the window; `docs/INSTALLER-DIAGNOSIS.md` explains what it is working
+around.
+
+macOS and Linux use `SwayCommand.command` and
+`SwayCommand.sh`, which need Node.js 18 or later already installed. Silent
+installation and uninstallation are covered in
 [INSTALLATION.md](docs/INSTALLATION.md).
 
 At first launch the Doctor checks the system: the Sway over USB (including
