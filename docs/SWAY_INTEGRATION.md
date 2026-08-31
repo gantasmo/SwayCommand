@@ -27,6 +27,50 @@ The device runs a dual-core STM32H7 with separate CM7 and CM4 firmware images; f
 
 SwayCommand matches by substring — `name.includes('Audima Labs The Sway')` — which covers the exact name on Windows and macOS and the suffixed name on ALSA in a single test. The string is defined as `SWAY.MIDI_PORT_NAME` in `src/shared/constants.js` and `SWAY_PORT_NAME` in `src/renderer/midi/swaymap.js`. Runtime binding policy: [MIDI.md](MIDI.md#device-detection-and-binding-policy).
 
+## Hardware reference
+
+Recorded from section 08 of Audima's user manual (pages 29 to 32 of the
+[published PDF](https://cdn.audima.com.au/docs/Audima%20Labs%20The%20Sway%20User%20Manual.pdf)).
+The manual is Audima's copyrighted document and is not reproduced here; what
+follows is the subset this project depends on.
+
+The unit is mirror-symmetric about a centre panel. A 16-LED reactive beam and a
+16-sensor array run along the top edge. Each side carries four click knobs above
+a four-by-two pad block, with a two-by-two group of mappable buttons inboard of
+the pads. The centre holds six preset buttons, the display and the scroll-click
+wheel.
+
+| Component | Behaviour |
+|---|---|
+| Reactive LED beam | 16 RGB LEDs following hand movement, customisable per region |
+| Motion-tracking sensors | 16 sensors reading hand position and movement above the playable area |
+| Preset buttons, 1 to 6 | Press loads a preset; holding enters bank selection |
+| Click knobs, 8 | A CC on rotation, and a button when pressed |
+| Drum pads, 16 | A note on activation. Not velocity sensitive by default |
+| Mappable buttons | Send CC values, configurable per preset |
+| Display | Current preset parameters: mode, note, scale, octave, CC values |
+| Scroll-click wheel | Navigates and adjusts on-device parameters; also the power button, held two seconds |
+
+Two of those settle rows the factory map had left open. A knob press sends a
+second, independent CC rather than a note, and the mappable buttons send CC
+rather than notes. Neither number is published, so both still need one hardware
+MIDI-monitor session to pin down.
+
+Pad and knob assignments are edited in the companion application, under Encoder
+and Pad Mapping.
+
+### I/O
+
+| Port | Position | Purpose |
+|---|---|---|
+| MIDI output, TRS-A | Left | Hardware synthesisers or external MIDI interfaces, through a TRS-A to 5-pin DIN adapter, which is not supplied |
+| USB-C power in | Centre | Power only, for a wall adapter rated under 35 W when the host cannot supply enough |
+| USB-C host, data and power | Right | The primary connection: MIDI and power over one cable |
+
+Only the right-hand USB-C port carries data, so a Sway that enumerates no MIDI
+port is often plugged into the centre one. The box ships the controller, two
+USB-C cables, a quick-start card and warranty information.
+
 ## Factory MIDI map (Base Project V2)
 
 The map was recovered from Audima's own artifacts — the Base Project V2 `.swayproj`, the decompiled Ableton remote script, and the inflated Cubase script — and is not officially published. Every binding is overridable at runtime via MIDI-learn ([MIDI.md](MIDI.md#midi-learn)).
@@ -42,10 +86,11 @@ Everything transmits on MIDI channel 1 (0-indexed `0` in code) except where the 
 | Gesture isolation: Sway (lateral sway amount) | CC | 37 | Confirmed |
 | X-trigger / Y-modulation paired regions | CC | 73 (X) / 74 (Y) | Confirmed |
 | Knobs 1–8, rotation | CC | 20–27 | Confirmed |
-| Knobs 1–8, press | CC | Numbers not established; resolvable with one hardware MIDI-monitor session | (unconfirmed) |
-| 8 mappable buttons, defaults | CC or notes | The CC-versus-note default is not established | (unconfirmed) |
+| Knobs 1–8, press | CC | A second, independent CC per the manual, so a press is never a note. Numbers not established; resolvable with one hardware MIDI-monitor session | Mechanism confirmed, numbers (unconfirmed) |
+| 8 mappable buttons, defaults | CC | The manual states CC, configurable per preset, which settles the earlier CC-versus-note question. Numbers not established | Kind confirmed, numbers (unconfirmed) |
 | 16 drum pads, factory layout | Note On/Off | B natural minor Theory Engine grid: `47 49 50 52 54 55 57 59 61 62 64 66 67 69 71 73` (low to high) | Confirmed |
 | 16 drum pads, Audima Ableton demo packs and SwayCommand's internal normalization | Note On/Off | Chromatic 24–39 → pad index 0–15 | Confirmed |
+| 16 drum pads, on-device default | Note On/Off | The manual's Figure 15 shows one eight-pad block as E0 F0 F#0 G0 over C1 C#1 D1 D#1, which is neither the Theory Engine grid nor the chromatic run. Treat it as a third layout the device can ship in, not a correction to either row above | (unconfirmed) |
 | Pad transmit channel | — | 1 per the `.swayproj`, 16 per the official Ableton script; SwayCommand accepts both (`channels: [0, 15]`) | (unconfirmed) |
 | Sleep / wake | Program Change (bank 0) | PC 37 = sleep, PC 38 = wake | Confirmed |
 | MPE | Per-region flag in projects | Zone and channel details unpublished | (unconfirmed) |
@@ -116,8 +161,32 @@ SwayCommand never writes to the Sway's CDC serial interface. This is a hard poli
 
 The supported alternative: any SwayCommand-tuned preset is authored as a `.swayproj` in Audima's own Sway Software, shipped as a file, and pushed to the device with Audima's application — no reverse engineering, no brick risk. The Base Project V2 factory map (<https://cdn.audima.com.au/software/Audima%20Labs%20The%20Sway%20V2.swayproj>) plus runtime MIDI-learn covers every remaining case. Direct device configuration would be revisited only under an Audima partnership (contactus@audima.com.au, <https://discord.com/invite/CYUrJXjjN4>).
 
+## Official resources
+
+Everything Audima publishes about the device, for anyone who needs the primary
+source rather than this project's reading of it.
+
+| Resource | Link |
+|---|---|
+| Product site | <https://audima.com.au/> |
+| Downloads: companion application, drivers, DAW scripts | <https://audima.com.au/downloads/> |
+| User manual, PDF | <https://cdn.audima.com.au/docs/Audima%20Labs%20The%20Sway%20User%20Manual.pdf> |
+| Firmware update guide, PDF | <https://cdn.audima.com.au/docs/Audima%20Labs%20The%20Sway%20Firmware%20Update%20Guide.pdf> |
+| Firmware archive | <https://cdn.audima.com.au/firmware/v1.3.0.zip> |
+| Windows DFU driver | <https://cdn.audima.com.au/software/Windows%20DFU%20Driver.zip> |
+| Version manifest the Doctor reads | <https://cdn.audima.com.au/software/latest.json> |
+| Ableton Live 12 remote script | <https://cdn.audima.com.au/daws/ableton/Audima%20Labs%20The%20Sway%20Ableton%20Live%2012.zip> |
+| Cubase MIDI Remote script | <https://cdn.audima.com.au/daws/cubase/Audima%20Labs%20The%20Sway%20Cubase.midiremote> |
+| Base Project V2, the factory map source | <https://cdn.audima.com.au/software/Audima%20Labs%20The%20Sway%20V2.swayproj> |
+| Terms and conditions | <https://audima.com.au/terms-and-conditions/> |
+
+SwayCommand never redistributes any of these. The Doctor downloads the driver
+package and the companion installer directly from Audima on request, verifies
+the installer against Audima's published minisign signature, and opens it.
+Everything else here is a link a reader follows themselves.
+
 ## Sources
 
 Every claim above traces to a primary source listed in [RESEARCH.md](RESEARCH.md): the firmware descriptor and USB identity to the official firmware archive, the factory map to the Base Project V2 file and the DAW scripts, the CDN behavior to empirical verification dated 2026-08-19, and the serial-protocol findings to binary analysis of the companion application's installer.
 
-The physical layout comes from pages 30 and 31 of Audima's user manual, captured under [`reference/sway-manual/`](reference/sway-manual/README.md). Those captures are working reference only: they reproduce a copyrighted document, and no image in that directory reaches a build, since `electron-builder.yml` packages `docs/**/*.md` alone.
+The physical layout and the I/O table come from section 08 of the user manual. The manual itself is Audima's copyrighted document and is not redistributed here; the [Official resources](#official-resources) section links to it.

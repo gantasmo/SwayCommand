@@ -20,6 +20,7 @@
 [![Follow @gantasmo on X](https://img.shields.io/badge/Follow-%40gantasmo-000000?style=flat-square&labelColor=0b0f17&logo=x&logoColor=white)](https://x.com/gantasmo)
 [![Learn more at gantasmo.com](https://img.shields.io/badge/Learn%20More-gantasmo.com-7C3AED?style=flat-square&labelColor=0b0f17&logo=googlechrome&logoColor=white)](https://gantasmo.com)
 
+<!-- rizz:ignore-start reason="GANTASMO identity paragraph, supplied verbatim" -->
 > **GANTASMO** is an amorphous entity by [Daniel Joaquin Trujillo](https://github.com/danieljtrujillo)
 > and [Josh Valenzuela](https://github.com/StarskreamEXE) that defies conventional
 > classification. We make thought provoking, highly technical, yet listenable music
@@ -28,6 +29,7 @@
 > Artificial Intelligence, Augmented Reality, Virtual Reality, the democratization of
 > musical tools and education, and the preservation and evolution of musical history
 > and traditions predating modern recording infrastructure.
+<!-- rizz:ignore-end -->
 
 ---
 
@@ -236,8 +238,8 @@ elevation; the Windows installer is one click and launches on completion.
 
 Running from source needs no preparation on Windows: double-click
 `SwayCommand.bat`. It opens a setup window that works out what
-is already on the machine, installs only what is missing — including Node.js, as
-a private copy that needs no administrator and touches no system PATH — and then
+is already on the machine, installs only what is missing (including Node.js, as
+a private copy that needs no administrator and touches no system PATH), and then
 starts the app, with a progress bar and a time estimate measured from the work
 actually in front of it. Everything it downloads is cached and checksummed, so a
 second run installs nothing and launches straight away. The optional Sway
@@ -279,14 +281,22 @@ closeness to the sensors, engaging past 0.55 and releasing under 0.25.
 ## Development
 
 ```sh
-npm install
+npm install                  # postinstall fetches the Electron runtime
 npm start                    # bundle the renderer, launch Electron
+npm test                     # BLAKE2b and minisign, under Node
+npm run test:electron        # the same tests under Electron's BoringSSL
 npm run build:renderer       # dist/, the desktop bundle
 npm run build:renderer:embed # dist-embed/, a static bundle a host app serves
 npm run dist:win             # Windows installer
 npm run dist:mac             # macOS DMG
 npm run dist:linux           # Linux AppImage
 ```
+
+Both test commands matter. Electron links BoringSSL and Node links OpenSSL, and
+they disagree about which hashes exist, so a crypto test that passes under one
+can fail under the other. Electron 43 also publishes no install hook of its own,
+which is why `postinstall` fetches the runtime; without it `npm start` and the
+harness have no binary to spawn.
 
 Scenes are verified without launching the application. The offscreen harness
 compiles a scene in a hidden Electron window, drives its `update()` with a
