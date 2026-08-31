@@ -9,6 +9,7 @@
   "scripts": {
     "test": "node scripts/test-blake2b.js && node scripts/test-minisign.js",
     "postinstall": "node scripts/ensure-electron.js",
+    "hooks": "git config core.hooksPath .githooks",
     "ensure:electron": "node scripts/ensure-electron.js",
     "test:electron": "node scripts/test-electron.js",
     "build:renderer": "node scripts/build-renderer.js",

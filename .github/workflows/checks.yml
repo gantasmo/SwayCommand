@@ -1,0 +1,89 @@
+# The half of the attribution rule that cannot be skipped with --no-verify.
+#
+# The local hook in .githooks/commit-msg catches a trailer before it is ever
+# committed. This catches one that arrives anyway, from a machine where the hook
+# was never activated or a commit made with --no-verify.
+#
+# It inspects only the commits a push or pull request actually adds, so the 21
+# commits that already carry a trailer stay in the record without failing every
+# future run.
+
+name: Checks
+
+on:
+  push:
+    branches: [main, cockpit]
+  pull_request:
+
+jobs:
+  attribution:
+    name: No AI attribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Scan the commits this change adds
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          else
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+          fi
+
+          # A new branch reports an all-zero "before"; there is no range to read,
+          # so fall back to the tip commit alone rather than the whole history.
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            range="$head~1..$head"
+          else
+            range="$base..$head"
+          fi
+
+          echo "range: $range"
+          commits=$(git rev-list --no-merges "$range" 2>/dev/null || git rev-list --no-merges -1 "$head")
+          [ -n "$commits" ] && echo "$commits" | wc -l | xargs echo "commits to scan:" || echo "nothing to scan"
+
+          bad=0
+          for sha in $commits; do
+            body=$(git log -1 --format=%B "$sha")
+            if printf '%s\n' "$body" | grep -qiE '^[[:space:]]*co-authored-by:.*(claude|chatgpt|gpt-[0-9]|copilot|gemini|cursor|codex|devin|anthropic|openai)|generated with .*(claude|chatgpt|copilot|gemini)|<noreply@(anthropic|openai)\.com>'; then
+              echo "::error::$(git log -1 --format='%h %s' "$sha") carries AI attribution"
+              printf '%s\n' "$body" | grep -inE 'co-authored-by|generated with|noreply@' | sed 's/^/    /'
+              bad=$((bad + 1))
+            fi
+          done
+
+          if [ "$bad" -gt 0 ]; then
+            echo "Authorship here is the author's. Reword the commit and force-push the branch."
+            exit 1
+          fi
+          echo "clean"
+
+  prose:
+    name: Documentation prose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Typography only. The wider prose rules are not enforced yet: the
+      # documentation still carries 19 findings that need rewriting rather than
+      # substituting, and failing every run on them would train the check to be
+      # ignored.
+      - name: No dashes, arrows, ellipses or curly quotes
+        shell: bash
+        run: |
+          set -euo pipefail
+          hits=$(git ls-files '*.md' | xargs grep -nP '[\x{2013}\x{2014}\x{2192}\x{2190}\x{21D2}\x{2026}\x{2018}\x{2019}\x{201C}\x{201D}]' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::typographic characters found in documentation"
+            printf '%s\n' "$hits" | head -40
+            exit 1
+          fi
+          echo "clean"

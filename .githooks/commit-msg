@@ -1,0 +1,49 @@
+#!/bin/sh
+# Reject commit messages carrying AI attribution.
+#
+# Authorship of this project is the author's. No trailer, footer or byline
+# credits a tool, and none of the 21 commits that already carry one are a
+# precedent: they are the reason this hook exists.
+#
+# Hooks are not cloned with a repository, so this lives in a tracked directory
+# and is activated by pointing core.hooksPath at it:
+#
+#   npm run hooks        (or)  git config core.hooksPath .githooks
+#
+# Bypassing is possible with --no-verify. The CI check in
+# .github/workflows/checks.yml is the half that cannot be bypassed.
+
+msg_file="$1"
+[ -f "$msg_file" ] || exit 0
+
+# The comment block git appends is not part of the message.
+body=$(grep -v '^#' "$msg_file")
+
+fail() {
+    echo "commit-msg: $1" >&2
+    echo >&2
+    echo "  Authorship here is yours alone. Remove the line and commit again." >&2
+    echo "  Offending text:" >&2
+    printf '%s\n' "$body" | grep -n -i -E "$2" | sed 's/^/    /' >&2
+    exit 1
+}
+
+# Co-authorship credited to an assistant rather than a person.
+co_author='^[[:space:]]*co-authored-by:.*(claude|chatgpt|gpt-[0-9]|copilot|gemini|cursor|codex|devin|anthropic|openai)'
+if printf '%s\n' "$body" | grep -qiE "$co_author"; then
+    fail "AI co-author trailer" "$co_author"
+fi
+
+# Generated-with footers, with or without the robot.
+generated='generated with .*(claude|chatgpt|copilot|gemini|cursor|codex)|🤖 generated with'
+if printf '%s\n' "$body" | grep -qiE "$generated"; then
+    fail "AI generation footer" "$generated"
+fi
+
+# Any noreply address belonging to a model vendor.
+vendor='<noreply@(anthropic|openai)\.com>'
+if printf '%s\n' "$body" | grep -qiE "$vendor"; then
+    fail "AI vendor address" "$vendor"
+fi
+
+exit 0
