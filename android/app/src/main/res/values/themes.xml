@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SwayCommand" parent="Theme.AppCompat.NoActionBar">
+        <!-- The cockpit's own background, so the launch window does not flash
+             white before the first frame. -->
+        <item name="android:windowBackground">@color/cockpit_bg</item>
+        <item name="android:statusBarColor">@color/cockpit_bg</item>
+        <item name="android:navigationBarColor">@color/cockpit_bg</item>
+    </style>
+</resources>

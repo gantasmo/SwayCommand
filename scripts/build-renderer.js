@@ -36,7 +36,12 @@ const EMBED = argv.includes('--embed');
 const baseArg = argv.find((a) => a.startsWith('--base='));
 const BASE = baseArg ? baseArg.slice('--base='.length) : '/';
 
-const outDir = path.join(root, EMBED ? 'dist-embed' : 'dist');
+// --out= lets a host choose where the embed lands. The Android module points
+// it at app/src/main/assets so gradle packages the bundle with no copy step.
+const outArg = argv.find((a) => a.startsWith('--out='));
+const outDir = outArg
+  ? path.resolve(root, outArg.slice('--out='.length))
+  : path.join(root, EMBED ? 'dist-embed' : 'dist');
 
 /** Documents the in-app viewer offers, in order. Mirrors DOC_ORDER in main.js. */
 const DOC_ORDER = [
@@ -56,6 +61,7 @@ const DOC_ORDER = [
   'docs/AUDIO.md',
   'docs/SWAY_INTEGRATION.md',
   'docs/BUILD.md',
+  'docs/ANDROID.md',
   'docs/ENVIRONMENT.md',
   'docs/RESEARCH.md',
 ];

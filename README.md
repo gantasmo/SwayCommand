@@ -9,7 +9,7 @@
 [![16 procedural scenes](https://img.shields.io/badge/scenes-16%20procedural-ff2d95?style=flat-square&labelColor=0b0f17)](#scenes)
 
 [![hardware Audima Sway](https://img.shields.io/badge/hardware-Audima%20Sway-ff2d95?style=flat-square&labelColor=0b0f17)](https://audima.com.au)
-![platform Windows macOS Linux](https://img.shields.io/badge/platform-Windows%20%2F%20macOS%20%2F%20Linux-2de1fc?style=flat-square&labelColor=0b0f17&logo=windows&logoColor=white)
+![platform Windows macOS Linux Android](https://img.shields.io/badge/platform-Windows%20%2F%20macOS%20%2F%20Linux%20%2F%20Android-2de1fc?style=flat-square&labelColor=0b0f17&logo=windows&logoColor=white)
 [![companion theDAW](https://img.shields.io/badge/companion-theDAW-7C3AED?style=flat-square&labelColor=0b0f17&logo=github&logoColor=white)](https://github.com/gantasmo/theDAW)
 [![license MIT](https://img.shields.io/badge/license-MIT-2de1fc?style=flat-square&labelColor=0b0f17)](LICENSE)
 ![status active development](https://img.shields.io/badge/status-active%20development-F4A261?style=flat-square&labelColor=0b0f17)
@@ -314,10 +314,23 @@ per frame and any shader error:
 node scripts/scene-harness.js <plan.json>
 ```
 
+Android is a second host for the same web bundle, not a port. `android/`
+wraps it in a WebView, opens the Sway with `android.media.midi` and relays the
+bytes into the page over the channel theDAW already uses, so the decode is the
+desktop one. A phone supplies little current, so the Sway wants a powered
+USB-C hub rather than the phone itself. Details, including what does not work
+there: [ANDROID.md](docs/ANDROID.md).
+
+```sh
+npm run build:renderer:android   # bundle into android/app/src/main/assets
+cd android && ./gradlew assembleDebug
+```
+
 Packaged builds come from a tag. Pushing `v*` runs
 [the release workflow](.github/workflows/release.yml), which builds the Windows
-installer, both macOS disk images and the Linux AppImage on their own runners
-and attaches them to a GitHub release. The builds are unsigned.
+installer, both macOS disk images, the Linux AppImage and the Android APK on
+their own runners, and attaches them to a GitHub release. The builds are
+unsigned.
 
 Build system: [BUILD.md](docs/BUILD.md). Environment variables, settings file
 locations and network endpoints: [ENVIRONMENT.md](docs/ENVIRONMENT.md).
@@ -344,6 +357,7 @@ matches the installed version.
 | [SCENE_CONTRACT.md](docs/SCENE_CONTRACT.md) | Scene module interface and authoring rules |
 | [SWAY_INTEGRATION.md](docs/SWAY_INTEGRATION.md) | Sway USB identity, MIDI map, driver matrix, CDN interface |
 | [BUILD.md](docs/BUILD.md) | Build scripts, packaging, release artifacts |
+| [ANDROID.md](docs/ANDROID.md) | The Android module: WebView host, MIDI relay, USB power |
 | [ENVIRONMENT.md](docs/ENVIRONMENT.md) | Environment variables, settings file, network endpoints |
 | [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Known issues and resolutions |
 | [RESEARCH.md](docs/RESEARCH.md) | Source research record with citations |

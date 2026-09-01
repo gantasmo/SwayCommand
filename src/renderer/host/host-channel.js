@@ -69,6 +69,19 @@ export function isFramed() {
   }
 }
 
+/**
+ * True when something other than this page owns the MIDI hardware.
+ *
+ * Being framed implies it, which is theDAW's case. An Android WebView is the
+ * opposite shape: the page is top level, so isFramed() is false, yet the host
+ * absolutely owns the port because a WebView implements no Web MIDI at all and
+ * the device is opened through android.media.midi. Such a host says so before
+ * app.js runs by setting the flag below.
+ */
+export function hostOwnsMidi() {
+  return isFramed() || window.__SWAY_HOST_MIDI__ === true;
+}
+
 export function postToHost(payload) {
   if (!window.parent || window.parent === window) return;
   try {

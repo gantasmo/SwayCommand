@@ -19,6 +19,7 @@
     "dist:mac": "npm run build:icon && npm run build:renderer && electron-builder --mac",
     "dist:linux": "npm run build:icon && npm run build:renderer && electron-builder --linux",
     "build:renderer:embed": "node scripts/build-renderer.js --embed --base=/sway-app/",
+    "build:renderer:android": "node scripts/build-renderer.js --embed --base=/assets/ --out=android/app/src/main/assets",
     "build:all": "npm run build:renderer && npm run build:renderer:embed"
   },
   "devDependencies": {

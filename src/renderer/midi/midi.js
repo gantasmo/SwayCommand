@@ -8,7 +8,7 @@
 //   * keeps a small monitor ring buffer for the HUD.
 
 import { FACTORY_MAP, SWAY_PORT_NAME, createControlState } from './swaymap.js';
-import { isFramed, onHostMidi } from '../host/host-channel.js';
+import { hostOwnsMidi, onHostMidi } from '../host/host-channel.js';
 
 const MONITOR_SIZE = 14;
 
@@ -24,7 +24,7 @@ export async function createMidi({ onEvent } = {}) {
   // Embedded: the host owns the only MIDIAccess and relays raw bytes to us.
   // Windows allows exactly ONE process to hold a MIDI input, so opening the
   // port here would either take it away from the host or fail as PORT BUSY.
-  const relayed = isFramed();
+  const relayed = hostOwnsMidi();
   const supported = relayed || typeof navigator.requestMIDIAccess === 'function';
   if (!relayed && typeof navigator.requestMIDIAccess === 'function') {
     try {
@@ -204,7 +204,7 @@ export async function createMidi({ onEvent } = {}) {
     // decode below is the hardware path, byte for byte.
     control.connected = true;
     control.isSway = true;
-    control.portName = 'theDAW (relayed)';
+    control.portName = window.__SWAY_HOST_NAME__ || 'theDAW (relayed)';
     pushMonitor('Linked to the host application - MIDI is relayed.');
     onHostMidi((data) => {
       try {
