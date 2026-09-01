@@ -103,9 +103,54 @@ jobs:
             release/*.AppImage
             release/*.blockmap
 
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # The runner image already carries the SDK; this accepts the licences
+      # and puts the command line tools on PATH.
+      - uses: android-actions/setup-android@v3
+
+      - run: npm ci
+
+      # Gradle refuses to package without this rather than shipping an APK
+      # whose WebView would load a blank page.
+      - name: Build the web bundle
+        run: npm run build:renderer:android
+
+      - name: Assemble
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Name it after the tag
+        shell: bash
+        run: |
+          TAG="${{ inputs.tag || github.ref_name }}"
+          mkdir -p release
+          cp android/app/build/outputs/apk/debug/app-debug.apk "release/SwayCommand-${TAG#v}.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          if-no-files-found: error
+          retention-days: 14
+          path: release/*.apk
+
   publish:
     name: Publish release
-    needs: build
+    needs: [build, android]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -130,6 +175,7 @@ jobs:
           | Windows 10 or later, x64 | the `.exe`, a per-user NSIS installer |
           | macOS 11 or later | the `arm64.dmg` on Apple silicon, the plain `.dmg` on Intel |
           | Linux, glibc x64 | the `.AppImage` |
+          | Android 8 or later, USB host | the `.apk`, sideloaded |
 
           ## These builds are unsigned
 

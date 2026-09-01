@@ -47,6 +47,7 @@ For the Sway itself:
 | [SCENE_CONTRACT.md](SCENE_CONTRACT.md) | Scene module interface | Scene authors |
 | [SWAY_INTEGRATION.md](SWAY_INTEGRATION.md) | Sway hardware interface | Developers, integrators |
 | [BUILD.md](BUILD.md) | Build and packaging | Developers, packagers |
+| [ANDROID.md](ANDROID.md) | The Android module, the MIDI relay, power over USB | Developers |
 | [ENVIRONMENT.md](ENVIRONMENT.md) | Environment variables, settings, endpoints | Developers, support |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Known issues | Users, support |
 | [RESEARCH.md](RESEARCH.md) | Research record, citations | Everyone |

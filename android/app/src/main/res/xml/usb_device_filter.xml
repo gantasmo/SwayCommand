@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The Sway in normal operation. Vendor 0x0483 is STMicroelectronics,
+         product 0x52A4 is the composite device: CDC-ACM plus USB-MIDI.
+         Recorded in docs/SWAY_INTEGRATION.md. -->
+    <usb-device vendor-id="1155" product-id="21156" />
+
+    <!-- Any class-compliant USB MIDI interface: audio class 1, MIDI streaming
+         subclass 3. This is what makes a generic controller work too. -->
+    <usb-device class="1" subclass="3" />
+</resources>

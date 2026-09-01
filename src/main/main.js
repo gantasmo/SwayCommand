@@ -163,6 +163,7 @@ const DOC_ORDER = [
   'docs/AUDIO.md',
   'docs/SWAY_INTEGRATION.md',
   'docs/BUILD.md',
+  'docs/ANDROID.md',
   'docs/ENVIRONMENT.md',
   'docs/RESEARCH.md',
 ];
