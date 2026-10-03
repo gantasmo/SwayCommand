@@ -15,7 +15,7 @@
 const FORMAT = 'sway';
 const FORMAT_VERSION = 1;
 
-const { FX_KINDS, fxDefaults, fxClamp } = require('./trackfx');
+const { FX_KINDS, fxSpec, fxDefaults, fxClamp, isHostKind, hostFxId } = require('./trackfx');
 
 const PALETTE_FALLBACK = ['#ff2d95', '#7a0bc0', '#2de1fc', '#f9f871', '#ff6b35'];
 const GESTURE_SOURCES = ['xy:x', 'xy:y', 'gesture:pulse', 'gesture:press', 'gesture:sway'];
@@ -30,6 +30,14 @@ const SAMPLER_KNOB_TARGETS = ['sampler:master', 'sampler:cutoff', 'sampler:rate'
 const SNAPS = ['off', 'bar', 'beat', 'half', 'quarter'];
 const QUANTS = ['none', 'beat', 'bar', 'twoBars', 'fourBars'];
 const TRACK_KEYS = ['gain', 'mute', 'solo', 'vstmix'];
+const VST_STATE_HOSTS = ['thedaw', 'pedalboard'];
+// The instruments' inserts: what the kit and the synth play goes through the
+// bus of the same source (its effect chain, then its VST3 chain) to the master.
+const BUSES = [
+  { id: 'bus-kit', name: 'Kit', source: 'kit' },
+  { id: 'bus-synth', name: 'Synth', source: 'synth' },
+];
+const BUS_IDS = BUSES.map((b) => b.id);
 
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
@@ -108,6 +116,7 @@ function defaultProject() {
           defaultAudioTrack('audio-1', 'Audio'),
           { id: 'visual-1', type: 'visual', name: 'Scenes', clips: [] },
         ],
+        buses: BUSES.map(defaultBus),
       },
       plugins: [], // linked .gan surfaces: { id, name, path, controls: [{ id, name, kind }] }
       assignments: defaultAssignments(),
@@ -116,9 +125,10 @@ function defaultProject() {
   };
 }
 
-// An audio track: clips, a live effect chain, an offline VST chain played as
-// a wet/dry mix, and regions, sections of the track where an effect
-// parameter takes a value (the "effect on a section" of the brief).
+// An audio track: clips, a live effect chain, a VST chain (live in a host
+// that runs plugins, else rendered offline) played as a wet/dry mix, and
+// regions, sections of the track where an effect parameter takes a value (the
+// "effect on a section" of the brief).
 function defaultAudioTrack(id, name) {
   return {
     id: id || uid('t'),
@@ -129,8 +139,54 @@ function defaultAudioTrack(id, name) {
     solo: false,
     clips: [],
     fx: [],
-    vst: { plugins: [], mix: 1, renders: {} },
+    vst: { plugins: [], mix: 1, live: true, renders: {} },
     regions: [],
+  };
+}
+
+// A bus: an instrument's insert, shaped like a track so the panel, the chain
+// wiring and the bindings serve both.
+function defaultBus(bus) {
+  return {
+    id: bus.id,
+    type: 'bus',
+    source: bus.source,
+    name: bus.name,
+    gain: 1,
+    muted: false,
+    solo: false,
+    clips: [],
+    fx: [],
+    vst: { plugins: [], mix: 1, live: true, renders: {} },
+    regions: [],
+  };
+}
+
+// A chain entry whose effect the embedding host supplies (kind `host:<id>`,
+// theDAW's rack). Its parameter schema lives in the host: with the host's
+// catalog registered the values are clamped to it, and without it (the desktop
+// app, or before the host has answered) every finite number is kept as it is,
+// so the entry survives a round trip through a cockpit that cannot play it.
+// `label` is the effect's name for a list drawn where the catalog is absent.
+// A cockpit older than this kind drops the entry on load, as it does any kind
+// it has no row for.
+function hostFxEntry(id, e) {
+  const spec = fxSpec(e.kind);
+  const params = spec ? fxDefaults(e.kind) : {};
+  if (isObj(e.params)) {
+    for (const [k, v] of Object.entries(e.params)) {
+      const n = Number(v);
+      if (typeof v === 'boolean' || v === null || v === '' || !Number.isFinite(n)) continue;
+      if (!spec) params[k] = n;
+      else if (spec.params[k]) params[k] = fxClamp(e.kind, k, n);
+    }
+  }
+  return {
+    id,
+    kind: e.kind,
+    enabled: e.enabled !== false,
+    params,
+    label: (spec && spec.label) || (typeof e.label === 'string' && e.label) || hostFxId(e.kind),
   };
 }
 
@@ -316,17 +372,26 @@ function validateProject(input) {
   if (!audioIns.length) audioIns.push(dp.timeline.tracks[0]);
   const visualIn = tracks.find((t) => isObj(t) && t.type === 'visual') || dp.timeline.tracks[1];
   const trackIds = new Set();
-  const audioTracks = audioIns.map((audioIn, ti) => {
-    let id = str(audioIn.id, `audio-${ti + 1}`);
-    if (trackIds.has(id)) id = uid('t');
-    trackIds.add(id);
+  // A VST3 row's id names one running plugin in the host, so it is unique in
+  // the whole project; a row saved before rows had ids is given one.
+  const vstIds = new Set();
+  // An audio track, or one of the buses (BUSES: the kit's and the synth's
+  // insert). Both carry an effect chain and a VST3 chain; a bus has no clips
+  // and no sections, and its id and name are fixed.
+  const validateTrack = (audioIn, ti, bus) => {
+    let id = bus ? bus.id : str(audioIn.id, `audio-${ti + 1}`);
+    if (!bus) {
+      if (trackIds.has(id)) id = uid('t');
+      trackIds.add(id);
+    }
     const fxIds = new Set();
     const fx = (Array.isArray(audioIn.fx) ? audioIn.fx : [])
-      .filter((e) => isObj(e) && FX_KINDS[e.kind])
+      .filter((e) => isObj(e) && (FX_KINDS[e.kind] || isHostKind(e.kind)))
       .map((e) => {
         let eid = str(e.id, uid('fx'));
         if (fxIds.has(eid)) eid = uid('fx');
         fxIds.add(eid);
+        if (isHostKind(e.kind)) return hostFxEntry(eid, e);
         const params = fxDefaults(e.kind);
         if (isObj(e.params)) {
           for (const k of Object.keys(params)) {
@@ -339,28 +404,44 @@ function validateProject(input) {
     const vst = {
       plugins: (Array.isArray(vstIn.plugins) ? vstIn.plugins : [])
         .filter((v) => isObj(v) && typeof v.path === 'string' && v.path)
-        .map((v) => ({
-          path: v.path,
-          name: str(v.name, v.path.split(/[\\/]/).pop()),
-          params: isObj(v.params) ? v.params : {},
-          rawState: str(v.rawState, null),
-        })),
+        .map((v) => {
+          let vid = str(v.id, '');
+          if (!vid || vstIds.has(vid)) vid = uid('vst');
+          vstIds.add(vid);
+          return {
+            id: vid,
+            path: v.path,
+            name: str(v.name, v.path.split(/[\\/]/).pop()),
+            params: isObj(v.params) ? v.params : {},
+            // The whole plugin, base64; the one state a live host, a render
+            // and the plugin's window all read and write.
+            rawState: str(v.rawState, null),
+            // Which host captured rawState ('thedaw' live, 'pedalboard' a
+            // render's window); null until a state is captured.
+            stateHost: VST_STATE_HOSTS.includes(v.stateHost) ? v.stateHost : null,
+          };
+        }),
       mix: num(vstIn.mix, 1, 0, 1),
+      // The chain runs in the host as it plays (a host with the 'vst-live'
+      // cap), or plays the wet files RENDER wrote. A bus has no files, so its
+      // chain is live wherever a host can run it.
+      live: bus ? true : bool(vstIn.live, true),
       renders: {},
     };
-    if (isObj(vstIn.renders)) {
+    if (!bus && isObj(vstIn.renders)) {
       for (const [src, wet] of Object.entries(vstIn.renders)) {
         if (mediaIds.has(src) && typeof wet === 'string' && mediaIds.has(wet)) vst.renders[src] = wet;
       }
     }
     return {
       id,
-      type: 'audio',
-      name: str(audioIn.name, `Audio ${ti + 1}`),
+      type: bus ? 'bus' : 'audio',
+      ...(bus ? { source: bus.source } : {}),
+      name: bus ? bus.name : str(audioIn.name, `Audio ${ti + 1}`),
       gain: num(audioIn.gain, 1, 0, 2),
       muted: bool(audioIn.muted, false),
-      solo: bool(audioIn.solo, false),
-      clips: (Array.isArray(audioIn.clips) ? audioIn.clips : [])
+      solo: bus ? false : bool(audioIn.solo, false),
+      clips: (!bus && Array.isArray(audioIn.clips) ? audioIn.clips : [])
         .filter((c) => {
           if (!isObj(c)) return false;
           if (typeof c.media !== 'string' || !mediaIds.has(c.media)) {
@@ -385,7 +466,7 @@ function validateProject(input) {
       vst,
       // A region engages one parameter of one chain entry (or the VST mix)
       // while the playhead is inside it.
-      regions: (Array.isArray(audioIn.regions) ? audioIn.regions : [])
+      regions: (!bus && Array.isArray(audioIn.regions) ? audioIn.regions : [])
         .filter((r) => isObj(r) && num(r.end, 0, 0) > num(r.start, 0, 0) && typeof r.fx === 'string' && typeof r.param === 'string')
         .filter((r) => r.fx === 'vst' || fxIds.has(r.fx))
         .map((r) => ({
@@ -398,6 +479,12 @@ function validateProject(input) {
         }))
         .sort((a, b) => a.start - b.start),
     };
+  };
+  const audioTracks = audioIns.map((audioIn, ti) => validateTrack(audioIn, ti, null));
+  const busesIn = Array.isArray(tl.buses) ? tl.buses : [];
+  tl.buses = BUSES.map((bus, bi) => {
+    const found = busesIn.find((b) => isObj(b) && b.id === bus.id);
+    return validateTrack(found || {}, bi, bus);
   });
   const audioTrack = audioTracks[0];
   const visualTrack = {
@@ -467,7 +554,7 @@ function validateProject(input) {
     }
     if (a.type === 'trackFx') {
       // A held punch on one track-effect parameter (or the VST mix).
-      if (typeof a.track !== 'string' || !trackIds.has(a.track)) return null;
+      if (typeof a.track !== 'string' || !(trackIds.has(a.track) || BUS_IDS.includes(a.track))) return null;
       if (typeof a.fx !== 'string' || typeof a.param !== 'string' || !a.fx || !a.param) return null;
       return { type: 'trackFx', track: a.track, fx: a.fx, param: a.param, value: num(a.value, 1) };
     }
@@ -562,6 +649,8 @@ module.exports = {
   defaultProject,
   defaultAssignments,
   defaultAudioTrack,
+  BUSES,
+  BUS_IDS,
   validateProject,
   legacyToSway,
   parseTarget,

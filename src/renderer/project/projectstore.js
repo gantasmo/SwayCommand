@@ -7,6 +7,7 @@
 // (kit, synth patch, fx params, autoVJ, midi overrides).
 
 import { validateProject, uid } from '../../shared/swayproject.js';
+import { hostVstCapture } from '../audio/hostfx.js';
 
 // decodeAudioData expands to Float32 PCM; a long compressed file can decode
 // to gigabytes. Estimated from cached duration when known.
@@ -180,6 +181,9 @@ export function createProjectStore(deps) {
   }
 
   async function saveTo(path) {
+    // Plugins running live hand their current state over first, so the file
+    // holds what is being heard.
+    await hostVstCapture();
     collect();
     await fillMediaStats();
     const result = await window.swaycommand.project.write(path, doc);

@@ -13,20 +13,34 @@
 // is queued a quarter second before the seam), so it is sample-accurate too.
 //
 // Per track: clips -> [vst dry / wet mix] -> track input -> effect chain (live
-// Web Audio nodes from audio/trackfx.js, in chain order) -> track gain -> mute
-// / solo -> master. A track's VST chain is rendered offline (main/vsthost.js)
-// to a wet media per source file; clips that have one play dry and wet
-// together under `track.vst.mix`. Regions engage one parameter of one chain
+// Web Audio nodes from audio/trackfx.js, and the embedding host's own effects
+// from audio/hostfx.js, in chain order) -> track gain -> mute / solo ->
+// alignment delay -> master. A track's VST chain runs one of two ways:
+//
+//   live      inside a host that runs plugins (theDAW, cap 'vst-live'): the
+//             clips feed the plugins in order and their output is the wet
+//             branch; the dry branch waits as long as the chain (its reported
+//             latency), so the mix never combs, and every track waits for the
+//             slowest one, so the stems stay together.
+//   rendered  the chain is rendered offline (main/vsthost.js) to a wet media
+//             per source file; clips that have one play dry and wet together.
+//
+// Either way `track.vst.mix` is the wet / dry. The kit and the synth play into
+// the two buses (`timeline.buses`), which are tracks without clips: their own
+// effect chain and a live VST chain, then the master. Regions engage one parameter of one chain
 // entry while the playhead is inside them. Stems launched from pads
 // (launchStem) start on the next grid boundary at the offset the grid
 // dictates, so a stem fired mid-song comes in exactly in phase with the
 // timeline.
 
 import { createFxNode, ensureWorklet } from './trackfx.js';
-import { defaultAudioTrack, uid } from '../../shared/swayproject.js';
-import { fxDefaults, fxClamp } from '../../shared/trackfx.js';
+import { defaultAudioTrack, uid, BUSES } from '../../shared/swayproject.js';
+import { createHostFxNode, createHostVstNode, hostVstReady, hostVstTransport } from './hostfx.js';
+import { fxSpec, fxDefaults, fxClamp, isHostKind } from '../../shared/trackfx.js';
 
 const LOOKAHEAD = 0.25; // seconds before the loop seam the next pass is queued
+const MAX_PLUGIN_DELAY = 5; // seconds of plugin latency a track can be lined up by
+const DELAY_RAMP = 0.03; // a latency change glides, so it never clicks
 const QUANT_BEATS = { none: 0, beat: 1, bar: 4, twoBars: 8, fourBars: 16 };
 const SNAP_BEATS = { off: 0, bar: 4, beat: 1, half: 0.5, quarter: 0.25 };
 
@@ -64,23 +78,41 @@ export function createTransport(ctx, destinationNodes) {
   // visual lane holds its scene until endScrub() fires the one cut.
   let scrubbing = false;
 
-  // Live track graphs: trackId -> { input, vstDry, vstWet, chain: [{ entry, node }], gain, mute }
+  // Live track graphs: trackId -> { pre, dryDelay, vstDry, vstWet, live: [{ row, node }],
+  // input, chain: [{ entry, node }], gain, mute, comp }
   const graphs = new Map();
   // Stems launched from pads: mediaId -> { src, gain, state, startAt, stopAt, track }
   const stems = new Map();
   const stemBus = ctx.createGain();
-  stemBus.connect(master);
+  // Stems on no track wait for the slowest track too.
+  const stemComp = ctx.createDelay(MAX_PLUGIN_DELAY);
+  stemBus.connect(stemComp);
+  stemComp.connect(master);
+  // The instruments play into these from boot on (busInput); a project's bus
+  // graph takes each one over, and gives it back to the master when it goes.
+  const busInputs = new Map(BUSES.map((b) => [b.id, ctx.createGain()]));
+  for (const node of busInputs.values()) node.connect(master);
+  // What the app hears about a live plugin: a state it captured, a change of
+  // status, latency or parameter list.
+  let vstHandlers = {};
   // Region engagement: `${trackId}|${regionId}` -> the value to restore on exit
   const engaged = new Map();
 
   function audioTracks() {
     return timeline ? timeline.tracks.filter((t) => t.type === 'audio') : [];
   }
+  function buses() {
+    return timeline && Array.isArray(timeline.buses) ? timeline.buses : [];
+  }
+  // Everything with a graph: the tracks, then the buses.
+  function allTracks() {
+    return [...audioTracks(), ...buses()];
+  }
   function visualTrack() {
     return timeline ? timeline.tracks.find((t) => t.type === 'visual') : null;
   }
   function trackById(id) {
-    return audioTracks().find((t) => t.id === id) || null;
+    return allTracks().find((t) => t.id === id) || null;
   }
   function bpm() {
     return state.bpm > 0 ? state.bpm : 0;
@@ -103,22 +135,163 @@ export function createTransport(ctx, destinationNodes) {
 
   function buildGraph(track) {
     const g = {
-      input: ctx.createGain(),
+      bus: track.type === 'bus',
+      // What the live VST chain takes: the clips (a track) or the instrument (a bus).
+      pre: ctx.createGain(),
+      dryDelay: ctx.createDelay(MAX_PLUGIN_DELAY),
       vstDry: ctx.createGain(),
       vstWet: ctx.createGain(),
+      live: [],
+      ownLatency: 0,
+      input: ctx.createGain(),
       chain: [],
       gain: ctx.createGain(),
       mute: ctx.createGain(),
+      comp: ctx.createDelay(MAX_PLUGIN_DELAY),
     };
+    g.dryDelay.connect(g.vstDry);
     g.vstDry.connect(g.input);
     g.vstWet.connect(g.input);
     g.gain.gain.value = track.gain ?? 1;
     g.gain.connect(g.mute);
-    g.mute.connect(master);
+    g.mute.connect(g.comp);
+    g.comp.connect(master);
     graphs.set(track.id, g);
+    if (g.bus) {
+      const from = busInputs.get(track.id);
+      if (from) {
+        from.disconnect();
+        from.connect(g.pre);
+      }
+    }
+    wireLive(track, g);
     wireChain(track, g);
     applyVstMix(track, g);
     return g;
+  }
+
+  // --- live VST chain ---------------------------------------------------------------
+
+  function liveOn(track) {
+    return track.vst.live !== false && track.vst.plugins.length > 0 && hostVstReady();
+  }
+
+  function liveStale(track, g) {
+    const want = liveOn(track) ? track.vst.plugins : [];
+    return want.length !== g.live.length || want.some((r, i) => g.live[i].row.id !== r.id || g.live[i].row.path !== r.path);
+  }
+
+  // What a live plugin row tells the app. The row is looked up by id when the
+  // host speaks, since the project may hold a newer object for it by then.
+  function vstSink(trackId, rowId) {
+    const rowNow = () => {
+      const t = trackById(trackId);
+      return t ? t.vst.plugins.find((r) => r.id === rowId) || null : null;
+    };
+    return {
+      state(rawState, stateHost) {
+        const row = rowNow();
+        if (!row || typeof rawState !== 'string' || !rawState || row.rawState === rawState) return;
+        row.rawState = rawState;
+        row.stateHost = stateHost === 'pedalboard' ? 'pedalboard' : 'thedaw';
+        // The state is the whole plugin, with every parameter in it.
+        row.params = {};
+        const t = trackById(trackId);
+        if (t && Object.keys(t.vst.renders).length) t.vst.renders = {}; // the sound changed; renders are stale
+        if (vstHandlers.onState) vstHandlers.onState(t, row);
+      },
+      change() {
+        updateLatency();
+        if (vstHandlers.onChange) vstHandlers.onChange(trackById(trackId), rowNow());
+      },
+    };
+  }
+
+  // pre -> dry delay -> vst dry, and pre -> plugin 1 -> ... -> vst wet, while
+  // the chain is live; otherwise pre goes straight to the track input. Nodes
+  // are kept across rewires by row id, so a reorder never restarts a plugin.
+  function wireLive(track, g) {
+    g.pre.disconnect();
+    for (const l of g.live) {
+      try {
+        l.node.output.disconnect();
+      } catch {
+        /* detached */
+      }
+    }
+    const keep = new Map(g.live.map((l) => [l.row.id, l]));
+    const next = [];
+    if (liveOn(track)) {
+      for (const row of track.vst.plugins) {
+        let l = keep.get(row.id);
+        if (l && (l.stale || l.row.path !== row.path)) {
+          l.node.dispose();
+          keep.delete(row.id);
+          l = null;
+        }
+        if (!l) l = { row, node: createHostVstNode(ctx, row, vstSink(track.id, row.id)) };
+        else l.row = row;
+        keep.delete(row.id);
+        next.push(l);
+      }
+    }
+    for (const l of keep.values()) l.node.dispose(); // rows that left, or a chain that stopped being live
+    g.live = next;
+    if (next.length) {
+      g.pre.connect(g.dryDelay);
+      let prev = g.pre;
+      for (const l of next) {
+        prev.connect(l.node.input);
+        prev = l.node.output;
+      }
+      prev.connect(g.vstWet);
+    } else {
+      g.pre.connect(g.input);
+    }
+    updateLatency();
+  }
+
+  function glideDelay(node, seconds) {
+    const v = Math.max(0, Math.min(MAX_PLUGIN_DELAY, seconds));
+    if (Math.abs(node.delayTime.value - v) < 1e-6) return;
+    const now = ctx.currentTime;
+    node.delayTime.cancelScheduledValues(now);
+    node.delayTime.setValueAtTime(node.delayTime.value, now);
+    node.delayTime.linearRampToValueAtTime(v, now + DELAY_RAMP);
+  }
+
+  // A live plugin reports its latency (the host's block bridge plus the
+  // plugin's own) once it runs. The dry branch waits as long as its chain;
+  // every track waits for the slowest track, and so do stems on no track. A
+  // bus is played by hand, so it is never held back to meet the tracks.
+  function updateLatency() {
+    let slowest = 0;
+    for (const g of graphs.values()) {
+      let own = 0;
+      for (const l of g.live) own += Math.max(0, Number(l.node.status().latency) || 0);
+      g.ownLatency = Math.min(own, MAX_PLUGIN_DELAY);
+      glideDelay(g.dryDelay, g.ownLatency);
+      if (!g.bus) slowest = Math.max(slowest, g.ownLatency);
+    }
+    for (const g of graphs.values()) glideDelay(g.comp, g.bus ? 0 : slowest - g.ownLatency);
+    glideDelay(stemComp, slowest);
+  }
+
+  // Where the transport is, for every plugin the host runs for this cockpit.
+  // `jump` is a start, a seek, a stop or the loop seam: the host resets the
+  // plugin there, so a delay tail never smears across it. `at` is the context
+  // time the position holds at.
+  function feedHost(jump, at, position) {
+    const when = at === undefined ? ctx.currentTime : at;
+    const pos = position === undefined ? (state.playing ? when - startedAt : state.position) : position;
+    hostVstTransport({
+      playing: state.playing,
+      positionSamples: Math.max(0, Math.round(pos * ctx.sampleRate)),
+      tempoBpm: bpm(),
+      discontinuity: !!jump,
+      atTime: when,
+      atSec: when,
+    });
   }
 
   // Rewires input -> enabled entries in order -> gain. Nodes are kept across
@@ -136,12 +309,16 @@ export function createTransport(ctx, destinationNodes) {
     const next = [];
     for (const entry of track.fx) {
       let c = keep.get(entry.id);
-      if (c && c.node.kind !== entry.kind) {
+      if (c && (c.node.kind !== entry.kind || c.stale)) {
         c.node.dispose();
         c = null;
       }
       if (!c) {
-        const node = createFxNode(ctx, entry.kind, entry.params, { bpm });
+        // A `host:<id>` entry is built by the host's own effect code on this
+        // context; with no host it is a pass-through that keeps its place.
+        const node = isHostKind(entry.kind)
+          ? createHostFxNode(ctx, entry.kind, entry.params)
+          : createFxNode(ctx, entry.kind, entry.params, { bpm });
         if (!node) continue;
         c = { entry, node };
       } else {
@@ -176,10 +353,11 @@ export function createTransport(ctx, destinationNodes) {
     const tracks = audioTracks();
     const anySolo = tracks.some((t) => t.solo);
     const now = ctx.currentTime;
-    for (const t of tracks) {
+    for (const t of allTracks()) {
       const g = graphs.get(t.id);
       if (!g) continue;
-      const on = !t.muted && (!anySolo || t.solo);
+      // A bus follows its own mute; a solo on a track leaves the instruments playing.
+      const on = !t.muted && (t.type === 'bus' || !anySolo || t.solo);
       g.mute.gain.cancelScheduledValues(now);
       g.mute.gain.setValueAtTime(g.mute.gain.value, now);
       g.mute.gain.linearRampToValueAtTime(on ? 1 : 0, now + 0.02);
@@ -188,9 +366,10 @@ export function createTransport(ctx, destinationNodes) {
 
   function syncGraphs() {
     const ids = new Set();
-    for (const t of audioTracks()) {
+    for (const t of allTracks()) {
       ids.add(t.id);
       const g = graphs.get(t.id) || buildGraph(t);
+      if (liveStale(t, g)) wireLive(t, g);
       if (g.chain.length !== t.fx.length || g.chain.some((c, i) => c.entry !== t.fx[i])) wireChain(t, g);
     }
     for (const [id, g] of graphs) {
@@ -202,13 +381,20 @@ export function createTransport(ctx, destinationNodes) {
   }
 
   function disposeGraph(g) {
+    for (const l of g.live) l.node.dispose();
     for (const c of g.chain) c.node.dispose();
-    for (const n of [g.input, g.vstDry, g.vstWet, g.gain, g.mute]) {
+    for (const n of [g.pre, g.dryDelay, g.input, g.vstDry, g.vstWet, g.gain, g.mute, g.comp]) {
       try {
         n.disconnect();
       } catch {
         /* detached */
       }
+    }
+    // A bus's instrument goes back to the master.
+    for (const [id, from] of busInputs) {
+      if (graphs.get(id) !== g) continue;
+      from.disconnect();
+      from.connect(master);
     }
   }
 
@@ -286,7 +472,8 @@ export function createTransport(ctx, destinationNodes) {
         if (clip.end <= position || clip.start >= passEnd) continue;
         const buffer = buffers.get(clip.media);
         if (!buffer) continue;
-        const wetId = track.vst && track.vst.renders ? track.vst.renders[clip.media] : null;
+        // A live chain plays the clip itself; a rendered one plays its wet file.
+        const wetId = !g.live.length && track.vst && track.vst.renders ? track.vst.renders[clip.media] : null;
         const wet = wetId ? buffers.get(wetId) : null;
 
         const startsAhead = clip.start > position;
@@ -306,7 +493,7 @@ export function createTransport(ctx, destinationNodes) {
           outAt: clip.fadeOut > 0 && outStart > from ? outStart - from : -1,
         };
         const dur = Math.min(remaining, buffer.duration - offset);
-        const dest = wet ? g.vstDry : g.input;
+        const dest = wet ? g.vstDry : g.pre;
         live.push({ ...startSource(buffer, dest, when, offset, dur, level, fades), clip });
         if (wet && offset < wet.duration) {
           live.push({ ...startSource(wet, g.vstWet, when, offset, Math.min(remaining, wet.duration - offset), level, fades), clip });
@@ -346,6 +533,7 @@ export function createTransport(ctx, destinationNodes) {
       startedAt = ctx.currentTime - state.position;
       scheduleFrom(state.position);
     }
+    feedHost(true);
     pendingVisualCause = null;
     if (!scrubbing) fireVisual(visualClipAt(state.position), cause);
   }
@@ -356,6 +544,7 @@ export function createTransport(ctx, destinationNodes) {
     state.playing = false;
     stopSources();
     stopAllStems(true);
+    feedHost(false);
   }
 
   // --- regions ----------------------------------------------------------------------
@@ -436,7 +625,7 @@ export function createTransport(ctx, destinationNodes) {
 
   function stemDest(trackId) {
     const t = trackId && trackById(trackId);
-    if (t) return (graphs.get(t.id) || buildGraph(t)).input;
+    if (t) return (graphs.get(t.id) || buildGraph(t)).pre;
     return stemBus;
   }
 
@@ -554,6 +743,7 @@ export function createTransport(ctx, destinationNodes) {
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     state.playing = true;
     startedAt = ctx.currentTime - state.position;
+    feedHost(true);
     scheduleFrom(state.position);
     pendingVisualCause = null;
     fireVisual(visualClipAt(state.position), 'play');
@@ -578,6 +768,7 @@ export function createTransport(ctx, destinationNodes) {
       for (const g of graphs.values()) disposeGraph(g);
       graphs.clear();
       if (tl) syncGraphs();
+      feedHost(true);
     },
 
     // Re-sorts clips and recomputes duration after the UI edits the timeline
@@ -613,6 +804,7 @@ export function createTransport(ctx, destinationNodes) {
       releaseRegions();
       state.position = 0;
       state.activeVisualClip = null;
+      feedHost(true);
     },
 
     seek(seconds) {
@@ -660,6 +852,9 @@ export function createTransport(ctx, destinationNodes) {
           startedAt += state.loop.end - state.loop.start;
           state.position = now - startedAt;
           seamQueued = false;
+          // Told when crossed, stamped with the seam's own time, so the
+          // plugins land on the loop start however late this frame is.
+          feedHost(true, seamAt, state.loop.start);
           pendingVisualCause = 'seek';
           // Stems re-phase across the seam (the seam is a jump on the grid).
           restemAt(state.position);
@@ -693,6 +888,7 @@ export function createTransport(ctx, destinationNodes) {
       state.bpm = b;
       if (timeline) timeline.bpm = b;
       for (const g of graphs.values()) for (const c of g.chain) c.node.retune();
+      feedHost(false);
     },
     setSnap(s) {
       state.snap = SNAP_BEATS[s] !== undefined ? s : 'beat';
@@ -762,6 +958,8 @@ export function createTransport(ctx, destinationNodes) {
       const params = fxDefaults(kind);
       if (!t || !params) return null;
       const entry = { id: uid('fx'), kind, enabled: true, params };
+      // A host effect carries its name, for a list drawn outside its host.
+      if (isHostKind(kind)) entry.label = fxSpec(kind).label;
       t.fx.push(entry);
       syncGraphs();
       return entry;
@@ -775,6 +973,30 @@ export function createTransport(ctx, destinationNodes) {
       t.regions = t.regions.filter((r) => r.fx !== fxId);
       syncGraphs();
       return true;
+    },
+    // The host's effect catalog arrived or changed: every `host:<id>` entry
+    // gets the values its schema asks for, and its node is built again, so an
+    // entry that was passing through starts to sound.
+    refreshHostFx() {
+      for (const t of allTracks()) {
+        for (const entry of t.fx) {
+          const spec = isHostKind(entry.kind) ? fxSpec(entry.kind) : null;
+          if (!spec) continue;
+          for (const [k, s] of Object.entries(spec.params)) {
+            entry.params[k] = entry.params[k] === undefined ? s[2] : fxClamp(entry.kind, k, entry.params[k]);
+          }
+          if (!entry.label) entry.label = spec.label;
+        }
+        const g = graphs.get(t.id);
+        if (!g) continue;
+        let any = false;
+        for (const c of g.chain) {
+          if (!isHostKind(c.node.kind)) continue;
+          c.stale = true;
+          any = true;
+        }
+        if (any) wireChain(t, g);
+      }
     },
     moveFx(trackId, fxId, dir) {
       const t = trackById(trackId);
@@ -800,6 +1022,62 @@ export function createTransport(ctx, destinationNodes) {
       const t = trackById(trackId);
       return t ? paramSet(t, 'vst', 'mix', v) : false;
     },
+
+    // --- live VST -------------------------------------------------------------------
+    // The host's plugin API arrived or changed: every live chain is built again.
+    refreshHostVst() {
+      for (const t of allTracks()) {
+        const g = graphs.get(t.id);
+        if (!g) continue;
+        for (const l of g.live) l.stale = true;
+        wireLive(t, g);
+      }
+      feedHost(true);
+      if (state.playing) scheduleFrom(ctx.currentTime - startedAt);
+    },
+    // A VST row added, removed, reordered, or the chain switched between live and rendered.
+    refreshVst(trackId) {
+      const t = trackById(trackId);
+      const g = t && graphs.get(t.id);
+      if (!g) return;
+      wireLive(t, g);
+      if (state.playing) scheduleFrom(ctx.currentTime - startedAt);
+    },
+    setVstLive(trackId, on) {
+      const t = trackById(trackId);
+      if (!t || t.type === 'bus') return false;
+      t.vst.live = !!on;
+      const g = graphs.get(t.id);
+      if (g) wireLive(t, g);
+      if (state.playing) scheduleFrom(ctx.currentTime - startedAt);
+      return true;
+    },
+    // True while the track's VST chain is running in the host.
+    vstIsLive(trackId) {
+      const g = graphs.get(trackId);
+      return !!g && g.live.length > 0;
+    },
+    // The live node of one row, for the panel: status, parameters, its window.
+    vstNode(trackId, rowId) {
+      const g = graphs.get(trackId);
+      const l = g && g.live.find((x) => x.row.id === rowId);
+      return l ? l.node : null;
+    },
+    // Seconds every track is held back to meet the slowest live chain.
+    latency() {
+      let slowest = 0;
+      for (const g of graphs.values()) if (!g.bus) slowest = Math.max(slowest, g.ownLatency);
+      return slowest;
+    },
+    onVst(handlers) {
+      vstHandlers = handlers || {};
+    },
+    // The node an instrument ('kit' or 'synth') plays into.
+    busInput(source) {
+      const bus = BUSES.find((b) => b.source === source);
+      return bus ? busInputs.get(bus.id) : master;
+    },
+    buses,
     // A VST render landed: wet media for a source media on this track.
     setRender(trackId, srcMedia, wetMedia) {
       const t = trackById(trackId);
@@ -850,6 +1128,8 @@ export function createTransport(ctx, destinationNodes) {
       for (const g of graphs.values()) disposeGraph(g);
       graphs.clear();
       stemBus.disconnect();
+      stemComp.disconnect();
+      for (const node of busInputs.values()) node.disconnect();
       master.disconnect();
       buffers.clear();
     },

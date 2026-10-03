@@ -10,6 +10,9 @@
 // through the pedalboard sidecar (main/vsthost.js) and played as a wet/dry
 // mix; they have no row here.
 //
+// Kinds named `host:<id>` are effects the embedding host supplies (theDAW's
+// rack); their rows are registered at run time, see "host effects" below.
+//
 // Param spec: [min, max, default, unit?]. Units: 'hz' (log mapped on the UI
 // slider), 'beats' (a tempo-synced division, converted with the timeline's
 // bpm, 120 when unknown), 'db', 'enum' (an integer pick from `options`).
@@ -137,12 +140,102 @@ const FX_KINDS = Object.freeze({
 
 const FX_ORDER = Object.keys(FX_KINDS);
 
+// --- host effects --------------------------------------------------------------
+// Inside theDAW the host hands the cockpit its own effect catalog
+// (renderer/audio/hostfx.js). Each of those effects is a kind `host:<id>` whose
+// spec is registered here at run time, in the shape of the rows above, so the
+// transport, the validator and the assignment panel treat it as one more kind.
+// A host param spec is [min, max, default, unit, extra]: unit is 'enum' for a
+// pick, otherwise unset; extra is { name, step, log, percent, suffix, values,
+// tip }, where `values` holds the number each option of a pick sets.
+//
+// The table is empty in the desktop app and in the main process. A `host:`
+// entry then has no spec: it stays in the project and passes audio through.
+
+const HOST_PREFIX = 'host:';
+const hostKinds = new Map();
+
+function isHostKind(kind) {
+  return typeof kind === 'string' && kind.startsWith(HOST_PREFIX) && kind.length > HOST_PREFIX.length;
+}
+
+function hostFxId(kind) {
+  return isHostKind(kind) ? kind.slice(HOST_PREFIX.length) : null;
+}
+
+function hostFxKind(id) {
+  return HOST_PREFIX + id;
+}
+
+// Replaces the table with the host's catalog: [{ id, name, group, mix, params:
+// [{ key, name, min, max, step, default, unit, options, values, curve,
+// percent, tip }] }]. Rows that do not describe a usable effect are skipped.
+// Returns how many kinds are registered.
+function registerHostFx(catalog) {
+  hostKinds.clear();
+  for (const fx of Array.isArray(catalog) ? catalog : []) {
+    if (!fx || typeof fx.id !== 'string' || !fx.id || !Array.isArray(fx.params)) continue;
+    const params = {};
+    const options = {};
+    for (const p of fx.params) {
+      if (!p || typeof p.key !== 'string' || !p.key) continue;
+      const lo = Number(p.min);
+      const hi = Number(p.max);
+      if (!Number.isFinite(lo) || !Number.isFinite(hi) || !(hi > lo)) continue;
+      const def = Number.isFinite(Number(p.default)) ? Math.min(hi, Math.max(lo, Number(p.default))) : lo;
+      const labels = Array.isArray(p.options) && p.options.length ? p.options.map(String) : null;
+      const values = labels && Array.isArray(p.values) && p.values.length === labels.length ? p.values.map(Number) : null;
+      const pick = !!(labels && values && values.every(Number.isFinite));
+      params[p.key] = [
+        lo,
+        hi,
+        def,
+        pick ? 'enum' : undefined,
+        {
+          name: typeof p.name === 'string' && p.name ? p.name : p.key,
+          step: Number(p.step) > 0 ? Number(p.step) : 0,
+          log: p.curve === 'log' && lo > 0,
+          percent: p.percent === true,
+          suffix: typeof p.unit === 'string' ? p.unit : '',
+          values: pick ? values : null,
+          tip: typeof p.tip === 'string' ? p.tip : '',
+        },
+      ];
+      if (pick) options[p.key] = labels;
+    }
+    if (!Object.keys(params).length) continue;
+    hostKinds.set(hostFxKind(fx.id), {
+      label: typeof fx.name === 'string' && fx.name ? fx.name : fx.id,
+      group: typeof fx.group === 'string' ? fx.group : '',
+      mix: typeof fx.mix === 'string' && params[fx.mix] ? fx.mix : null,
+      host: true,
+      params,
+      options,
+    });
+  }
+  return hostKinds.size;
+}
+
+// The registered host kinds, in the host's own order.
+function hostFxOrder() {
+  return [...hostKinds.keys()];
+}
+
 function fxSpec(kind) {
-  return FX_KINDS[kind] || null;
+  return FX_KINDS[kind] || hostKinds.get(kind) || null;
+}
+
+// The name a chain entry shows: its kind's label, else the label the entry
+// carries (a host effect outside its host), else the kind.
+function fxLabel(entry) {
+  const spec = entry ? fxSpec(entry.kind) : null;
+  if (spec) return spec.label;
+  if (!entry) return '';
+  return (typeof entry.label === 'string' && entry.label) || hostFxId(entry.kind) || String(entry.kind);
 }
 
 function fxDefaults(kind) {
-  const spec = FX_KINDS[kind];
+  const spec = fxSpec(kind);
   if (!spec) return null;
   const out = {};
   for (const [k, s] of Object.entries(spec.params)) out[k] = s[2];
@@ -151,7 +244,7 @@ function fxDefaults(kind) {
 
 // Clamps one param into its spec range; returns null for unknown keys.
 function fxClamp(kind, key, value) {
-  const spec = FX_KINDS[kind];
+  const spec = fxSpec(kind);
   if (!spec || !spec.params[key]) return null;
   const [lo, hi] = spec.params[key];
   const v = Number(value);
@@ -165,4 +258,17 @@ function beatsToSeconds(beats, bpm) {
   return (60 / b) * beats;
 }
 
-module.exports = { FX_KINDS, FX_ORDER, fxSpec, fxDefaults, fxClamp, beatsToSeconds };
+module.exports = {
+  FX_KINDS,
+  FX_ORDER,
+  fxSpec,
+  fxLabel,
+  fxDefaults,
+  fxClamp,
+  beatsToSeconds,
+  isHostKind,
+  hostFxId,
+  hostFxKind,
+  hostFxOrder,
+  registerHostFx,
+};

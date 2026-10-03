@@ -25,7 +25,7 @@
 
 import { uid } from '../../shared/swayproject.js';
 import { hasHost, postToHost } from '../host/host-channel.js';
-import { FX_KINDS } from '../../shared/trackfx.js';
+import { fxLabel } from '../../shared/trackfx.js';
 
 const $ = (sel) => document.querySelector(sel);
 const EDGE = 8; // px resize zone on clip edges
@@ -309,7 +309,7 @@ export function createTimeline({ transport, engine, store, onEdit, onSelect, onI
   function regionLabel(track, r) {
     if (r.fx === 'vst') return 'vst mix';
     const e = track.fx.find((x) => x.id === r.fx);
-    return e ? `${FX_KINDS[e.kind] ? FX_KINDS[e.kind].label : e.kind} · ${r.param}` : r.param;
+    return e ? `${fxLabel(e)} · ${r.param}` : r.param;
   }
 
   function renderAudio() {

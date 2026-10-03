@@ -16,7 +16,8 @@ import { createRouter } from './control/router.js';
 import { initFrames } from './ui/frame.js';
 import { openPopover, closePopover, popoverOpen, popoverAnchor, wirePopover } from './ui/popover.js';
 import { createHostBar } from './ui/hostbar.js';
-import { hostState, onHostEvent, framedByTheDAW, choosePluginFile } from './host/host-channel.js';
+import { hostState, onHostEvent, framedByTheDAW, choosePluginFile, hostCan, isFramed, HOST_CAP_RACK_FX } from './host/host-channel.js';
+import { adoptHostFx, hostVstReady, HOST_FX_KEY } from './audio/hostfx.js';
 import { displayPortName } from './midi/swaymap.js';
 import { createWave } from './ui/wave.js';
 import { createSurface } from './ui/surface.js';
@@ -375,6 +376,8 @@ async function restoreKit(saved) {
 
 function wireKit() {
   $('#btn-add-samples').addEventListener('click', addSamples);
+  // The kit's bus: its effects and VST3 plugins, in the panel on the right.
+  $('#btn-kit-fx').addEventListener('click', () => ui.timeline.selectTrack('bus-kit'));
   $('#sample-list').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-sample]');
     if (!btn) return;
@@ -463,6 +466,8 @@ function renderModMatrix() {
 }
 
 function wireSynth() {
+  // The synth's bus: its effects and VST3 plugins, in the panel on the right.
+  $('#btn-synth-fx').addEventListener('click', () => ui.timeline.selectTrack('bus-synth'));
   $('#synth-enable').addEventListener('change', (e) => {
     state.synthEnabled = e.target.checked;
     state.router.synthEnabled = e.target.checked;
@@ -1523,9 +1528,11 @@ async function main() {
   // Sampler, synth, and the timeline all feed the speakers AND the analyser,
   // so anything the instrument plays drives the visuals.
   const audioOuts = [state.audio.ctx.destination, state.audio.analyser];
-  state.sampler = createSampler(state.audio.ctx, audioOuts);
-  state.synth = createSynth(state.audio.ctx, audioOuts);
   state.transport = createTransport(state.audio.ctx, audioOuts);
+  // The kit and the synth play through their buses (each its own effect chain
+  // and VST3 chain) into the same master.
+  state.sampler = createSampler(state.audio.ctx, [state.transport.busInput('kit')]);
+  state.synth = createSynth(state.audio.ctx, [state.transport.busInput('synth')]);
 
   // Every MIDI event goes to the assignment router, one dispatch path for
   // hardware, keyboard pads, and the timeline alike.
@@ -1628,6 +1635,53 @@ async function main() {
     const at = req.at !== null ? req.at : state.transport.snapTime(state.transport.state.position);
     importAudio([{ path: req.path, name: req.name }], { at, trackId: req.trackId });
   });
+  // A host that lists 'rack-fx' has put its effect API on this window. Once it
+  // is adopted, every track's EFFECTS list offers the host's effects, and the
+  // entries a project already holds are built and heard.
+  const adoptRackFx = async () => {
+    if (!hostCan(HOST_CAP_RACK_FX)) return;
+    let api = null;
+    try {
+      api = window[HOST_FX_KEY];
+    } catch {
+      api = null;
+    }
+    if (!(await adoptHostFx(api, state.audio.ctx))) return;
+    try {
+      state.transport.refreshHostFx();
+      // A host that also runs VST3 plugins: every chain of the project starts live.
+      if (hostVstReady()) state.transport.refreshHostVst();
+      ui.assign.refresh();
+      ui.timeline.render();
+    } catch (err) {
+      console.warn('[hostfx] the host effects could not be put on the tracks:', err && err.message);
+    }
+  };
+  // What a live plugin says back: a state its window (or a save) captured
+  // belongs to the project; a status or a latency redraws its track's panel.
+  let liveRedraw = null;
+  const redrawLive = (track) => {
+    if (!track || liveRedraw) return;
+    liveRedraw = requestAnimationFrame(() => {
+      liveRedraw = null;
+      ui.assign.refreshLive(track.id);
+    });
+  };
+  state.transport.onVst({
+    onState: (track) => {
+      state.projectStore.markDirty();
+      redrawLive(track);
+    },
+    onChange: redrawLive,
+  });
+  onHostEvent('sway/host-ready', adoptRackFx);
+  adoptRackFx();
+  // The host's effect code lives in the host's page and outlives this frame:
+  // when the frame goes (a scene opened in theDAW reloads it), every track
+  // graph is disposed so no host effect is left running on a dead context.
+  if (isFramed()) {
+    window.addEventListener('pagehide', () => state.transport && state.transport.dispose());
+  }
   ui.layout = createLayout({ root: $('#cockpit'), settings: window.swaycommand.settings });
   ui.hostbar = createHostBar({
     project: () => state.projectStore.state,

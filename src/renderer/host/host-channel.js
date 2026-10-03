@@ -27,6 +27,9 @@
 // for a picked file, { path: null } for a cancel, { path: null, failure } when
 // the host cannot pick). A host that can answer lists 'plugin-file' in its
 // sway/host-ready caps; one that never answers is covered by a short wait.
+// A host that lists 'rack-fx' has put its effect API on this window
+// (window.theDAWHost: catalog, prepare, build), which audio/hostfx.js adopts so
+// every track's effect chain can hold the host's own effects.
 // Every addition is optional on both sides: a host that ignores caps keeps its
 // own bar, and a cockpit that never sends them gets today's two headers.
 
@@ -37,8 +40,12 @@ const PROTOCOL = 1;
  * the host's own bar into #topbar, so the host may hide its bar. 'host-scenes':
  * the cockpit shows the host's scene list and asks the host to open one.
  * 'host-plugin-file': the cockpit may ask the host to pick a .gan file.
+ * 'host-rack-fx': the cockpit plays the host's effects on its tracks.
  */
-export const HOST_CAPS = ['host-header', 'host-scenes', 'host-track-menu', 'host-plugin-file'];
+export const HOST_CAPS = ['host-header', 'host-scenes', 'host-track-menu', 'host-plugin-file', 'host-rack-fx'];
+
+/** The host cap that says its effect API is on this window. */
+export const HOST_CAP_RACK_FX = 'rack-fx';
 
 /** The host cap that says sway/choose-plugin-file gets an answer. */
 export const HOST_CAP_PLUGIN_FILE = 'plugin-file';

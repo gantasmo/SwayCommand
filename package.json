@@ -7,7 +7,7 @@
   "license": "MIT",
   "main": "src/main/main.js",
   "scripts": {
-    "test": "node scripts/test-blake2b.js && node scripts/test-minisign.js",
+    "test": "node scripts/test-blake2b.js && node scripts/test-minisign.js && node scripts/test-hostfx.js",
     "postinstall": "node scripts/ensure-electron.js",
     "hooks": "git config core.hooksPath .githooks",
     "ensure:electron": "node scripts/ensure-electron.js",
